@@ -49,7 +49,6 @@ class TodoModel extends ChangeNotifier {
         .collection("items")
         .add(item.toMap());
     item.id = ref.id;
-    _items.add(item);
     notifyListeners();
   }
 
@@ -65,7 +64,6 @@ class TodoModel extends ChangeNotifier {
   }
 
   deleteItem(Item item) async {
-    _items.remove(item);
     await firestore
         .collection("lists")
         .doc("myfirstlist")

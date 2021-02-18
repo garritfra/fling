@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="de.garritfra.fling">
    <application
-        android:label="fling"
+        android:label="Fling"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
