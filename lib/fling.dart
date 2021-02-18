@@ -66,9 +66,9 @@ class _TodoPageState extends State<TodoPage> {
                           newTodoController.clear();
                         },
                         decoration: InputDecoration(
-                            hintText: "Pasta",
+                            hintText: "Nudeln",
                             border: OutlineInputBorder(),
-                            labelText: "Add Item"),
+                            labelText: "Item hinzufügen"),
                       );
                     },
                   ),
