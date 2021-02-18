@@ -4,12 +4,21 @@ import 'package:fling/TodoModel.dart';
 import 'package:provider/provider.dart';
 
 class Item {
+  String id;
   String text;
   bool checked;
 
-  Item(String text) {
+  Item.withText(String text) {
+    // TODO: Will this cause errors?
+    this.id = "";
     this.checked = false;
     this.text = text;
+  }
+
+  Item({this.id, this.text, this.checked});
+
+  factory Item.fromMap(Map<String, dynamic> data) {
+    return Item(id: data["id"], checked: data["checked"], text: data["text"]);
   }
 }
 
