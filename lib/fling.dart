@@ -42,45 +42,49 @@ class _TodoPageState extends State<TodoPage> {
   Widget build(BuildContext context) {
     TodoModel model = context.watch<TodoModel>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: SizedBox(
-          width: 600.0,
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
-                // TODO: use subscribed model in state
-                child: Consumer<TodoModel>(
-                  builder: (context, model, child) {
-                    return TextField(
-                      controller: newTodoController,
-                      onSubmitted: (value) {
-                        model.addItem(value);
-                        newTodoController.clear();
-                      },
-                      decoration: InputDecoration(
-                          hintText: "Pasta",
-                          border: OutlineInputBorder(),
-                          labelText: "Add Item"),
-                    );
-                  },
+    return MaterialApp(
+      theme: ThemeData.dark(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: SizedBox(
+            width: 600.0,
+            child: Column(
+              children: [
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
+                  // TODO: use subscribed model in state
+                  child: Consumer<TodoModel>(
+                    builder: (context, model, child) {
+                      return TextField(
+                        controller: newTodoController,
+                        onSubmitted: (value) {
+                          model.addItem(value);
+                          newTodoController.clear();
+                        },
+                        decoration: InputDecoration(
+                            hintText: "Pasta",
+                            border: OutlineInputBorder(),
+                            labelText: "Add Item"),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                    key: UniqueKey(),
-                    itemCount: model.items.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      Item todo = model.items.elementAt(index);
-                      return ItemView(todo);
-                    }),
-              ),
-            ],
+                Expanded(
+                  child: ListView.builder(
+                      key: UniqueKey(),
+                      itemCount: model.items.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        Item todo = model.items.elementAt(index);
+                        return ItemView(todo);
+                      }),
+                ),
+              ],
+            ),
           ),
         ),
       ),
