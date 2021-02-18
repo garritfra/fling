@@ -20,6 +20,13 @@ class Item {
   factory Item.fromMap(Map<String, dynamic> data) {
     return Item(id: data["id"], checked: data["checked"], text: data["text"]);
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "checked": checked,
+      "text": text,
+    };
+  }
 }
 
 class ItemView extends StatefulWidget {

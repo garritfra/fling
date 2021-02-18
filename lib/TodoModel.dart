@@ -33,15 +33,28 @@ class TodoModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addItem(String text) {
+  void addItem(String text) async {
     Item item =
         new Item(checked: false, id: text.hashCode.toString(), text: text);
+
+    var ref = await firestore
+        .collection("lists")
+        .doc("myfirstlist")
+        .collection("items")
+        .add(item.toMap());
+    item.id = ref.id;
     _items.add(item);
     notifyListeners();
   }
 
-  void toggleItem(Item item) {
+  void toggleItem(Item item) async {
     item.checked = !item.checked;
+    await firestore
+        .collection("lists")
+        .doc("myfirstlist")
+        .collection("items")
+        .doc(item.id)
+        .set(item.toMap());
     notifyListeners();
   }
 
