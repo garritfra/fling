@@ -11,6 +11,12 @@ class TodoModel extends ChangeNotifier {
   UnmodifiableListView<Item> get items => UnmodifiableListView(_items);
 
   TodoModel() {
+    firestore
+        .collection("lists")
+        .doc("myfirstlist")
+        .collection("items")
+        .snapshots()
+        .listen((event) => init());
     init();
   }
 
