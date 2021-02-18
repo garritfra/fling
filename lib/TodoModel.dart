@@ -58,8 +58,14 @@ class TodoModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  deleteItem(Item item) {
+  deleteItem(Item item) async {
     _items.remove(item);
+    await firestore
+        .collection("lists")
+        .doc("myfirstlist")
+        .collection("items")
+        .doc(item.id)
+        .delete();
     notifyListeners();
   }
 }
