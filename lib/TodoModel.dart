@@ -8,7 +8,10 @@ class TodoModel extends ChangeNotifier {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // Expose items as immutable
-  UnmodifiableListView<Item> get items => UnmodifiableListView(_items);
+  UnmodifiableListView<Item> get items {
+    _items.sort((i1, i2) => i1.text.toLowerCase().compareTo(i2.text.toLowerCase()));
+    return UnmodifiableListView(_items);
+  }
 
   TodoModel() {
     firestore
