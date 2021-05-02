@@ -14,3 +14,10 @@ To compile this project, you have to do the following:
     * **Android**: Copy google-services.json into `android/app/google-services.json`
     * **iOS**: TODO
 4. Run the app via `flutter run`
+
+## Release Workflow
+
+1. Update version info in `pubspec.yaml`
+1. Commit with name of version
+1. `git tag -a <new tag> -m "$(git shortlog <previous tag>..HEAD)"`
+1. `git push --tags`
