@@ -30,6 +30,13 @@ class TodoPage extends StatefulWidget {
 
 class _TodoPageState extends State<TodoPage> {
   final newTodoController = TextEditingController();
+  ScrollController _scrollController;
+
+  @override
+  void initState() {
+    _scrollController = ScrollController(keepScrollOffset: true);
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -94,7 +101,8 @@ class _TodoPageState extends State<TodoPage> {
                               .toList();
 
                           return ListView(
-                            key: UniqueKey(),
+                            key: PageStorageKey<String>("items"),
+                            controller: _scrollController,
                             children: items.map((Item item) {
                               return ItemView(item);
                             }).toList(),
