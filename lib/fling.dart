@@ -93,10 +93,6 @@ class _TodoPageState extends State<TodoPage> {
                                   Item.fromMap({"id": doc.id, ...doc.data()}))
                               .toList();
 
-                          items.sort((Item i1, Item i2) => i1.text
-                              .toLowerCase()
-                              .compareTo(i2.text.toLowerCase()));
-
                           return ListView(
                             key: UniqueKey(),
                             children: items.map((Item item) {
