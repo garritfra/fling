@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'TodoModel.dart';
@@ -74,15 +75,35 @@ class _TodoPageState extends State<TodoPage> {
                   ),
                 ),
                 Expanded(
-                  child: ListView.builder(
-                      key: UniqueKey(),
-                      itemCount: model.items.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        Item todo = model.items.elementAt(index);
-                        return ItemView(todo);
-                      }),
-                ),
+                    child: StreamBuilder(
+                        stream: model.items,
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError || !snapshot.hasData) {
+                            return Text(
+                                "Etwas ist Schiefgegangen: ${snapshot.error}");
+                          }
+
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          }
+
+                          List<Item> items = snapshot.data.docs
+                              .map<Item>((QueryDocumentSnapshot doc) =>
+                                  Item.fromMap({"id": doc.id, ...doc.data()}))
+                              .toList();
+
+                          items.sort((Item i1, Item i2) => i1.text
+                              .toLowerCase()
+                              .compareTo(i2.text.toLowerCase()));
+
+                          return ListView(
+                            key: UniqueKey(),
+                            children: items.map((Item item) {
+                              return ItemView(item);
+                            }).toList(),
+                          );
+                        })),
               ],
             ),
           ),

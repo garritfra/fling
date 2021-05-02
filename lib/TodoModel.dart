@@ -4,55 +4,28 @@ import 'package:flutter/foundation.dart';
 import 'package:fling/item.dart';
 
 class TodoModel extends ChangeNotifier {
-  List<Item> _items = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  // Expose items as immutable
-  UnmodifiableListView<Item> get items {
-    _items.sort((i1, i2) => i1.text.toLowerCase().compareTo(i2.text.toLowerCase()));
-    return UnmodifiableListView(_items);
-  }
-
-  TodoModel() {
-    firestore
+  Stream<QuerySnapshot> get items {
+    return firestore
         .collection("lists")
         .doc("myfirstlist")
         .collection("items")
-        .snapshots()
-        .listen((event) => init());
-    init();
-  }
-
-  Future init() async {
-    var snapshot = await firestore
-        .collection("lists")
-        .doc("myfirstlist")
-        .collection("items")
-        .get();
-    List<Item> fetchedItems = [];
-    for (var entry in snapshot.docs) {
-      var data = entry.data();
-      Item item =
-          Item(id: entry.id, checked: data["checked"], text: data["text"]);
-      fetchedItems.add(item);
-    }
-
-    _items = fetchedItems;
-
-    notifyListeners();
+        .snapshots();
   }
 
   void addItem(String text) async {
     Item item =
         new Item(checked: false, id: text.hashCode.toString(), text: text);
 
-    var ref = await firestore
+    var collection = await firestore
         .collection("lists")
         .doc("myfirstlist")
-        .collection("items")
-        .add(item.toMap());
+        .collection("items");
+
+    var ref = await collection.add(item.toMap());
     item.id = ref.id;
-    notifyListeners();
+    collection.doc(item.id).set(item.toMap());
   }
 
   void toggleItem(Item item) async {
@@ -62,17 +35,15 @@ class TodoModel extends ChangeNotifier {
         .doc("myfirstlist")
         .collection("items")
         .doc(item.id)
-        .set(item.toMap());
-    notifyListeners();
+        .update(item.toMap());
   }
 
   deleteItem(Item item) async {
-    await firestore
+    var ref = firestore
         .collection("lists")
         .doc("myfirstlist")
         .collection("items")
-        .doc(item.id)
-        .delete();
-    notifyListeners();
+        .doc(item.id);
+    await ref.delete();
   }
 }
