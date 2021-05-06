@@ -46,7 +46,6 @@ class _ItemViewState extends State<ItemView> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      key: UniqueKey(),
       child: Consumer<TodoModel>(
         builder: (context, model, child) {
           return ListTile(

@@ -3,13 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fling/item.dart';
 
+String listName = "myfirstlist";
+
 class TodoModel extends ChangeNotifier {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Stream<QuerySnapshot> get items {
     return firestore
         .collection("lists")
-        .doc("myfirstlist")
+        .doc(listName)
         .collection("items")
         .orderBy("text")
         .snapshots();
@@ -19,10 +21,8 @@ class TodoModel extends ChangeNotifier {
     Item item =
         new Item(checked: false, id: text.hashCode.toString(), text: text);
 
-    var collection = await firestore
-        .collection("lists")
-        .doc("myfirstlist")
-        .collection("items");
+    var collection =
+        firestore.collection("lists").doc(listName).collection("items");
 
     var ref = await collection.add(item.toMap());
     item.id = ref.id;
@@ -33,7 +33,7 @@ class TodoModel extends ChangeNotifier {
     item.checked = !item.checked;
     await firestore
         .collection("lists")
-        .doc("myfirstlist")
+        .doc(listName)
         .collection("items")
         .doc(item.id)
         .update(item.toMap());
@@ -42,7 +42,7 @@ class TodoModel extends ChangeNotifier {
   deleteItem(Item item) async {
     var ref = firestore
         .collection("lists")
-        .doc("myfirstlist")
+        .doc(listName)
         .collection("items")
         .doc(item.id);
     await ref.delete();

@@ -100,13 +100,13 @@ class _TodoPageState extends State<TodoPage> {
                                   Item.fromMap({"id": doc.id, ...doc.data()}))
                               .toList();
 
-                          return ListView(
-                            key: PageStorageKey<String>("items"),
-                            controller: _scrollController,
-                            children: items.map((Item item) {
-                              return ItemView(item);
-                            }).toList(),
-                          );
+                          return ListView.builder(
+                              itemCount: items.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                Item item = items.elementAt(index);
+                                return Container(
+                                    key: Key(item.id), child: ItemView(item));
+                              });
                         })),
               ],
             ),
