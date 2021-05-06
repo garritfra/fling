@@ -47,4 +47,18 @@ class TodoModel extends ChangeNotifier {
         .doc(item.id);
     await ref.delete();
   }
+
+  void deleteChecked() async {
+    WriteBatch batch = firestore.batch();
+    await firestore
+        .collection("lists")
+        .doc(listName)
+        .collection("items")
+        .where("checked", isEqualTo: true)
+        .get()
+        .then((values) => values.docs
+            .forEach((snapshot) => batch.delete(snapshot.reference)));
+
+    await batch.commit();
+  }
 }

@@ -55,6 +55,12 @@ class _TodoPageState extends State<TodoPage> {
       home: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.delete),
+                color: Colors.red,
+                onPressed: () => model.deleteChecked())
+          ],
         ),
         body: Center(
           child: SizedBox(
