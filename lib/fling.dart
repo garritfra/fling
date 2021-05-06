@@ -104,8 +104,11 @@ class _TodoPageState extends State<TodoPage> {
                               itemCount: items.length,
                               itemBuilder: (BuildContext context, int index) {
                                 Item item = items.elementAt(index);
-                                return Container(
-                                    key: Key(item.id), child: ItemView(item));
+                                return Dismissible(
+                                    onDismissed: (direction) =>
+                                        model.deleteItem(item),
+                                    key: Key(item.id),
+                                    child: ItemView(item));
                               });
                         })),
               ],

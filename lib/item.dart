@@ -56,11 +56,6 @@ class _ItemViewState extends State<ItemView> {
               },
             ),
             title: Text(widget.todo.text),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              color: Colors.red,
-              onPressed: () => model.deleteItem(todo),
-            ),
           );
         },
       ),

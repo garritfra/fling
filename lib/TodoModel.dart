@@ -39,7 +39,7 @@ class TodoModel extends ChangeNotifier {
         .update(item.toMap());
   }
 
-  deleteItem(Item item) async {
+  void deleteItem(Item item) async {
     var ref = firestore
         .collection("lists")
         .doc(listName)
