@@ -58,10 +58,10 @@ class _TodoPageState extends State<TodoPage> {
     }
 
     Widget _buildAppBar() {
-     return AppBar(
-          title: Text(widget.title),
-          actions: [_buildDeleteButton()],
-        ) 
+      return AppBar(
+        title: Text(widget.title),
+        actions: [_buildDeleteButton()],
+      );
     }
 
     Widget _buildItemTextField() {
