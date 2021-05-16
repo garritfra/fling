@@ -79,33 +79,40 @@ class _ShoppingListState extends State<ShoppingList> {
     }
 
     Widget _buildItemList() {
-      return Expanded(
-          child: StreamBuilder(
-              stream: model.items,
-              builder: (context, snapshot) {
-                if (snapshot.hasError || !snapshot.hasData) {
-                  return Text("Etwas ist Schiefgegangen: ${snapshot.error}");
-                }
+      return FutureBuilder(
+          future: model.listName,
+          builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+            String listName = snapshot.data;
+            return Expanded(
+                child: StreamBuilder(
+                    stream: model.getItemsInList(listName),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError || !snapshot.hasData) {
+                        return Text(
+                            "Etwas ist Schiefgegangen: ${snapshot.error}");
+                      }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                }
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
 
-                List<Item> items = snapshot.data.docs
-                    .map<Item>((QueryDocumentSnapshot doc) =>
-                        Item.fromMap({"id": doc.id, ...doc.data()}))
-                    .toList();
+                      List<Item> items = snapshot.data.docs
+                          .map<Item>((QueryDocumentSnapshot doc) =>
+                              Item.fromMap({"id": doc.id, ...doc.data()}))
+                          .toList();
 
-                return ListView.builder(
-                    itemCount: items.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      Item item = items.elementAt(index);
-                      return Dismissible(
-                          onDismissed: (direction) => model.deleteItem(item),
-                          key: Key(item.id),
-                          child: ItemView(item));
-                    });
-              }));
+                      return ListView.builder(
+                          itemCount: items.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            Item item = items.elementAt(index);
+                            return Dismissible(
+                                onDismissed: (direction) =>
+                                    model.deleteItem(item),
+                                key: Key(item.id),
+                                child: ItemView(item));
+                          });
+                    }));
+          });
     }
 
     return MaterialApp(
