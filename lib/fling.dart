@@ -1,3 +1,4 @@
+import 'package:fling/config.dart';
 import 'package:flutter/material.dart';
 import 'shopping_list.dart';
 
@@ -7,6 +8,9 @@ class FlingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fling',
+      routes: <String, WidgetBuilder>{
+        '/settings': (context) => ConfigPage(),
+      },
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,

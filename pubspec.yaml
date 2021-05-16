@@ -24,6 +24,7 @@ dependencies:
   provider: "^4.3.3"
   firebase_core: "0.7.0"
   cloud_firestore: "^0.16.0"
+  localstorage: ^4.0.0+1
   flutter:
     sdk: flutter
 

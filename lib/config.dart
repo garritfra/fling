@@ -9,8 +9,8 @@ class ConfigPage extends StatefulWidget {
 }
 
 class _ConfigPageState extends State<ConfigPage> {
-  final storage = new LocalStorage("Fling");
-  List<dynamic> _knownLists = ["myfirstlist"];
+  final storage = new LocalStorage("fling.json");
+  List<String> _knownLists = ["myfirstlist"];
   String _currentList = "";
 
   final _nameTextController = TextEditingController();
@@ -36,22 +36,36 @@ class _ConfigPageState extends State<ConfigPage> {
       _currentList = _knownLists.first;
     }
 
-    List<dynamic> knownLists = json.decode(storage.getItem("known_lists"));
+    final String listKey = "known_lists";
+
+    _ensureKnownListsSet(listKey);
+
+    var rawLists = storage.getItem("known_lists");
+
+    List<dynamic> knownLists = json.decode(rawLists);
+
     if (knownLists == null) {
       setState(() {
         _knownLists = [];
       });
     } else {
       setState(() {
-        _knownLists = knownLists;
+        _knownLists = knownLists.map((el) => el.toString()).toList();
       });
+    }
+  }
+
+  void _ensureKnownListsSet(String listKey) {
+    if (storage.getItem(listKey) == null) {
+      storage.setItem(listKey, json.encode(['myfirstlist']));
     }
   }
 
   void _addListToKnown(String list) {
     var oldKnown = storage.getItem("known_lists");
     if (oldKnown == null) oldKnown = "[]";
-    List<dynamic> known = json.decode(oldKnown);
+    List<String> known =
+        json.decode(oldKnown).map<String>((el) => el.toString()).toList();
     if (!known.contains(list)) known.add(list);
     storage.setItem("known_lists", json.encode(known));
     setState(() {
@@ -94,18 +108,22 @@ class _ConfigPageState extends State<ConfigPage> {
                       padding: EdgeInsets.all(5.0),
                       child: Row(
                         children: [
-                          DropdownButton(
+                          DropdownButton<String>(
                             hint: Text("Liste"),
-                            value: DropdownMenuItem(
-                              child: Text(_knownLists
-                                  .firstWhere((item) => item == _currentList)),
-                            ),
+                            value: _currentList,
                             items: _knownLists
-                                .map(
-                                    (lst) => DropdownMenuItem(child: Text(lst)))
-                                .toList(),
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
                             onChanged: (value) {
-                              storage.setItem("list", value);
+                              storage.setItem("list", value).then((_) {
+                                setState(() {
+                                  _currentList = value;
+                                });
+                              });
                             },
                           ),
                           Expanded(
@@ -122,6 +140,7 @@ class _ConfigPageState extends State<ConfigPage> {
                             onPressed: () {
                               if (_newListController.text.isNotEmpty) {
                                 _addListToKnown(_newListController.text);
+                                _newListController.clear();
                               }
                             },
                           )

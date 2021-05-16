@@ -43,10 +43,16 @@ class _ShoppingListState extends State<ShoppingList> {
           onPressed: () => model.deleteChecked());
     }
 
+    Widget _buildPreferencesButton() {
+      return IconButton(
+          icon: Icon(Icons.settings),
+          onPressed: () => {Navigator.pushNamed(context, '/settings')});
+    }
+
     Widget _buildAppBar() {
       return AppBar(
         title: Text(widget.title),
-        actions: [_buildDeleteButton()],
+        actions: [_buildDeleteButton(), _buildPreferencesButton()],
       );
     }
 
