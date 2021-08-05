@@ -21,6 +21,7 @@ class TodoModel extends ChangeNotifier {
         .collection("lists")
         .doc(list)
         .collection("items")
+        .orderBy("checked")
         .orderBy("text")
         .snapshots();
   }
