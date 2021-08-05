@@ -4,14 +4,18 @@ import 'package:flutter/foundation.dart';
 import 'package:fling/item.dart';
 import 'package:localstorage/localstorage.dart';
 
-String listName = "myfirstlist";
-
 class TodoModel extends ChangeNotifier {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final storage = new LocalStorage("fling.json");
 
   Future<String> get listName async {
     await storage.ready;
+
+
+    var item = await storage.getItem("list");
+    if (item == null) {
+      await storage.setItem("list", "myfirstlist");
+    }
 
     return storage.getItem("list");
   }
