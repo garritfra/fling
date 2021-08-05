@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fling/feature_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -52,7 +53,10 @@ class _ShoppingListState extends State<ShoppingList> {
     Widget _buildAppBar() {
       return AppBar(
         title: Text(widget.title),
-        actions: [_buildDeleteButton(), _buildPreferencesButton()],
+        actions: [
+          _buildDeleteButton(),
+          if (FeatureManager.SETTINGS.isEnabled) _buildPreferencesButton()
+        ],
       );
     }
 

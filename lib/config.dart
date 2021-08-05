@@ -83,6 +83,49 @@ class _ConfigPageState extends State<ConfigPage> {
 
   @override
   Widget build(BuildContext context) {
+    _showAddListDialog() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Liste hinzufügen"),
+            content: Expanded(
+              child: Container(
+                child: TextField(
+                  controller: _newListController,
+                  decoration: InputDecoration(border: OutlineInputBorder()),
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                  child: Text('Abbrechen'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  }),
+              TextButton(
+                  child: Text('Hinzufügen'),
+                  onPressed: () {
+                    // Hier passiert etwas
+                    Navigator.of(context).pop();
+                    if (_newListController.text.isNotEmpty) {
+                      _addListToKnown(_newListController.text);
+                      _newListController.clear();
+                    }
+                  }),
+            ],
+          );
+        },
+      );
+    }
+
+    _buildAddListDialog() {
+      return IconButton(
+        icon: Icon(Icons.add),
+        onPressed: _showAddListDialog,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Einstellungen"),
@@ -126,24 +169,7 @@ class _ConfigPageState extends State<ConfigPage> {
                               });
                             },
                           ),
-                          Expanded(
-                            child: Container(
-                              child: TextField(
-                                controller: _newListController,
-                                decoration: InputDecoration(
-                                    border: OutlineInputBorder()),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {
-                              if (_newListController.text.isNotEmpty) {
-                                _addListToKnown(_newListController.text);
-                                _newListController.clear();
-                              }
-                            },
-                          )
+                          _buildAddListDialog(),
                         ],
                       )),
                 ),
