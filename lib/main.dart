@@ -1,8 +1,8 @@
-import 'package:fling/fling.dart';
-import 'package:flutter/material.dart';
-import 'package:fling/TodoModel.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fling/model/shopping_list.dart';
+import 'package:fling/ui/fling.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +19,7 @@ class FirebaseContainer extends StatelessWidget {
           print("Firebase connection state: ${snapshot.connectionState}");
           if (snapshot.connectionState == ConnectionState.done) {
             return ChangeNotifierProvider(
-                create: (BuildContext context) => TodoModel(),
+                create: (BuildContext context) => TodoListModel(),
                 child: FlingApp());
           } else {
             return Container(

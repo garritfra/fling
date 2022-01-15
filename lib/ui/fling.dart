@@ -1,6 +1,6 @@
-import 'package:fling/config.dart';
+import 'package:fling/ui/config.dart';
+import 'package:fling/ui/shopping_list.dart';
 import 'package:flutter/material.dart';
-import 'shopping_list.dart';
 
 class FlingApp extends StatelessWidget {
   // This widget is the root of your application.

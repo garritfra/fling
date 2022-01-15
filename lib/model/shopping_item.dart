@@ -1,6 +1,5 @@
+import 'package:fling/model/shopping_list.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:fling/TodoModel.dart';
 import 'package:provider/provider.dart';
 
 class Item {
@@ -31,6 +30,7 @@ class Item {
 
 class ItemView extends StatefulWidget {
   final Item todo;
+
   ItemView(this.todo);
 
   @override
@@ -39,6 +39,7 @@ class ItemView extends StatefulWidget {
 
 class _ItemViewState extends State<ItemView> {
   Item todo;
+
   _ItemViewState(Item todo) {
     this.todo = todo;
   }
@@ -46,7 +47,7 @@ class _ItemViewState extends State<ItemView> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: Consumer<TodoModel>(
+      child: Consumer<TodoListModel>(
         builder: (context, model, child) {
           return ListTile(
             leading: Checkbox(
