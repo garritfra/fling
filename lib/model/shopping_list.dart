@@ -7,33 +7,39 @@ class TodoListModel extends ChangeNotifier {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final storage = new LocalStorage("fling.json");
 
-  Future<String> get listName async {
+  Future<String> get household async {
     await storage.ready;
 
-    var item = await storage.getItem("list");
-    if (item == null) {
-      await storage.setItem("list", "myfirstlist");
+    var household = await storage.getItem("household");
+    if (household == null) {
+      await storage.setItem("household", "liaundgarrit");
     }
 
-    return storage.getItem("list");
+    return storage.getItem("household");
   }
 
-  Stream<QuerySnapshot> getItemsInList(String list) {
+  Stream<QuerySnapshot> getItemsInList(String household) {
     return firestore
-        .collection("lists")
-        .doc(list)
-        .collection("items")
+        .collection("households")
+        .doc(household)
+        .collection("shoppinglist")
         .orderBy("checked")
         .orderBy("text")
         .snapshots();
+  }
+
+  Future<CollectionReference> get shoppingList async {
+    return firestore
+        .collection("households")
+        .doc(await household)
+        .collection("shoppinglist");
   }
 
   void addItem(String text) async {
     Item item =
         new Item(checked: false, id: text.hashCode.toString(), text: text);
 
-    var collection =
-        firestore.collection("lists").doc(await listName).collection("items");
+    var collection = await shoppingList;
 
     var ref = await collection.add(item.toMap());
     item.id = ref.id;
@@ -42,32 +48,18 @@ class TodoListModel extends ChangeNotifier {
 
   void toggleItem(Item item) async {
     item.checked = !item.checked;
-    await firestore
-        .collection("lists")
-        .doc(await listName)
-        .collection("items")
-        .doc(item.id)
-        .update(item.toMap());
+    await (await shoppingList).doc(item.id).update(item.toMap());
   }
 
   void deleteItem(Item item) async {
-    var ref = firestore
-        .collection("lists")
-        .doc(await listName)
-        .collection("items")
-        .doc(item.id);
+    var ref = (await shoppingList).doc(item.id);
     await ref.delete();
   }
 
   void deleteChecked() async {
     WriteBatch batch = firestore.batch();
-    await firestore
-        .collection("lists")
-        .doc(await listName)
-        .collection("items")
-        .where("checked", isEqualTo: true)
-        .get()
-        .then((values) => values.docs
+    await (await shoppingList).where("checked", isEqualTo: true).get().then(
+        (values) => values.docs
             .forEach((snapshot) => batch.delete(snapshot.reference)));
 
     await batch.commit();

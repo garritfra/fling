@@ -6,5 +6,5 @@ class Feature {
 }
 
 class FeatureManager {
-  static final Feature settings = Feature(name: "Settings", isEnabled: false);
+  static final Feature settings = Feature(name: "Settings", isEnabled: true);
 }

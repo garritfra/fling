@@ -81,7 +81,7 @@ class _ShoppingListState extends State<ShoppingList> {
 
     Widget _buildItemList() {
       return FutureBuilder(
-          future: model.listName,
+          future: model.household,
           builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
             String listName = snapshot.data;
             return Expanded(
