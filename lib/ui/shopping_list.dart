@@ -106,11 +106,19 @@ class _ShoppingListState extends State<ShoppingList> {
                           itemCount: items.length,
                           itemBuilder: (BuildContext context, int index) {
                             Item item = items.elementAt(index);
-                            return Dismissible(
-                                onDismissed: (direction) =>
-                                    model.deleteItem(item),
-                                key: Key(item.id),
-                                child: ItemView(item));
+
+                            Widget itemView = ItemView(item);
+
+                            if (item.checked) {
+                              return Dismissible(
+                                  onDismissed: (direction) =>
+                                      model.deleteItem(item),
+                                  key: Key(item.id),
+                                  child: itemView);
+                            } else {
+                              return Container(
+                                  key: Key(item.id), child: itemView);
+                            }
                           });
                     }));
           });
