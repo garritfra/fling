@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:localstorage/localstorage.dart';
 
@@ -50,16 +49,16 @@ class _ConfigPageState extends State<ConfigPage> {
         title: Text("Einstellungen"),
       ),
       body: Container(
+        padding: EdgeInsets.all(16.0),
         child: Center(
           child: SizedBox(
             width: 400,
-            child: ListView(
+            child: Column(
               children: [
                 Row(
                   children: [
                     Expanded(
                       child: Container(
-                        padding: EdgeInsets.all(5.0),
                         child: TextField(
                           controller: _nameTextController,
                           decoration: InputDecoration(
@@ -70,11 +69,11 @@ class _ConfigPageState extends State<ConfigPage> {
                     ),
                   ],
                 ),
+                Padding(padding: EdgeInsets.all(8.0)),
                 Row(
                   children: [
                     Expanded(
                       child: Container(
-                        padding: EdgeInsets.all(5.0),
                         child: TextField(
                           controller: _householdTextController,
                           decoration: InputDecoration(
@@ -86,7 +85,6 @@ class _ConfigPageState extends State<ConfigPage> {
                   ],
                 ),
                 Container(
-                  padding: EdgeInsets.all(5.0),
                   child: ElevatedButton(
                     onPressed: _onSubmit,
                     child: Text("Save"),

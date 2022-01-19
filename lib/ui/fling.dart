@@ -7,14 +7,11 @@ class FlingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData.dark(),
       title: 'Fling',
       routes: <String, WidgetBuilder>{
         '/settings': (context) => ConfigPage(),
       },
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
       home: ShoppingList(title: 'Fling'),
     );
   }

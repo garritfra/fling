@@ -116,16 +116,13 @@ class _ShoppingListState extends State<ShoppingList> {
           });
     }
 
-    return MaterialApp(
-      theme: ThemeData.dark(),
-      home: Scaffold(
-        appBar: _buildAppBar(),
-        body: Center(
-          child: SizedBox(
-            width: 600.0,
-            child: Column(
-              children: [_buildItemTextField(), _buildItemList()],
-            ),
+    return Scaffold(
+      appBar: _buildAppBar(),
+      body: Center(
+        child: SizedBox(
+          width: 600.0,
+          child: Column(
+            children: [_buildItemTextField(), _buildItemList()],
           ),
         ),
       ),
