@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fling/feature_manager.dart';
 import 'package:fling/model/shopping_item.dart';
 import 'package:fling/model/shopping_list.dart';
+import 'package:fling/ui/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -44,7 +45,7 @@ class _ShoppingListState extends State<ShoppingList> {
     Widget _buildPreferencesButton() {
       return IconButton(
           icon: Icon(Icons.settings),
-          onPressed: () => {Navigator.pushNamed(context, '/settings')});
+          onPressed: () => {Navigator.pushNamed(context, '/config')});
     }
 
     Widget _buildAppBar() {
@@ -126,6 +127,7 @@ class _ShoppingListState extends State<ShoppingList> {
 
     return Scaffold(
       appBar: _buildAppBar(),
+      drawer: FlingDrawer(),
       body: Center(
         child: SizedBox(
           width: 600.0,
