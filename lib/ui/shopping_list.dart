@@ -100,7 +100,10 @@ class _ShoppingListState extends State<ShoppingList> {
 
                       List<Item> items = snapshot.data.docs
                           .map<Item>((QueryDocumentSnapshot doc) =>
-                              Item.fromMap({"id": doc.id, ...doc.data()}))
+                              Item.fromMap({
+                                "id": doc.id,
+                                ...doc.data() as Map<String, dynamic>
+                              }))
                           .toList();
 
                       return ListView.builder(
