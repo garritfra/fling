@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fba;
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'firebase_options.dart';
 
-import 'pages/login.dart';
 import 'pages/home.dart';
 
 Future<void> main() async {
@@ -17,14 +18,26 @@ Future<void> main() async {
 class FlingApp extends StatelessWidget {
   const FlingApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var providers = [EmailAuthProvider()];
+
     return MaterialApp(
       theme: ThemeData.dark(),
       title: 'Fling',
+      initialRoute:
+          fba.FirebaseAuth.instance.currentUser == null ? '/login' : '/',
       routes: <String, WidgetBuilder>{
-        '/login': (context) => const LoginPage(),
+        '/login': (context) {
+          return SignInScreen(
+            providers: providers,
+            actions: [
+              AuthStateChangeAction<SignedIn>((context, state) {
+                Navigator.pushReplacementNamed(context, '/');
+              }),
+            ],
+          );
+        },
       },
       home: const HomePage(),
     );
