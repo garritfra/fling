@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class FlingDrawer extends StatelessWidget {
@@ -10,7 +9,7 @@ class FlingDrawer extends StatelessWidget {
     String? email = FirebaseAuth.instance.currentUser?.email;
     String? username = FirebaseAuth.instance.currentUser?.displayName;
 
-    _buildHeader() {
+    buildHeader() {
       return UserAccountsDrawerHeader(
         decoration: const BoxDecoration(
           color: Colors.blue,
@@ -28,9 +27,9 @@ class FlingDrawer extends StatelessWidget {
         // Important: Remove any padding from the ListView.
         padding: EdgeInsets.zero,
         children: [
-          _buildHeader(),
+          buildHeader(),
           ListTile(
-            title: const Text('Einkaufsliste'),
+            title: const Text('Home'),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushReplacementNamed(context, '/');
@@ -40,8 +39,8 @@ class FlingDrawer extends StatelessWidget {
             height: 2.0,
           ),
           ListTile(
-            leading: Icon(Icons.logout),
-            title: Text("Logout"),
+            leading: const Icon(Icons.logout),
+            title: const Text("Logout"),
             onTap: () {
               FirebaseAuth.instance.signOut();
               Navigator.popUntil(context, (route) => route.isFirst);

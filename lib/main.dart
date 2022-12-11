@@ -1,7 +1,9 @@
+import 'package:fling/data/data/user.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fba;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 import 'pages/home.dart';
@@ -12,7 +14,11 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const FlingApp());
+  FlingUser? user = await FlingUser.currentUser;
+
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider<FlingUser?>(create: (context) => user)
+  ], child: const FlingApp()));
 }
 
 class FlingApp extends StatelessWidget {
