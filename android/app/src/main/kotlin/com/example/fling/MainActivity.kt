@@ -1,4 +1,4 @@
-package de.garritfra.fling
+package com.example.fling
 
 import io.flutter.embedding.android.FlutterActivity
 
