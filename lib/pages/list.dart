@@ -64,8 +64,34 @@ class _ListPageState extends State<ListPage> {
     }
 
     Widget _buildListItem(ListItem item) {
+      var textController = TextEditingController(text: item.text);
       return Card(
         child: ListTile(
+          onTap: () => showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Eintrag bearbeiten'),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text("Abbrechen")),
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      list.addItem(textController.text);
+                      list.deleteItem(item);
+                    },
+                    child: Text("Fertig")),
+              ],
+              content: TextField(
+                controller: textController,
+                autofocus: true,
+                decoration: const InputDecoration(hintText: "Name"),
+              ),
+            ),
+          ),
           leading: Checkbox(
             value: item.checked,
             onChanged: (checked) {
