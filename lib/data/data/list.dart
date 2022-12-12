@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fling/data/data/household.dart';
 import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
+
+import 'list_item.dart';
 
 class FlingListModel extends ChangeNotifier {
   String id;
@@ -35,7 +35,8 @@ class FlingListModel extends ChangeNotifier {
   }
 
   void addItem(String text) async {
-    Item item = Item(checked: false, id: text.hashCode.toString(), text: text);
+    ListItem item =
+        ListItem(checked: false, id: text.hashCode.toString(), text: text);
 
     var items = ref.collection("items");
 
@@ -44,12 +45,12 @@ class FlingListModel extends ChangeNotifier {
     items.doc(item.id).set(item.toMap());
   }
 
-  void toggleItem(Item item) async {
+  void toggleItem(ListItem item) async {
     item.checked = !item.checked;
     await ref.collection("items").doc(item.id).update(item.toMap());
   }
 
-  void deleteItem(Item item) async {
+  void deleteItem(ListItem item) async {
     var itemRef = ref.collection("items").doc(item.id);
     await itemRef.delete();
   }
@@ -61,30 +62,5 @@ class FlingListModel extends ChangeNotifier {
             .forEach((snapshot) => batch.delete(snapshot.reference)));
 
     await batch.commit();
-  }
-}
-
-class Item {
-  late String id;
-  String text;
-  late bool checked;
-
-  Item.withText(this.text) {
-    // TODO: Will this cause errors?
-    id = "";
-    checked = false;
-  }
-
-  Item({required this.id, required this.text, required this.checked});
-
-  factory Item.fromMap(Map<String, dynamic> data) {
-    return Item(id: data["id"], checked: data["checked"], text: data["text"]);
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      "checked": checked,
-      "text": text,
-    };
   }
 }
