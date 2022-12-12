@@ -1,6 +1,4 @@
-## Bugs
-- [ ] Disable swipe deletion for unchecked items
-
 ## Features
+- [ ] Lock symbol for list
 - [ ] Recipes
 - [ ] Finances
