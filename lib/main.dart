@@ -1,4 +1,5 @@
 import 'package:fling/data/data/user.dart';
+import 'package:fling/pages/list.dart';
 import 'package:fling/pages/lists.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -45,7 +46,8 @@ class FlingApp extends StatelessWidget {
             ],
           );
         },
-        '/lists': ((context) => const ListsPage())
+        '/lists': ((context) => const ListsPage()),
+        '/list': ((context) => const ListPage())
       },
       home: const HomePage(),
     );

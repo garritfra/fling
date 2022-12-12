@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fling/data/data/household.dart';
 import 'package:fling/data/data/list.dart';
 import 'package:fling/data/data/user.dart';
 import 'package:fling/layout/drawer.dart';
+import 'package:fling/pages/list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +27,8 @@ class _ListsPageState extends State<ListsPage> {
                     FlingListModel list = lists.data!.elementAt(index);
 
                     return ListTile(
+                      onTap: () => Navigator.pushNamed(context, '/list',
+                          arguments: ListPageArguments(list)),
                       key: Key(list.id),
                       title: Text(list.name),
                     );
