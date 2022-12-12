@@ -39,44 +39,47 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    return Consumer<FlingUser>(
+    return Consumer<FlingUser?>(
       builder: (BuildContext context, user, Widget? child) {
         return FutureBuilder(
-            future: user.currentHousehold,
-            builder: (BuildContext context,
-                AsyncSnapshot<HouseholdModel> household) {
-              return Scaffold(
-                appBar: AppBar(
-                  // Here we take the value from the HomePage object that was created by
-                  // the App.build method, and use it to set our appbar title.
-                  title: Text(household.data?.name ?? ""),
-                ),
-                drawer: const FlingDrawer(),
-                body: Row(
-                  children: [
-                    Expanded(
-                      child: Card(
-                        child: InkWell(
-                          onTap: () {
-                            // TODO: Possible memory leak. Proper navigation concept needed
-                            Navigator.pushNamed(context, '/lists');
-                          },
-                          child: SizedBox(
-                            height: 100,
-                            width: 300,
-                            child: Center(
-                                child: Text(
-                              'Listen',
-                              style: Theme.of(context).textTheme.displaySmall,
-                            )),
+          future: user?.currentHousehold,
+          builder: (context, household) => StreamBuilder(
+              stream: household.data,
+              builder: (BuildContext context,
+                  AsyncSnapshot<HouseholdModel> household) {
+                return Scaffold(
+                  appBar: AppBar(
+                    // Here we take the value from the HomePage object that was created by
+                    // the App.build method, and use it to set our appbar title.
+                    title: Text(household.data?.name ?? ""),
+                  ),
+                  drawer: const FlingDrawer(),
+                  body: Row(
+                    children: [
+                      Expanded(
+                        child: Card(
+                          child: InkWell(
+                            onTap: () {
+                              // TODO: Possible memory leak. Proper navigation concept needed
+                              Navigator.pushNamed(context, '/lists');
+                            },
+                            child: SizedBox(
+                              height: 100,
+                              width: 300,
+                              child: Center(
+                                  child: Text(
+                                'Listen',
+                                style: Theme.of(context).textTheme.displaySmall,
+                              )),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            });
+                    ],
+                  ),
+                );
+              }),
+        );
       },
     );
   }

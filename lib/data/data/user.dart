@@ -24,16 +24,15 @@ class FlingUser extends ChangeNotifier {
     return FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
   }
 
-  Future<HouseholdModel> get currentHousehold async {
+  Future<Stream<HouseholdModel>> get currentHousehold async {
     var snapshot = await firestore.collection("users").doc(uid).get();
     var user = FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
 
-    var householdSnap = await firestore
+    return firestore
         .collection("households")
         .doc(user.currentHouseholdId)
-        .get();
-
-    return HouseholdModel.fromMap(householdSnap.data()!, householdSnap.id);
+        .snapshots()
+        .map((snap) => HouseholdModel.fromMap(snap.data()!, snap.id));
   }
 
   factory FlingUser.fromMap(Map<String, dynamic> data, String uid) {

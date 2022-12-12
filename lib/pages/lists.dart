@@ -37,26 +37,30 @@ class _ListsPageState extends State<ListsPage> {
       );
     }
 
-    return Consumer<FlingUser>(
+    return Consumer<FlingUser?>(
       builder: (BuildContext context, user, Widget? child) {
         return FutureBuilder(
-            future: user.currentHousehold,
-            builder: (BuildContext context,
-                AsyncSnapshot<HouseholdModel> household) {
-              return Scaffold(
-                appBar: AppBar(
-                  title: const Text("Listen"),
-                ),
-                drawer: const FlingDrawer(),
-                body: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      if (household.hasData) buildLists(household.data!)
-                    ],
-                  ),
-                ),
-              );
+            future: user?.currentHousehold,
+            builder: (context, household) {
+              return StreamBuilder(
+                  stream: household.data,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<HouseholdModel> household) {
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: const Text("Listen"),
+                      ),
+                      drawer: const FlingDrawer(),
+                      body: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            if (household.hasData) buildLists(household.data!)
+                          ],
+                        ),
+                      ),
+                    );
+                  });
             });
       },
     );

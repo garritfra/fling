@@ -124,32 +124,36 @@ class _ListPageState extends State<ListPage> {
           });
     }
 
-    return Consumer<FlingUser>(
+    return Consumer<FlingUser?>(
       builder: (BuildContext context, user, Widget? child) {
         return FutureBuilder(
-            future: user.currentHousehold,
-            builder: (BuildContext context,
-                AsyncSnapshot<HouseholdModel> household) {
-              return Scaffold(
-                appBar: AppBar(
-                  actions: [
-                    _buildDeleteButton(),
-                  ],
-                  title: Text(args.list.name),
-                ),
-                drawer: const FlingDrawer(),
-                body: Center(
-                  child: SizedBox(
-                    width: 600.0,
-                    child: Column(
-                      children: [
-                        _buildItemList(),
-                        _buildItemTextField(),
-                      ],
-                    ),
-                  ),
-                ),
-              );
+            future: user?.currentHousehold,
+            builder: (context, household) {
+              return StreamBuilder(
+                  stream: household.data,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<HouseholdModel> household) {
+                    return Scaffold(
+                      appBar: AppBar(
+                        actions: [
+                          _buildDeleteButton(),
+                        ],
+                        title: Text(args.list.name),
+                      ),
+                      drawer: const FlingDrawer(),
+                      body: Center(
+                        child: SizedBox(
+                          width: 600.0,
+                          child: Column(
+                            children: [
+                              _buildItemList(),
+                              _buildItemTextField(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  });
             });
       },
     );
