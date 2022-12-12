@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fling/data/data/list.dart';
 import 'package:flutter/foundation.dart';
 import 'user.dart';
 
@@ -11,19 +11,6 @@ class HouseholdModel extends ChangeNotifier {
 
   HouseholdModel({this.id, required this.name});
 
-  Future<HouseholdModel> get currentHousehold async {
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    var snapshot = await firestore.collection("users").doc(uid).get();
-    var user = FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
-
-    var householdSnap = await firestore
-        .collection("households")
-        .doc(user.currentHouseholdId)
-        .get();
-
-    return HouseholdModel.fromMap(householdSnap.data()!, householdSnap.id);
-  }
-
   factory HouseholdModel.fromMap(Map<String, dynamic> data, String? id) {
     return HouseholdModel(id: id, name: data["name"]);
   }
@@ -33,5 +20,18 @@ class HouseholdModel extends ChangeNotifier {
       "id": id,
       "name": name,
     };
+  }
+
+  Future<DocumentReference> get ref async {
+    FlingUser? user = await FlingUser.currentUser;
+    return firestore.collection("households").doc(user?.currentHouseholdId);
+  }
+
+  Future<List<FlingListModel>> get lists async {
+    var snapshot = await (await ref).collection("lists").get();
+
+    return snapshot.docs
+        .map((doc) => FlingListModel.fromMap(doc.data(), doc.id, id!))
+        .toList();
   }
 }

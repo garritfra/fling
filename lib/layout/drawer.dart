@@ -35,6 +35,13 @@ class FlingDrawer extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/');
             },
           ),
+          ListTile(
+            title: const Text('Listen'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/lists');
+            },
+          ),
           const Divider(
             height: 2.0,
           ),

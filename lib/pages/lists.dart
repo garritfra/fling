@@ -6,20 +6,16 @@ import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class ListsPage extends StatefulWidget {
+  const ListsPage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<ListsPage> createState() => _ListsPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _ListsPageState extends State<ListsPage> {
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth.instance.authStateChanges().listen((user) => {
-          if (user == null) {Navigator.popAndPushNamed(context, "/login")}
-        });
-
     Widget buildLists(HouseholdModel household) {
       return Expanded(
         child: FutureBuilder<List<FlingListModel>>(
@@ -47,33 +43,16 @@ class _HomePageState extends State<HomePage> {
                 AsyncSnapshot<HouseholdModel> household) {
               return Scaffold(
                 appBar: AppBar(
-                  // Here we take the value from the HomePage object that was created by
-                  // the App.build method, and use it to set our appbar title.
-                  title: Text(household.data?.name ?? ""),
+                  title: const Text("Listen"),
                 ),
                 drawer: const FlingDrawer(),
-                body: Row(
-                  children: [
-                    Expanded(
-                      child: Card(
-                        child: InkWell(
-                          onTap: () {
-                            // TODO: Possible memory leak. Proper navigation concept needed
-                            Navigator.pushNamed(context, '/lists');
-                          },
-                          child: SizedBox(
-                            height: 100,
-                            width: 300,
-                            child: Center(
-                                child: Text(
-                              'Listen',
-                              style: Theme.of(context).textTheme.displaySmall,
-                            )),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      if (household.hasData) buildLists(household.data!)
+                    ],
+                  ),
                 ),
               );
             });
