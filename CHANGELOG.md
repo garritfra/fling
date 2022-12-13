@@ -8,7 +8,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
-xxx
+**Features**
+
+- Add i18n
 
 ## v0.4.1 (2022-12-12)
 
