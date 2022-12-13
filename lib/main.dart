@@ -51,8 +51,9 @@ class FlingApp extends StatelessWidget {
         Locale('en', ''),
         Locale('de', ''),
       ],
-      theme: ThemeData.dark(),
       title: 'Fling',
+      theme: ThemeData.light(useMaterial3: true),
+      darkTheme: ThemeData.dark(useMaterial3: true),
       initialRoute:
           fba.FirebaseAuth.instance.currentUser == null ? '/login' : '/',
       routes: <String, WidgetBuilder>{

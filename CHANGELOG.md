@@ -10,8 +10,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 **Features**
 
-- Add i18n
+- Localize texts
 - Login after account creation
+- Respect system theme preferences
+- Switch to Material You design guidelines
 
 ## v0.4.1 (2022-12-12)
 
