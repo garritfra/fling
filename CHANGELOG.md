@@ -11,6 +11,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 **Features**
 
 - Add i18n
+- Login after account creation
 
 ## v0.4.1 (2022-12-12)
 
