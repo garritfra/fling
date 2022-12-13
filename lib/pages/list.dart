@@ -4,6 +4,7 @@ import 'package:fling/data/data/user.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../data/data/list_item.dart';
 
@@ -35,6 +36,7 @@ class _ListPageState extends State<ListPage> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as ListPageArguments;
+    var l10n = AppLocalizations.of(context)!;
 
     FlingListModel list = args.list;
 
@@ -50,16 +52,16 @@ class _ListPageState extends State<ListPage> {
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
         // TODO: use subscribed model in state
         child: TextField(
-          controller: newItemController,
-          onSubmitted: (value) {
-            list.addItem(value);
-            newItemController.clear();
-          },
-          decoration: const InputDecoration(
-              hintText: "Nudeln",
-              border: OutlineInputBorder(),
-              labelText: "Item hinzufügen"),
-        ),
+            controller: newItemController,
+            onSubmitted: (value) {
+              list.addItem(value);
+              newItemController.clear();
+            },
+            decoration: InputDecoration(
+              hintText: l10n.item_hint,
+              border: const OutlineInputBorder(),
+              labelText: l10n.item_add,
+            )),
       );
     }
 
@@ -70,25 +72,25 @@ class _ListPageState extends State<ListPage> {
           onTap: () => showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Eintrag bearbeiten'),
+              title: Text(l10n.action_edit_entry),
               actions: [
                 TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("Abbrechen")),
+                    child: Text(l10n.action_cancel)),
                 TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
                       list.addItem(textController.text);
                       list.deleteItem(item);
                     },
-                    child: Text("Fertig")),
+                    child: Text(l10n.action_done)),
               ],
               content: TextField(
                 controller: textController,
                 autofocus: true,
-                decoration: const InputDecoration(hintText: "Name"),
+                decoration: InputDecoration(hintText: l10n.item_name),
               ),
             ),
           ),
@@ -112,8 +114,7 @@ class _ListPageState extends State<ListPage> {
                     stream: snapshot.data,
                     builder: (context, snapshot) {
                       if (snapshot.hasError || !snapshot.hasData) {
-                        return Text(
-                            "Etwas ist Schiefgegangen: ${snapshot.error}");
+                        return Text(l10n.status_error);
                       }
 
                       if (snapshot.connectionState == ConnectionState.waiting) {

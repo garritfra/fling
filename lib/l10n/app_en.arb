@@ -1,0 +1,11 @@
+{
+    "action_cancel": "Cancel",
+    "action_done": "Done",
+    "action_edit_entry": "Edit entry",
+    "lists": "Lists",
+    "home": "Home",
+    "item_add": "Add item",
+    "item_hint": "Pasta",
+    "item_name": "Name",
+    "status_error": "Something went wrong."
+}

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class FlingDrawer extends StatelessWidget {
   const FlingDrawer({super.key});
@@ -29,14 +30,14 @@ class FlingDrawer extends StatelessWidget {
         children: [
           buildHeader(),
           ListTile(
-            title: const Text('Home'),
+            title: Text(AppLocalizations.of(context)!.home),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushReplacementNamed(context, '/');
             },
           ),
           ListTile(
-            title: const Text('Listen'),
+            title: Text(AppLocalizations.of(context)!.lists),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushReplacementNamed(context, '/lists');
