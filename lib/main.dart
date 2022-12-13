@@ -63,6 +63,9 @@ class FlingApp extends StatelessWidget {
               AuthStateChangeAction<SignedIn>((context, state) {
                 Navigator.pushReplacementNamed(context, '/');
               }),
+              AuthStateChangeAction<UserCreated>((context, state) {
+                Navigator.pushReplacementNamed(context, '/');
+              }),
             ],
           );
         },

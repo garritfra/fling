@@ -21,6 +21,9 @@ class FlingUser extends ChangeNotifier {
       return null;
     }
     var snapshot = await firestore.collection("users").doc(uid).get();
+    if (snapshot.data() == null) {
+      return null;
+    }
     return FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
   }
 
