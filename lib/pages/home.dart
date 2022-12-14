@@ -21,6 +21,51 @@ class _HomePageState extends State<HomePage> {
           if (user == null) {Navigator.popAndPushNamed(context, "/login")}
         });
 
+    Widget buildCreateHouseholdButton() {
+      return Expanded(
+        child: Card(
+          color: const Color.fromARGB(255, 51, 138, 126),
+          child: InkWell(
+            onTap: () {
+              showAboutDialog(context: context);
+            },
+            child: SizedBox(
+              height: 100,
+              width: 300,
+              child: Center(
+                  child: Text(
+                AppLocalizations.of(context)!.household_create,
+                style: Theme.of(context).textTheme.button,
+              )),
+            ),
+          ),
+        ),
+      );
+    }
+
+    Widget buildListsButton() {
+      return Expanded(
+        child: Card(
+          color: const Color.fromARGB(255, 51, 138, 126),
+          child: InkWell(
+            onTap: () {
+              // TODO: Possible memory leak. Proper navigation concept needed
+              Navigator.pushNamed(context, '/lists');
+            },
+            child: SizedBox(
+              height: 100,
+              width: 300,
+              child: Center(
+                  child: Text(
+                AppLocalizations.of(context)!.lists,
+                style: Theme.of(context).textTheme.button,
+              )),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Consumer<FlingUser?>(
       builder: (BuildContext context, user, Widget? child) {
         return FutureBuilder(
@@ -39,26 +84,10 @@ class _HomePageState extends State<HomePage> {
                   drawer: const FlingDrawer(),
                   body: Row(
                     children: [
-                      Expanded(
-                        child: Card(
-                          color: const Color.fromARGB(255, 51, 138, 126),
-                          child: InkWell(
-                            onTap: () {
-                              // TODO: Possible memory leak. Proper navigation concept needed
-                              Navigator.pushNamed(context, '/lists');
-                            },
-                            child: SizedBox(
-                              height: 100,
-                              width: 300,
-                              child: Center(
-                                  child: Text(
-                                AppLocalizations.of(context)!.lists,
-                                style: Theme.of(context).textTheme.button,
-                              )),
-                            ),
-                          ),
-                        ),
-                      ),
+                      if (household.data == null)
+                        buildCreateHouseholdButton()
+                      else
+                        buildListsButton(),
                     ],
                   ),
                 );
