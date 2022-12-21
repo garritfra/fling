@@ -29,7 +29,10 @@ Future<void> main() async {
   FlingUser? user = await FlingUser.currentUser;
 
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider<FlingUser?>(create: (context) => user)
+    ChangeNotifierProvider<FlingUser?>(
+      create: (context) => user,
+      lazy: true,
+    )
   ], child: const FlingApp()));
 }
 
