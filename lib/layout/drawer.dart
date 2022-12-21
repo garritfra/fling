@@ -15,7 +15,7 @@ class FlingDrawer extends StatelessWidget {
         decoration: const BoxDecoration(
           color: Colors.blue,
         ),
-        accountEmail: Text(email!),
+        accountEmail: Text(email ?? ""),
         accountName: Text(username ?? ""),
       );
     }
@@ -29,13 +29,6 @@ class FlingDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           buildHeader(),
-          ListTile(
-            title: Text(AppLocalizations.of(context)!.home),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushReplacementNamed(context, '/');
-            },
-          ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.lists),
             onTap: () {
@@ -51,7 +44,8 @@ class FlingDrawer extends StatelessWidget {
             title: const Text("Logout"),
             onTap: () {
               FirebaseAuth.instance.signOut();
-              Navigator.popUntil(context, (route) => route.isFirst);
+              // TODO: the app should listen for logout changes
+              Navigator.popAndPushNamed(context, '/login');
             },
           ),
           // Spacer(),

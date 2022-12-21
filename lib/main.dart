@@ -76,7 +76,7 @@ class FlingApp extends StatelessWidget {
         '/lists': ((context) => const ListsPage()),
         '/list': ((context) => const ListPage())
       },
-      home: const HomePage(),
+      home: const ListsPage(),
     );
   }
 }
