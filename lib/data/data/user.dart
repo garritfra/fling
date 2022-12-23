@@ -44,6 +44,12 @@ class FlingUser extends ChangeNotifier {
         .map((snap) => HouseholdModel.fromMap(snap.data()!, snap.id));
   }
 
+  setCurrentHouseholdId(String id) {
+    ref.update({"current_household": id}).then((value) {
+      currentHouseholdId = id;
+    });
+  }
+
   factory FlingUser.fromMap(Map<String, dynamic> data, String uid) {
     return FlingUser(
         uid: uid,

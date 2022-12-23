@@ -19,6 +19,7 @@ class _ListsPageState extends State<ListsPage> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
+    var user = Provider.of<FlingUser>(context);
 
     Widget buildLists(HouseholdModel household) {
       return Expanded(
@@ -41,6 +42,39 @@ class _ListsPageState extends State<ListsPage> {
       );
     }
 
+    void showHouseholdSwitcher(List<HouseholdModel> households) {
+      void onUpdate(String id) {
+        user.setCurrentHouseholdId(id);
+        user.notifyListeners();
+        Navigator.pop(context);
+      }
+
+      showDialog(
+          context: context,
+          builder: ((context) => AlertDialog(
+              title: Text(l10n.households),
+              content: Container(
+                width: double.maxFinite,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    ...households.map((h) => ListTile(
+                          onTap: () => onUpdate(h.id!),
+                          title: Text(h.name),
+                          trailing: h.id == user.currentHouseholdId
+                              ? const Icon(Icons.check)
+                              : null,
+                          leading: const Icon(Icons.house),
+                        )),
+                    ListTile(
+                      title: Text(l10n.household_add),
+                      leading: Icon(Icons.add),
+                    )
+                  ],
+                ),
+              ))));
+    }
+
     return Consumer<FlingUser?>(
       builder: (BuildContext context, user, Widget? child) {
         return FutureBuilder(
@@ -60,42 +94,16 @@ class _ListsPageState extends State<ListsPage> {
                           future: households,
                           builder: (context, households) {
                             return IconButton(
-                                onPressed: () => {
-                                      showDialog(
-                                          context: context,
-                                          builder: ((context) => AlertDialog(
-                                              title: Text(l10n.households),
-                                              content: Container(
-                                                width: double.maxFinite,
-                                                child: ListView(
-                                                  shrinkWrap: true,
-                                                  children: [
-                                                    ...households.data!
-                                                        .map((h) => ListTile(
-                                                              title:
-                                                                  Text(h.name),
-                                                              trailing:
-                                                                  const Icon(Icons
-                                                                      .check),
-                                                              leading: const Icon(
-                                                                  Icons.house),
-                                                            )),
-                                                    ListTile(
-                                                      title: Text(
-                                                          l10n.household_add),
-                                                      leading: Icon(Icons.add),
-                                                    )
-                                                  ],
-                                                ),
-                                              ))))
-                                    },
+                                onPressed: () =>
+                                    showHouseholdSwitcher(households.data!),
                                 icon: const Icon(Icons.house_outlined));
                           });
                     }
 
                     return Scaffold(
                       appBar: AppBar(
-                        title: Text(AppLocalizations.of(context)!.lists),
+                        title: Text(household.data?.name ??
+                            AppLocalizations.of(context)!.lists),
                         actions: [buildSwitchHouseholdAction()],
                       ),
                       drawer: const FlingDrawer(),
