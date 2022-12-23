@@ -7,10 +7,12 @@ import 'household.dart';
 class FlingUser extends ChangeNotifier {
   String uid;
   String? currentHouseholdId;
+  List<String> householdIds;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  FlingUser({required this.uid, this.currentHouseholdId});
+  FlingUser(
+      {required this.uid, this.currentHouseholdId, required this.householdIds});
 
   static Future<FlingUser?> get currentUser async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -27,8 +29,12 @@ class FlingUser extends ChangeNotifier {
     return FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
   }
 
+  DocumentReference<Map<String, dynamic>> get ref {
+    return firestore.collection("users").doc(uid);
+  }
+
   Future<Stream<HouseholdModel>> get currentHousehold async {
-    var snapshot = await firestore.collection("users").doc(uid).get();
+    var snapshot = await ref.get();
     var user = FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
 
     return firestore
@@ -39,12 +45,18 @@ class FlingUser extends ChangeNotifier {
   }
 
   factory FlingUser.fromMap(Map<String, dynamic> data, String uid) {
-    return FlingUser(uid: uid, currentHouseholdId: data["current_household"]);
+    return FlingUser(
+        uid: uid,
+        currentHouseholdId: data["current_household"],
+        householdIds: data["households"] != null
+            ? List<String>.from(data["households"])
+            : []);
   }
 
   Map<String, dynamic> toMap() {
     return {
       "current_household": currentHouseholdId,
+      "households": householdIds.toList()
     };
   }
 }

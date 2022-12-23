@@ -1,5 +1,6 @@
 import 'package:fling/data/data/household.dart';
 import 'package:fling/data/data/list.dart';
+import 'package:fling/data/data/list_item.dart';
 import 'package:fling/data/data/user.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:fling/pages/list.dart';
@@ -17,6 +18,8 @@ class ListsPage extends StatefulWidget {
 class _ListsPageState extends State<ListsPage> {
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context)!;
+
     Widget buildLists(HouseholdModel household) {
       return Expanded(
         child: FutureBuilder<List<FlingListModel>>(
@@ -47,9 +50,53 @@ class _ListsPageState extends State<ListsPage> {
                   stream: household.data,
                   builder: (BuildContext context,
                       AsyncSnapshot<HouseholdModel> household) {
+                    Widget buildSwitchHouseholdAction() {
+                      var mapFutures = user?.householdIds
+                          .map((id) => HouseholdModel.fromId(id))
+                          .toList();
+                      Future<List<HouseholdModel>> households =
+                          Future.wait(mapFutures!);
+                      return FutureBuilder<List<HouseholdModel>>(
+                          future: households,
+                          builder: (context, households) {
+                            return IconButton(
+                                onPressed: () => {
+                                      showDialog(
+                                          context: context,
+                                          builder: ((context) => AlertDialog(
+                                              title: Text(l10n.households),
+                                              content: Container(
+                                                width: double.maxFinite,
+                                                child: ListView(
+                                                  shrinkWrap: true,
+                                                  children: [
+                                                    ...households.data!
+                                                        .map((h) => ListTile(
+                                                              title:
+                                                                  Text(h.name),
+                                                              trailing:
+                                                                  const Icon(Icons
+                                                                      .check),
+                                                              leading: const Icon(
+                                                                  Icons.house),
+                                                            )),
+                                                    ListTile(
+                                                      title: Text(
+                                                          l10n.household_add),
+                                                      leading: Icon(Icons.add),
+                                                    )
+                                                  ],
+                                                ),
+                                              ))))
+                                    },
+                                icon: const Icon(Icons.house_outlined));
+                          });
+                    }
+
                     return Scaffold(
                       appBar: AppBar(
                         title: Text(AppLocalizations.of(context)!.lists),
+                        actions: [buildSwitchHouseholdAction()],
                       ),
                       drawer: const FlingDrawer(),
                       body: Center(

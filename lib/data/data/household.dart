@@ -15,6 +15,13 @@ class HouseholdModel extends ChangeNotifier {
     return HouseholdModel(id: id, name: data["name"]);
   }
 
+  static Future<HouseholdModel> fromId(String id) async {
+    FlingUser? user = await FlingUser.currentUser;
+    var snap =
+        await FirebaseFirestore.instance.collection("households").doc(id).get();
+    return HouseholdModel.fromMap(snap.data() ?? {}, id);
+  }
+
   Map<String, dynamic> toMap() {
     return {
       "id": id,
