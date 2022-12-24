@@ -44,10 +44,18 @@ class FlingUser extends ChangeNotifier {
         .map((snap) => HouseholdModel.fromMap(snap.data()!, snap.id));
   }
 
-  setCurrentHouseholdId(String id) {
-    ref.update({"current_household": id}).then((value) {
+  setCurrentHouseholdId(String id) async {
+    await ref.update({"current_household": id}).then((value) {
       currentHouseholdId = id;
     });
+    notifyListeners();
+  }
+
+  joinHousehold(String id) async {
+    await ref.update({
+      "households": [...(await this.householdIds), id]
+    });
+    notifyListeners();
   }
 
   factory FlingUser.fromMap(Map<String, dynamic> data, String uid) {
@@ -57,12 +65,5 @@ class FlingUser extends ChangeNotifier {
         householdIds: data["households"] != null
             ? List<String>.from(data["households"])
             : []);
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      "current_household": currentHouseholdId,
-      "households": householdIds.toList()
-    };
   }
 }

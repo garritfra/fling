@@ -1,6 +1,5 @@
 import 'package:fling/data/data/household.dart';
 import 'package:fling/data/data/list.dart';
-import 'package:fling/data/data/list_item.dart';
 import 'package:fling/data/data/user.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:fling/pages/list.dart';
@@ -49,11 +48,15 @@ class _ListsPageState extends State<ListsPage> {
         Navigator.pop(context);
       }
 
+      void onAddhousehold() {
+        Navigator.popAndPushNamed(context, "/household_add");
+      }
+
       showDialog(
           context: context,
           builder: ((context) => AlertDialog(
               title: Text(l10n.households),
-              content: Container(
+              content: SizedBox(
                 width: double.maxFinite,
                 child: ListView(
                   shrinkWrap: true,
@@ -67,8 +70,9 @@ class _ListsPageState extends State<ListsPage> {
                           leading: const Icon(Icons.house),
                         )),
                     ListTile(
+                      onTap: () => onAddhousehold(),
                       title: Text(l10n.household_add),
-                      leading: Icon(Icons.add),
+                      leading: const Icon(Icons.add),
                     )
                   ],
                 ),
