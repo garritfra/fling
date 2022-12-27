@@ -16,7 +16,7 @@ class HouseholdModel extends ChangeNotifier {
   }
 
   static Future<HouseholdModel> fromId(String id) async {
-    FlingUser? user = await FlingUser.currentUser;
+    FlingUser? user = await FlingUser.currentUser.first;
     var snap =
         await FirebaseFirestore.instance.collection("households").doc(id).get();
     return HouseholdModel.fromMap(snap.data() ?? {}, id);
@@ -29,15 +29,15 @@ class HouseholdModel extends ChangeNotifier {
   }
 
   Future<DocumentReference> get ref async {
-    FlingUser? user = await FlingUser.currentUser;
+    FlingUser? user = await FlingUser.currentUser.first;
     return firestore.collection("households").doc(user?.currentHouseholdId);
   }
 
   Future<HouseholdModel> save() async {
-    FlingUser? user = await FlingUser.currentUser;
+    FlingUser? user = await FlingUser.currentUser.first;
     var ref = await firestore.collection("households").add(toMap());
     await ref.collection("members").doc(user!.uid).set({});
-    this.id = ref.id;
+    id = ref.id;
     notifyListeners();
     return this;
   }

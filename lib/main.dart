@@ -27,12 +27,12 @@ Future<void> main() async {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
   }
 
-  FlingUser? user = await FlingUser.currentUser;
+  Stream<FlingUser?> user = FlingUser.currentUser;
 
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider<FlingUser?>(
+    StreamProvider<FlingUser?>(
       create: (context) => user,
-      lazy: true,
+      initialData: await user.first,
     )
   ], child: const FlingApp()));
 }

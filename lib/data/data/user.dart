@@ -14,19 +14,21 @@ class FlingUser extends ChangeNotifier {
   FlingUser(
       {required this.uid, this.currentHouseholdId, required this.householdIds});
 
-  static Future<FlingUser?> get currentUser async {
+  static Stream<FlingUser?> get currentUser {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid == null) {
-      return null;
+      return const Stream.empty();
     }
-    var snapshot = await firestore.collection("users").doc(uid).get();
-    if (snapshot.data() == null) {
-      return null;
-    }
-    return FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
+    var snapshots = firestore.collection("users").doc(uid).snapshots();
+    return snapshots.map((snapshot) {
+      if (snapshot.data() == null) {
+        return null;
+      }
+      return FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
+    });
   }
 
   DocumentReference<Map<String, dynamic>> get ref {
@@ -47,13 +49,6 @@ class FlingUser extends ChangeNotifier {
   setCurrentHouseholdId(String id) async {
     await ref.update({"current_household": id}).then((value) {
       currentHouseholdId = id;
-    });
-    notifyListeners();
-  }
-
-  joinHousehold(String id) async {
-    await ref.update({
-      "households": [...(await this.householdIds), id]
     });
     notifyListeners();
   }

@@ -41,7 +41,7 @@ class _ListsPageState extends State<ListsPage> {
       );
     }
 
-    void showHouseholdSwitcher(List<HouseholdModel> households) {
+    void showHouseholdSwitcher() {
       void onUpdate(String id) {
         user.setCurrentHouseholdId(id);
         user.notifyListeners();
@@ -58,24 +58,37 @@ class _ListsPageState extends State<ListsPage> {
               title: Text(l10n.households),
               content: SizedBox(
                 width: double.maxFinite,
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    ...households.map((h) => ListTile(
-                          onTap: () => onUpdate(h.id!),
-                          title: Text(h.name),
-                          trailing: h.id == user.currentHouseholdId
-                              ? const Icon(Icons.check)
-                              : null,
-                          leading: const Icon(Icons.house),
-                        )),
-                    ListTile(
-                      onTap: () => onAddhousehold(),
-                      title: Text(l10n.household_add),
-                      leading: const Icon(Icons.add),
-                    )
-                  ],
-                ),
+                child: StreamBuilder(
+                    stream: FlingUser.currentUser,
+                    builder: (context, snapshot) {
+                      var mapFutures = snapshot.data?.householdIds
+                          .map((id) => HouseholdModel.fromId(id))
+                          .toList();
+                      Future<List<HouseholdModel>> householdsFuture =
+                          Future.wait(mapFutures!);
+                      return FutureBuilder(
+                          future: householdsFuture,
+                          builder: (context, snapshot) {
+                            return ListView(
+                              shrinkWrap: true,
+                              children: [
+                                ...?snapshot.data?.map((h) => ListTile(
+                                      onTap: () => onUpdate(h.id!),
+                                      title: Text(h.name),
+                                      trailing: h.id == user.currentHouseholdId
+                                          ? const Icon(Icons.check)
+                                          : null,
+                                      leading: const Icon(Icons.house),
+                                    )),
+                                ListTile(
+                                  onTap: () => onAddhousehold(),
+                                  title: Text(l10n.household_add),
+                                  leading: const Icon(Icons.add),
+                                )
+                              ],
+                            );
+                          });
+                    }),
               ))));
     }
 
@@ -89,19 +102,9 @@ class _ListsPageState extends State<ListsPage> {
                   builder: (BuildContext context,
                       AsyncSnapshot<HouseholdModel> household) {
                     Widget buildSwitchHouseholdAction() {
-                      var mapFutures = user?.householdIds
-                          .map((id) => HouseholdModel.fromId(id))
-                          .toList();
-                      Future<List<HouseholdModel>> households =
-                          Future.wait(mapFutures!);
-                      return FutureBuilder<List<HouseholdModel>>(
-                          future: households,
-                          builder: (context, households) {
-                            return IconButton(
-                                onPressed: () =>
-                                    showHouseholdSwitcher(households.data!),
-                                icon: const Icon(Icons.house_outlined));
-                          });
+                      return IconButton(
+                          onPressed: () => showHouseholdSwitcher(),
+                          icon: const Icon(Icons.house_outlined));
                     }
 
                     return Scaffold(
