@@ -1,4 +1,5 @@
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:fling/pages/household_add.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:fling/data/data/user.dart';
 import 'package:fling/pages/list.dart';
@@ -26,12 +27,12 @@ Future<void> main() async {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
   }
 
-  FlingUser? user = await FlingUser.currentUser;
+  Stream<FlingUser?> user = FlingUser.currentUser;
 
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider<FlingUser?>(
+    StreamProvider<FlingUser?>(
       create: (context) => user,
-      lazy: true,
+      initialData: await user.first,
     )
   ], child: const FlingApp()));
 }
@@ -74,7 +75,8 @@ class FlingApp extends StatelessWidget {
           );
         },
         '/lists': ((context) => const ListsPage()),
-        '/list': ((context) => const ListPage())
+        '/list': ((context) => const ListPage()),
+        '/household_add': ((context) => const AddHousehold())
       },
       home: const ListsPage(),
     );

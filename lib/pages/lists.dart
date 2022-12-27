@@ -17,6 +17,9 @@ class ListsPage extends StatefulWidget {
 class _ListsPageState extends State<ListsPage> {
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context)!;
+    var user = Provider.of<FlingUser>(context);
+
     Widget buildLists(HouseholdModel household) {
       return Expanded(
         child: FutureBuilder<List<FlingListModel>>(
@@ -38,6 +41,57 @@ class _ListsPageState extends State<ListsPage> {
       );
     }
 
+    void showHouseholdSwitcher() {
+      void onUpdate(String id) {
+        user.setCurrentHouseholdId(id);
+        user.notifyListeners();
+        Navigator.pop(context);
+      }
+
+      void onAddhousehold() {
+        Navigator.popAndPushNamed(context, "/household_add");
+      }
+
+      showDialog(
+          context: context,
+          builder: ((context) => AlertDialog(
+              title: Text(l10n.households),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: StreamBuilder(
+                    stream: FlingUser.currentUser,
+                    builder: (context, snapshot) {
+                      var mapFutures = snapshot.data?.householdIds
+                          .map((id) => HouseholdModel.fromId(id))
+                          .toList();
+                      Future<List<HouseholdModel>> householdsFuture =
+                          Future.wait(mapFutures!);
+                      return FutureBuilder(
+                          future: householdsFuture,
+                          builder: (context, snapshot) {
+                            return ListView(
+                              shrinkWrap: true,
+                              children: [
+                                ...?snapshot.data?.map((h) => ListTile(
+                                      onTap: () => onUpdate(h.id!),
+                                      title: Text(h.name),
+                                      trailing: h.id == user.currentHouseholdId
+                                          ? const Icon(Icons.check)
+                                          : null,
+                                      leading: const Icon(Icons.house),
+                                    )),
+                                ListTile(
+                                  onTap: () => onAddhousehold(),
+                                  title: Text(l10n.household_add),
+                                  leading: const Icon(Icons.add),
+                                )
+                              ],
+                            );
+                          });
+                    }),
+              ))));
+    }
+
     return Consumer<FlingUser?>(
       builder: (BuildContext context, user, Widget? child) {
         return FutureBuilder(
@@ -47,9 +101,17 @@ class _ListsPageState extends State<ListsPage> {
                   stream: household.data,
                   builder: (BuildContext context,
                       AsyncSnapshot<HouseholdModel> household) {
+                    Widget buildSwitchHouseholdAction() {
+                      return IconButton(
+                          onPressed: () => showHouseholdSwitcher(),
+                          icon: const Icon(Icons.house_outlined));
+                    }
+
                     return Scaffold(
                       appBar: AppBar(
-                        title: Text(AppLocalizations.of(context)!.lists),
+                        title: Text(household.data?.name ??
+                            AppLocalizations.of(context)!.lists),
+                        actions: [buildSwitchHouseholdAction()],
                       ),
                       drawer: const FlingDrawer(),
                       body: Center(

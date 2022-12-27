@@ -7,28 +7,36 @@ import 'household.dart';
 class FlingUser extends ChangeNotifier {
   String uid;
   String? currentHouseholdId;
+  List<String> householdIds;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  FlingUser({required this.uid, this.currentHouseholdId});
+  FlingUser(
+      {required this.uid, this.currentHouseholdId, required this.householdIds});
 
-  static Future<FlingUser?> get currentUser async {
+  static Stream<FlingUser?> get currentUser {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid == null) {
-      return null;
+      return const Stream.empty();
     }
-    var snapshot = await firestore.collection("users").doc(uid).get();
-    if (snapshot.data() == null) {
-      return null;
-    }
-    return FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
+    var snapshots = firestore.collection("users").doc(uid).snapshots();
+    return snapshots.map((snapshot) {
+      if (snapshot.data() == null) {
+        return null;
+      }
+      return FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
+    });
+  }
+
+  DocumentReference<Map<String, dynamic>> get ref {
+    return firestore.collection("users").doc(uid);
   }
 
   Future<Stream<HouseholdModel>> get currentHousehold async {
-    var snapshot = await firestore.collection("users").doc(uid).get();
+    var snapshot = await ref.get();
     var user = FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
 
     return firestore
@@ -38,13 +46,19 @@ class FlingUser extends ChangeNotifier {
         .map((snap) => HouseholdModel.fromMap(snap.data()!, snap.id));
   }
 
-  factory FlingUser.fromMap(Map<String, dynamic> data, String uid) {
-    return FlingUser(uid: uid, currentHouseholdId: data["current_household"]);
+  setCurrentHouseholdId(String id) async {
+    await ref.update({"current_household": id}).then((value) {
+      currentHouseholdId = id;
+    });
+    notifyListeners();
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      "current_household": currentHouseholdId,
-    };
+  factory FlingUser.fromMap(Map<String, dynamic> data, String uid) {
+    return FlingUser(
+        uid: uid,
+        currentHouseholdId: data["current_household"],
+        householdIds: data["households"] != null
+            ? List<String>.from(data["households"])
+            : []);
   }
 }
