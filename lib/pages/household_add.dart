@@ -21,7 +21,7 @@ class _AddHouseholdState extends State<AddHousehold> {
 
     Future<void> onCreate() async {
       var household = await HouseholdModel(name: nameController.text).save();
-      user.joinHousehold(household.id!);
+      // user.joinHousehold(household.id!);
       user.setCurrentHouseholdId(household.id!);
 
       Navigator.pop(context);
