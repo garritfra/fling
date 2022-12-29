@@ -22,20 +22,24 @@ class _ListsPageState extends State<ListsPage> {
 
     Widget buildLists(HouseholdModel household) {
       return Expanded(
-        child: FutureBuilder<List<FlingListModel>>(
+        child: FutureBuilder(
             future: household.lists,
             builder: (context, lists) {
-              return ListView.builder(
-                  itemCount: lists.data?.length ?? 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    FlingListModel list = lists.data!.elementAt(index);
+              return StreamBuilder(
+                  stream: lists.data,
+                  builder: (context, snapshot) {
+                    return ListView.builder(
+                        itemCount: snapshot.data?.length ?? 0,
+                        itemBuilder: (BuildContext context, int index) {
+                          FlingListModel list = snapshot.data!.elementAt(index);
 
-                    return ListTile(
-                      onTap: () => Navigator.pushNamed(context, '/list',
-                          arguments: ListPageArguments(list)),
-                      key: Key(list.id),
-                      title: Text(list.name),
-                    );
+                          return ListTile(
+                            onTap: () => Navigator.pushNamed(context, '/list',
+                                arguments: ListPageArguments(list)),
+                            key: Key(list.id ?? list.name),
+                            title: Text(list.name),
+                          );
+                        });
                   });
             }),
       );
@@ -92,6 +96,40 @@ class _ListsPageState extends State<ListsPage> {
               ))));
     }
 
+    onAddListPressed() {
+      TextEditingController textController = TextEditingController();
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text(l10n.list_create),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(l10n.action_cancel)),
+                  TextButton(
+                      onPressed: () {
+                        String? householdId = user?.currentHouseholdId;
+
+                        if (householdId != null) {
+                          FlingListModel(
+                                  householdId: householdId,
+                                  name: textController.text)
+                              .save();
+                        }
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(l10n.action_done)),
+                ],
+                content: TextField(
+                  controller: textController,
+                  autofocus: true,
+                  decoration: InputDecoration(hintText: l10n.item_name),
+                ),
+              ));
+    }
+
     return Consumer<FlingUser?>(
       builder: (BuildContext context, user, Widget? child) {
         return FutureBuilder(
@@ -113,6 +151,9 @@ class _ListsPageState extends State<ListsPage> {
                             AppLocalizations.of(context)!.lists),
                         actions: [buildSwitchHouseholdAction()],
                       ),
+                      floatingActionButton: FloatingActionButton(
+                          onPressed: () => onAddListPressed(),
+                          child: const Icon(Icons.add)),
                       drawer: const FlingDrawer(),
                       body: Center(
                         child: Column(
