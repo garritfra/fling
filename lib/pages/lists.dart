@@ -18,7 +18,7 @@ class _ListsPageState extends State<ListsPage> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
-    var user = Provider.of<FlingUser>(context);
+    var user = Provider.of<FlingUser?>(context);
 
     Widget buildLists(HouseholdModel household) {
       return Expanded(
@@ -43,8 +43,8 @@ class _ListsPageState extends State<ListsPage> {
 
     void showHouseholdSwitcher() {
       void onUpdate(String id) {
-        user.setCurrentHouseholdId(id);
-        user.notifyListeners();
+        user?.setCurrentHouseholdId(id);
+        user?.notifyListeners();
         Navigator.pop(context);
       }
 
@@ -75,7 +75,7 @@ class _ListsPageState extends State<ListsPage> {
                                 ...?snapshot.data?.map((h) => ListTile(
                                       onTap: () => onUpdate(h.id!),
                                       title: Text(h.name),
-                                      trailing: h.id == user.currentHouseholdId
+                                      trailing: h.id == user?.currentHouseholdId
                                           ? const Icon(Icons.check)
                                           : null,
                                       leading: const Icon(Icons.house),
