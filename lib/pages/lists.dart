@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:fling/data/data/household.dart';
 import 'package:fling/data/data/list.dart';
 import 'package:fling/data/data/user.dart';
@@ -15,6 +16,8 @@ class ListsPage extends StatefulWidget {
 }
 
 class _ListsPageState extends State<ListsPage> {
+  final functions = FirebaseFunctions.instance;
+
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
@@ -43,6 +46,45 @@ class _ListsPageState extends State<ListsPage> {
                   });
             }),
       );
+    }
+
+    void showInviteDialog() {
+      TextEditingController textController = TextEditingController();
+      String? errorText;
+
+      Future<void> onInviteUserPressed() async {
+        var callable = functions.httpsCallable('inviteToHouseholdByEmail');
+
+        var result = await callable({
+          "householdId": user?.currentHouseholdId ?? "",
+          "email": textController.text,
+        });
+
+        Navigator.of(context).pop();
+      }
+
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text(l10n.user_invite),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(l10n.action_cancel)),
+                  TextButton(
+                      onPressed: () {
+                        onInviteUserPressed();
+                      },
+                      child: Text(l10n.action_done)),
+                ],
+                content: TextField(
+                  controller: textController,
+                  autofocus: true,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+              ));
     }
 
     void showHouseholdSwitcher() {
@@ -126,6 +168,7 @@ class _ListsPageState extends State<ListsPage> {
                   controller: textController,
                   autofocus: true,
                   decoration: InputDecoration(hintText: l10n.item_name),
+                  keyboardType: TextInputType.emailAddress,
                 ),
               ));
     }
@@ -145,11 +188,20 @@ class _ListsPageState extends State<ListsPage> {
                           icon: const Icon(Icons.house_outlined));
                     }
 
+                    Widget buildInviteAction() {
+                      return IconButton(
+                          onPressed: () => showInviteDialog(),
+                          icon: const Icon(Icons.group_add));
+                    }
+
                     return Scaffold(
                       appBar: AppBar(
                         title: Text(household.data?.name ??
                             AppLocalizations.of(context)!.lists),
-                        actions: [buildSwitchHouseholdAction()],
+                        actions: [
+                          buildInviteAction(),
+                          buildSwitchHouseholdAction()
+                        ],
                       ),
                       floatingActionButton: FloatingActionButton(
                           onPressed: () => onAddListPressed(),
