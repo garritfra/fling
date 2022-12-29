@@ -16,12 +16,12 @@ class _AddHouseholdState extends State<AddHousehold> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
-    var user = Provider.of<FlingUser>(context);
+    var user = Provider.of<FlingUser?>(context);
     final nameController = TextEditingController();
 
     Future<void> onCreate() async {
       var household = await HouseholdModel(name: nameController.text).save();
-      user.setCurrentHouseholdId(household.id!);
+      user?.setCurrentHouseholdId(household.id!);
 
       Navigator.pop(context);
     }

@@ -65,7 +65,7 @@ class _ListsPageState extends State<ListsPage> {
                           .map((id) => HouseholdModel.fromId(id))
                           .toList();
                       Future<List<HouseholdModel>> householdsFuture =
-                          Future.wait(mapFutures!);
+                          Future.wait(mapFutures ?? []);
                       return FutureBuilder(
                           future: householdsFuture,
                           builder: (context, snapshot) {

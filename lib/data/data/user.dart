@@ -23,11 +23,11 @@ class FlingUser extends ChangeNotifier {
       return const Stream.empty();
     }
     var snapshots = firestore.collection("users").doc(uid).snapshots();
-    return snapshots.map((snapshot) {
+    return snapshots.asyncMap((snapshot) async {
       if (snapshot.data() == null) {
-        return null;
+        await firestore.collection("users").doc(uid).set({});
       }
-      return FlingUser.fromMap(Map.from(snapshot.data()!), snapshot.id);
+      return FlingUser.fromMap(Map.from(snapshot.data() ?? {}), snapshot.id);
     });
   }
 
