@@ -11,6 +11,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 **Features**
 
 - Info and license dialog
+- Ability to add lists to household
 
 **Bugfixes**
 

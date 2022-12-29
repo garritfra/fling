@@ -42,11 +42,11 @@ class HouseholdModel extends ChangeNotifier {
     return this;
   }
 
-  Future<List<FlingListModel>> get lists async {
-    var snapshot = await (await ref).collection("lists").get();
+  Future<Stream<List<FlingListModel>>> get lists async {
+    var snapshot = (await ref).collection("lists").snapshots();
 
-    return snapshot.docs
+    return snapshot.map((snap) => snap.docs
         .map((doc) => FlingListModel.fromMap(doc.data(), doc.id, id!))
-        .toList();
+        .toList());
   }
 }

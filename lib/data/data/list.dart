@@ -4,14 +4,13 @@ import 'package:flutter/foundation.dart';
 import 'list_item.dart';
 
 class FlingListModel extends ChangeNotifier {
-  String id;
+  String? id;
   String householdId;
   String name;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  FlingListModel(
-      {required this.id, required this.householdId, required this.name});
+  FlingListModel({required this.householdId, required this.name, this.id});
 
   factory FlingListModel.fromMap(
       Map<String, dynamic> data, String id, String householdId) {
@@ -62,5 +61,22 @@ class FlingListModel extends ChangeNotifier {
             .forEach((snapshot) => batch.delete(snapshot.reference)));
 
     await batch.commit();
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "name": name,
+    };
+  }
+
+  Future<FlingListModel?> save() async {
+    var ref = await firestore
+        .collection("households")
+        .doc(householdId)
+        .collection("lists")
+        .add(toMap());
+    id = ref.id;
+    notifyListeners();
+    return this;
   }
 }
