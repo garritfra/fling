@@ -12,5 +12,7 @@
     "item_add": "Add item",
     "item_hint": "Pasta",
     "item_name": "Name",
-    "status_error": "Something went wrong."
+    "lists": "Lists",
+    "status_error": "Something went wrong.",
+    "user_invite": "Invite user"
 }

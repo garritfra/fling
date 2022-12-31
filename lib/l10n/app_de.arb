@@ -12,5 +12,7 @@
     "item_add": "Item hinzufügen",
     "item_hint": "Nudeln",
     "item_name": "Name",
-    "status_error": "Etwas ist schiefgelaufen."
+    "lists": "Listen",
+    "status_error": "Etwas ist schiefgelaufen.",
+    "user_invite": "Nutzer einladen"
 }
