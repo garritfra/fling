@@ -18,6 +18,7 @@ To compile this project, you have to do the following:
 ## Release Workflow
 
 1. Update version info in `pubspec.yaml`
-1. Commit with name of version
-1. `git tag -a <new tag> -m "$(git shortlog <previous tag>..HEAD)"`
-1. `git push --tags`
+2. Update changelog
+3. Commit with name of version
+4. `git tag -a <new tag> -m "$(git shortlog <previous tag>..HEAD)"`
+5. `git push --tags`
