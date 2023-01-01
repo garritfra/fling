@@ -86,3 +86,19 @@ exports.inviteToHouseholdByEmail = functions.https.onCall(
     return membersRef.doc(invitedUser.uid).create({});
   }
 );
+
+exports.setupUser = functions.auth.user().onCreate((user) => {
+  return db
+    .collection("users")
+    .doc(user.uid)
+    .set({
+      households: [],
+    });
+});
+
+exports.deleteUser = functions.auth.user().onDelete((user) => {
+  return db
+    .collection("users")
+    .doc(user.uid)
+    .delete()
+});
