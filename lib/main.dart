@@ -32,7 +32,7 @@ Future<void> main() async {
   runApp(MultiProvider(providers: [
     StreamProvider<FlingUser?>(
       create: (context) => user,
-      initialData: await user.first,
+      initialData: null,
     )
   ], child: const FlingApp()));
 }

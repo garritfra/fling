@@ -16,11 +16,11 @@ class _AddHouseholdState extends State<AddHousehold> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
-    var user = Provider.of<FlingUser?>(context);
     final nameController = TextEditingController();
 
-    Future<void> onCreate() async {
+    Future<void> onCreateHousehold() async {
       var household = await HouseholdModel(name: nameController.text).save();
+      var user = await FlingUser.currentUser.first;
       user?.setCurrentHouseholdId(household.id!);
 
       Navigator.pop(context);
@@ -33,7 +33,7 @@ class _AddHouseholdState extends State<AddHousehold> {
         child: Column(children: [
           TextField(
               controller: nameController,
-              onSubmitted: (value) => onCreate(),
+              onSubmitted: (value) => onCreateHousehold(),
               decoration: InputDecoration(
                 border: const OutlineInputBorder(),
                 labelText: l10n.household_name,
@@ -41,7 +41,7 @@ class _AddHouseholdState extends State<AddHousehold> {
           Container(
             alignment: Alignment.centerRight,
             child: TextButton(
-              onPressed: () => onCreate(),
+              onPressed: () => onCreateHousehold(),
               child: Text(l10n.household_create),
             ),
           )
