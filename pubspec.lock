@@ -238,7 +238,7 @@ packages:
       name: firebase_ui_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.8"
+    version: "1.1.9"
   firebase_ui_localizations:
     dependency: transitive
     description:
@@ -252,7 +252,7 @@ packages:
       name: firebase_ui_oauth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.8"
+    version: "1.1.9"
   flutter:
     dependency: "direct main"
     description: flutter
