@@ -41,7 +41,7 @@ dependencies:
   firebase_auth: ^4.2.6
   firebase_ui_auth: ^1.1.13
   provider: ^6.0.5
-  firebase_crashlytics: ^3.0.14
+  firebase_crashlytics: ^3.0.15
   package_info_plus: ^3.0.3
   cloud_functions: ^4.0.11
 
