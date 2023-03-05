@@ -13,6 +13,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Ability to delete lists ([#58](https://github.com/garritfra/fling/pull/58))
 - Ability to leave households ([#61](https://github.com/garritfra/fling/pull/61))
 
+## Changed
+
+- Respect dynamic system color theme ([#62](https://github.com/garritfra/fling/pull/62))
+
 ## Maintenance
 
 - Bump cloud_functions from 4.0.8 to 4.4.3
