@@ -12,6 +12,14 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Ability to delete lists ([#58](https://github.com/garritfra/fling/pull/58))
 
+## Maintenance
+
+- Bump cloud_functions from 4.0.8 to 4.4.3
+- Bump firebase_auth from 4.2.5 to 4.2.6
+- Bump firebase_crashlytics from 3.0.9 to 3.0.15
+- Bump firebase_ui_auth from 1.1.7 to 1.1.14
+- Bump package_info_plus from 3.0.2 to 3.0.3
+
 ## v0.6.3 (2023-01-03)
 
 ## Improvements
