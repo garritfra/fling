@@ -11,7 +11,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ## Added
 
 - Ability to delete lists ([#58](https://github.com/garritfra/fling/pull/58))
-- Ability to leave households ([#60](https://github.com/garritfra/fling/pull/60))
+- Ability to leave households ([#61](https://github.com/garritfra/fling/pull/61))
 
 ## Maintenance
 
