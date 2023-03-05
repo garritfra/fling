@@ -22,6 +22,28 @@ class _ListsPageState extends State<ListsPage> {
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
 
+    void showListActionsDialog(FlingListModel list) {
+      showDialog(
+          context: context,
+          builder: ((context) => AlertDialog(
+                title: Text(l10n.list_delete),
+                content: Text(l10n.action_sure),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(l10n.action_cancel)),
+                  TextButton(
+                      onPressed: () {
+                        list.delete();
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(l10n.action_delete)),
+                ],
+              )));
+    }
+
     Widget buildLists(HouseholdModel household) {
       return Expanded(
         child: FutureBuilder(
@@ -38,6 +60,7 @@ class _ListsPageState extends State<ListsPage> {
                           return ListTile(
                             onTap: () => Navigator.pushNamed(context, '/list',
                                 arguments: ListPageArguments(list)),
+                            onLongPress: () => showListActionsDialog(list),
                             key: Key(list.id ?? list.name),
                             title: Text(list.name),
                           );
