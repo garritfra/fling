@@ -6,16 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+## Changed
+
+- Respect dynamic system color theme ([#62](https://github.com/garritfra/fling/pull/62))
+- Improved onboarding experience
+
 ## v0.7.0 (2023-03-05)
 
 ## Added
 
 - Ability to delete lists ([#58](https://github.com/garritfra/fling/pull/58))
 - Ability to leave households ([#61](https://github.com/garritfra/fling/pull/61))
-
-## Changed
-
-- Respect dynamic system color theme ([#62](https://github.com/garritfra/fling/pull/62))
 
 ## Maintenance
 

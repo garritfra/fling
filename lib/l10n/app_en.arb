@@ -10,6 +10,8 @@
     "home": "Home",
     "household_add": "Add household",
     "household_create": "Create household",
+    "household_create_first": "Create your first household",
+    "household_empty": "Empty around here...",
     "household_leave": "Leave household",
     "household_name": "Name of household",
     "households": "Households",

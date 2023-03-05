@@ -10,6 +10,8 @@
     "home": "Home",
     "household_add": "Haushalt hinzufügen",
     "household_create": "Haushalt erstellen",
+    "household_create_first": "Erstelle deinen ersten Haushalt",
+    "household_empty": "Ziemlich leer hier...",
     "household_leave": "Haushalt verlassen",
     "household_name": "Name des Haushalts",
     "households": "Haushalte",

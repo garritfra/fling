@@ -29,6 +29,10 @@ class _ListsPageState extends State<ListsPage> {
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
 
+    void onAddhousehold() {
+      Navigator.pushNamed(context, "/household_add");
+    }
+
     void showListActionsDialog(FlingListModel list) {
       showDialog(
           context: context,
@@ -59,10 +63,12 @@ class _ListsPageState extends State<ListsPage> {
               return StreamBuilder(
                   stream: lists.data,
                   builder: (context, snapshot) {
+                    var lists = snapshot.data ?? [];
+
                     return ListView.builder(
-                        itemCount: snapshot.data?.length ?? 0,
+                        itemCount: lists.length,
                         itemBuilder: (BuildContext context, int index) {
-                          FlingListModel list = snapshot.data!.elementAt(index);
+                          FlingListModel list = lists.elementAt(index);
 
                           return ListTile(
                             onTap: () => Navigator.pushNamed(context, '/list',
@@ -74,6 +80,17 @@ class _ListsPageState extends State<ListsPage> {
                         });
                   });
             }),
+      );
+    }
+
+    Widget buildEmptyHouseholds() {
+      return Column(
+        children: [
+          Text(l10n.household_empty),
+          TextButton(
+              onPressed: onAddhousehold,
+              child: Text(l10n.household_create_first))
+        ],
       );
     }
 
@@ -152,10 +169,6 @@ class _ListsPageState extends State<ListsPage> {
         Navigator.pop(context);
       }
 
-      void onAddhousehold() {
-        Navigator.popAndPushNamed(context, "/household_add");
-      }
-
       showDialog(
           context: context,
           builder: ((context) => AlertDialog(
@@ -231,7 +244,7 @@ class _ListsPageState extends State<ListsPage> {
                       AsyncSnapshot<HouseholdModel> household) {
                     Widget buildSwitchHouseholdAction() {
                       return IconButton(
-                          onPressed: () => showHouseholdSwitcher(),
+                          onPressed: showHouseholdSwitcher,
                           icon: const Icon(Icons.swap_horiz));
                     }
 
@@ -263,21 +276,28 @@ class _ListsPageState extends State<ListsPage> {
                     return Scaffold(
                       appBar: AppBar(
                         title: Text(household.data?.name ??
-                            AppLocalizations.of(context)!.lists),
-                        actions: [
-                          buildSwitchHouseholdAction(),
-                          buildMoreAction(),
-                        ],
+                            AppLocalizations.of(context)!.home),
+                        actions: household.hasData
+                            ? [
+                                buildSwitchHouseholdAction(),
+                                buildMoreAction(),
+                              ]
+                            : null,
                       ),
-                      floatingActionButton: FloatingActionButton(
-                          onPressed: () => onAddListPressed(),
-                          child: const Icon(Icons.add)),
+                      floatingActionButton: household.hasData
+                          ? FloatingActionButton(
+                              onPressed: onAddListPressed,
+                              child: const Icon(Icons.add))
+                          : null,
                       drawer: const FlingDrawer(),
                       body: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            if (household.hasData) buildLists(household.data!)
+                            if (household.hasData)
+                              buildLists(household.data!)
+                            else
+                              buildEmptyHouseholds(),
                           ],
                         ),
                       ),
