@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## Added
+
+- Links to changelog and issue tracker
+
 ## Changed
 
 - Respect dynamic system color theme ([#62](https://github.com/garritfra/fling/pull/62))

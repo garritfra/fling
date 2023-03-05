@@ -1,13 +1,18 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class FlingDrawer extends StatelessWidget {
   const FlingDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var l10n = AppLocalizations.of(context)!;
+
     String? email = FirebaseAuth.instance.currentUser?.email;
     String? username = FirebaseAuth.instance.currentUser?.displayName;
 
@@ -55,6 +60,18 @@ class FlingDrawer extends StatelessWidget {
               PackageInfo.fromPlatform().then((packageInfo) => {
                     showAboutDialog(
                         context: context,
+                        children: [
+                          TextButton(
+                            child: Text(l10n.bug_report),
+                            onPressed: () => launchUrlString(
+                                "https://github.com/garritfra/fling/issues"),
+                          ),
+                          TextButton(
+                            child: Text(l10n.changelog),
+                            onPressed: () => launchUrlString(
+                                "https://github.com/garritfra/fling/blob/main/CHANGELOG.md"),
+                          )
+                        ],
                         applicationVersion: packageInfo.version)
                   });
             },

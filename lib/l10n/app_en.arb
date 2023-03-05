@@ -4,6 +4,8 @@
     "action_done": "Done",
     "action_edit_entry": "Edit entry",
     "action_sure": "Are you sure?",
+    "bug_report": "Report a problem",
+    "changelog": "Changelog",
     "list_create": "Create list",
     "list_delete": "Delete list",
     "lists": "Lists",

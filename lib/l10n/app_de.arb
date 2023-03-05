@@ -4,6 +4,8 @@
     "action_done": "Fertig",
     "action_edit_entry": "Eintrag bearbeiten",
     "action_sure": "Bist du sicher?",
+    "bug_report": "Fehler melden",
+    "changelog": "Changelog",
     "list_create": "Liste erstellen",
     "list_delete": "Liste löschen",
     "lists": "Listen",
