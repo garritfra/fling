@@ -1,8 +1,11 @@
 {
     "action_cancel": "Abbrechen",
+    "action_delete": "Löschen",
     "action_done": "Fertig",
     "action_edit_entry": "Eintrag bearbeiten",
+    "action_sure": "Bist du sicher?",
     "list_create": "Liste erstellen",
+    "list_delete": "Liste löschen",
     "lists": "Listen",
     "home": "Home",
     "household_add": "Haushalt hinzufügen",

@@ -69,6 +69,12 @@ class FlingListModel extends ChangeNotifier {
     };
   }
 
+  Future<FlingListModel?> delete() async {
+    await ref.delete();
+    notifyListeners();
+    return this;
+  }
+
   Future<FlingListModel?> save() async {
     var ref = await firestore
         .collection("households")

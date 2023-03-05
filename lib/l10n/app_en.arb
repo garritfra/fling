@@ -1,8 +1,11 @@
 {
     "action_cancel": "Cancel",
+    "action_delete": "Delete",
     "action_done": "Done",
     "action_edit_entry": "Edit entry",
+    "action_sure": "Are you sure?",
     "list_create": "Create list",
+    "list_delete": "Delete list",
     "lists": "Lists",
     "home": "Home",
     "household_add": "Add household",
