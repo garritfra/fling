@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:fling/data/data/household.dart';
 import 'package:fling/data/data/list.dart';
@@ -13,6 +15,11 @@ class ListsPage extends StatefulWidget {
 
   @override
   State<ListsPage> createState() => _ListsPageState();
+}
+
+enum HouseholdMenuListAction {
+  inviteUser,
+  deleteHousehold,
 }
 
 class _ListsPageState extends State<ListsPage> {
@@ -67,6 +74,29 @@ class _ListsPageState extends State<ListsPage> {
                         });
                   });
             }),
+      );
+    }
+
+    void showDeleteHouseholdDialog(HouseholdModel household) {
+      showDialog(
+        context: context,
+        builder: ((context) => AlertDialog(
+              title: Text(l10n.list_delete),
+              content: Text(l10n.action_sure),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(l10n.action_cancel)),
+                TextButton(
+                    onPressed: () {
+                      household.leave();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(l10n.action_delete)),
+              ],
+            )),
       );
     }
 
@@ -194,21 +224,40 @@ class _ListsPageState extends State<ListsPage> {
         var user = snapshot.data;
         return FutureBuilder(
             future: user?.currentHousehold,
-            builder: (context, household) {
+            builder: (context, householdSnapshot) {
               return StreamBuilder(
-                  stream: household.data,
+                  stream: householdSnapshot.data,
                   builder: (BuildContext context,
                       AsyncSnapshot<HouseholdModel> household) {
                     Widget buildSwitchHouseholdAction() {
                       return IconButton(
                           onPressed: () => showHouseholdSwitcher(),
-                          icon: const Icon(Icons.house_outlined));
+                          icon: const Icon(Icons.swap_horiz));
                     }
 
-                    Widget buildInviteAction() {
-                      return IconButton(
-                          onPressed: () => showInviteDialog(),
-                          icon: const Icon(Icons.group_add));
+                    Widget buildMoreAction() {
+                      return PopupMenuButton(
+                          onSelected: (selection) {
+                            switch (selection) {
+                              case HouseholdMenuListAction.inviteUser:
+                                showInviteDialog();
+                                break;
+                              case HouseholdMenuListAction.deleteHousehold:
+                                if (household.data != null) {
+                                  showDeleteHouseholdDialog(household.data!);
+                                }
+                                break;
+                            }
+                          },
+                          itemBuilder: (context) => [
+                                PopupMenuItem(
+                                    value: HouseholdMenuListAction.inviteUser,
+                                    child: Text(l10n.user_invite)),
+                                PopupMenuItem(
+                                    value:
+                                        HouseholdMenuListAction.deleteHousehold,
+                                    child: Text(l10n.household_leave))
+                              ]);
                     }
 
                     return Scaffold(
@@ -216,8 +265,8 @@ class _ListsPageState extends State<ListsPage> {
                         title: Text(household.data?.name ??
                             AppLocalizations.of(context)!.lists),
                         actions: [
-                          buildInviteAction(),
-                          buildSwitchHouseholdAction()
+                          buildSwitchHouseholdAction(),
+                          buildMoreAction(),
                         ],
                       ),
                       floatingActionButton: FloatingActionButton(

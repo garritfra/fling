@@ -12,14 +12,18 @@ class HouseholdModel extends ChangeNotifier {
   HouseholdModel({this.id, required this.name});
 
   factory HouseholdModel.fromMap(Map<String, dynamic> data, String? id) {
-    return HouseholdModel(id: id, name: data["name"]);
+    return HouseholdModel(id: id, name: data["name"] ?? "");
   }
 
   static Future<HouseholdModel> fromId(String id) async {
-    FlingUser? user = await FlingUser.currentUser.first;
     var snap =
         await FirebaseFirestore.instance.collection("households").doc(id).get();
-    return HouseholdModel.fromMap(snap.data() ?? {}, id);
+    var data = snap.data() ?? {};
+    if (data != {}) {
+      return HouseholdModel.fromMap(data, id);
+    }
+
+    return HouseholdModel(name: "");
   }
 
   Map<String, dynamic> toMap() {
@@ -38,6 +42,13 @@ class HouseholdModel extends ChangeNotifier {
     var ref = await firestore.collection("households").add(toMap());
     await ref.collection("members").doc(user!.uid).set({});
     id = ref.id;
+    notifyListeners();
+    return this;
+  }
+
+  Future<HouseholdModel> leave() async {
+    FlingUser? user = await FlingUser.currentUser.first;
+    (await ref).collection("members").doc(user?.uid).delete();
     notifyListeners();
     return this;
   }
