@@ -91,21 +91,21 @@ packages:
       name: cloud_functions
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.11"
+    version: "4.0.12"
   cloud_functions_platform_interface:
     dependency: transitive
     description:
       name: cloud_functions_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.1.30"
+    version: "5.1.31"
   cloud_functions_web:
     dependency: transitive
     description:
       name: cloud_functions_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.3.19"
+    version: "4.3.20"
   collection:
     dependency: transitive
     description:
