@@ -175,21 +175,21 @@ packages:
       name: firebase_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.2.9"
+    version: "4.3.0"
   firebase_auth_platform_interface:
     dependency: transitive
     description:
       name: firebase_auth_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.11.11"
+    version: "6.12.0"
   firebase_auth_web:
     dependency: transitive
     description:
       name: firebase_auth_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.2.8"
+    version: "5.2.10"
   firebase_core:
     dependency: "direct main"
     description:
@@ -231,21 +231,21 @@ packages:
       name: firebase_dynamic_links
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.15"
+    version: "5.0.17"
   firebase_dynamic_links_platform_interface:
     dependency: transitive
     description:
       name: firebase_dynamic_links_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.3+30"
+    version: "0.2.3+32"
   firebase_ui_auth:
     dependency: "direct main"
     description:
       name: firebase_ui_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.15"
+    version: "1.1.17"
   firebase_ui_localizations:
     dependency: transitive
     description:
@@ -259,7 +259,7 @@ packages:
       name: firebase_ui_oauth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.15"
+    version: "1.1.17"
   flutter:
     dependency: "direct main"
     description: flutter
