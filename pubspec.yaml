@@ -34,7 +34,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  cloud_firestore: ^4.5.0
+  cloud_firestore: ^4.5.1
   cloud_functions: ^4.1.0
   cupertino_icons: ^1.0.2
   dynamic_color: ^1.5.4
