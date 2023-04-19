@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v0.8.1 (2023-04-19)
 
 ### Added
 
@@ -24,8 +24,6 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Bump firebase_crashlytics from 3.0.15 to 3.1.1
 - Bump firebase_ui_auth from 1.1.14 to 1.2.2
 - Bump package_info_plus from 3.0.3 to 3.1.0
-- Bump provider from 6.0.5 to 6.0.5
-- Bump url_launcher from 6.1.10 to 6.1.10
 - Bump flutter_launcher_icons from 0.11.0 to 0.13.1
 
 ## v0.8.0 (2023-03-05)
