@@ -128,9 +128,24 @@ class _ListPageState extends State<ListPage> {
                               }))
                           .toList();
 
-                      return ListView.builder(
+                      onReorder(int oldIndex, int newIndex) {
+                        if (oldIndex < newIndex) {
+                          newIndex -= 1;
+                        }
+                        final ListItem item = items.removeAt(oldIndex);
+                        items.insert(newIndex, item);
+
+                        for (var i = 0; i <= items.length - 1; i++) {
+                          items[i].index = i;
+                        }
+
+                        list.updateOrder(items);
+                      }
+
+                      return ReorderableListView.builder(
                           itemCount: items.length,
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          onReorder: onReorder,
                           itemBuilder: (BuildContext context, int index) {
                             ListItem item = items.elementAt(index);
 

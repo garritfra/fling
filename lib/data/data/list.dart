@@ -34,10 +34,14 @@ class FlingListModel extends ChangeNotifier {
   }
 
   void addItem(String text) async {
-    ListItem item =
-        ListItem(checked: false, id: text.hashCode.toString(), text: text);
-
     var items = ref.collection("items");
+    var itemCountSnapshot = await items.count().get();
+
+    ListItem item = ListItem(
+        checked: false,
+        id: text.hashCode.toString(),
+        text: text,
+        index: itemCountSnapshot.count);
 
     var itemRef = await items.add(item.toMap());
     item.id = itemRef.id;
@@ -72,6 +76,18 @@ class FlingListModel extends ChangeNotifier {
   Future<FlingListModel?> delete() async {
     await ref.delete();
     notifyListeners();
+    return this;
+  }
+
+  Future<FlingListModel?> updateOrder(List<ListItem> newItems) async {
+    var batch = firestore.batch();
+    for (var i = 0; i <= newItems.length - 1; i++) {
+      var item = newItems[i];
+      batch.update(ref.collection("items").doc(item.id), ({"index": i}));
+    }
+
+    await batch.commit();
+
     return this;
   }
 
