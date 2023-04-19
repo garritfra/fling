@@ -1,6 +1,7 @@
 {
     "action_cancel": "Abbrechen",
     "action_delete": "Löschen",
+    "action_delete_checked": "Erledigte Einträge löschen",
     "action_done": "Fertig",
     "action_edit_entry": "Eintrag bearbeiten",
     "action_sure": "Bist du sicher?",

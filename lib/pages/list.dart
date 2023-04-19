@@ -1,6 +1,7 @@
 import 'package:fling/data/data/household.dart';
 import 'package:fling/data/data/list.dart';
 import 'package:fling/data/data/user.dart';
+import 'package:fling/layout/confirm_dialog.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -40,14 +41,20 @@ class _ListPageState extends State<ListPage> {
 
     FlingListModel list = args.list;
 
-    Widget _buildDeleteButton() {
+    Widget buildDeleteButton() {
       return IconButton(
-          icon: const Icon(Icons.delete),
+          icon: const Icon(Icons.delete_sweep),
           color: Colors.red,
-          onPressed: () => list.deleteChecked());
+          onPressed: () => showConfirmDialog(
+              context: context,
+              yesText: l10n.action_delete_checked,
+              yesAction: () {
+                Navigator.of(context).pop();
+                list.deleteChecked();
+              }));
     }
 
-    Widget _buildItemTextField() {
+    Widget buildItemTextField() {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
         // TODO: use subscribed model in state
@@ -65,7 +72,7 @@ class _ListPageState extends State<ListPage> {
       );
     }
 
-    Widget _buildListItem(ListItem item) {
+    Widget buildListItem(ListItem item) {
       var textController = TextEditingController(text: item.text);
       return Card(
         child: ListTile(
@@ -105,7 +112,7 @@ class _ListPageState extends State<ListPage> {
       );
     }
 
-    Widget _buildItemList() {
+    Widget buildItemList() {
       return FutureBuilder(
           future: list.items,
           builder: (context, snapshot) {
@@ -134,7 +141,7 @@ class _ListPageState extends State<ListPage> {
                           itemBuilder: (BuildContext context, int index) {
                             ListItem item = items.elementAt(index);
 
-                            Widget itemView = _buildListItem(item);
+                            Widget itemView = buildListItem(item);
 
                             if (item.checked) {
                               return Dismissible(
@@ -163,7 +170,7 @@ class _ListPageState extends State<ListPage> {
                     return Scaffold(
                       appBar: AppBar(
                         actions: [
-                          _buildDeleteButton(),
+                          buildDeleteButton(),
                         ],
                         title: Text(args.list.name),
                       ),
@@ -173,8 +180,8 @@ class _ListPageState extends State<ListPage> {
                           width: 600.0,
                           child: Column(
                             children: [
-                              _buildItemList(),
-                              _buildItemTextField(),
+                              buildItemList(),
+                              buildItemTextField(),
                             ],
                           ),
                         ),

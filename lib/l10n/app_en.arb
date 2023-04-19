@@ -1,6 +1,7 @@
 {
     "action_cancel": "Cancel",
     "action_delete": "Delete",
+    "action_delete_checked": "Delete checked entries",
     "action_done": "Done",
     "action_edit_entry": "Edit entry",
     "action_sure": "Are you sure?",
