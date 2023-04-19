@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Added
+
+- Confirm if checked items should be deleted
+
 ### Maintenance
 
 - Bump dart SDK from 2.18.5 to 2.19.6
