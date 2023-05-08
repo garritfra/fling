@@ -39,7 +39,7 @@ dependencies:
   cupertino_icons: 1.0.5
   dynamic_color: 1.6.3
   firebase_auth: 4.4.2
-  firebase_core: 2.10.0
+  firebase_core: ^2.11.0
   firebase_crashlytics: ^3.1.2
   firebase_ui_auth: ^1.2.4
   intl: 0.17.0
