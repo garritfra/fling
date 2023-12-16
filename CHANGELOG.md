@@ -15,6 +15,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Maintenance
 
 - Bump cloud_firestore from 4.5.2 to 4.5.3
+- Bump dynamic_color from 1.6.3 to 1.6.6
 - Bump firebase_core from 2.10.0 to 2.11.0
 - Bump firebase_crashlytics from 3.1.1 to 3.1.2
 - Bump firebase_ui_auth from 1.2.2 to 1.2.4
