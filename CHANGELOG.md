@@ -19,6 +19,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Bump firebase_crashlytics from 3.1.1 to 3.1.2
 - Bump firebase_ui_auth from 1.2.2 to 1.2.4
 - Bump package_info_plus from 3.1.0 to 3.1.2
+- Bump firebase-functions from 3.18.0 to 4.5.0 in /functions
 - Bump protobufjs and google-gax in /functions
 - Bump semver from 7.3.8 to 7.5.3 in /functions
 - Bump word-wrap from 1.2.3 to 1.2.4 in /functions
