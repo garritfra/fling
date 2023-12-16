@@ -53,6 +53,10 @@ class FlingUser extends ChangeNotifier {
     notifyListeners();
   }
 
+  deleteAccount() async {
+    await FirebaseAuth.instance.currentUser?.delete();
+  }
+
   factory FlingUser.fromMap(Map<String, dynamic> data, String uid) {
     return FlingUser(
         uid: uid,

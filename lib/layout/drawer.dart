@@ -1,10 +1,13 @@
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fling/data/data/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
+import 'confirm_dialog.dart';
 
 class FlingDrawer extends StatelessWidget {
   const FlingDrawer({super.key});
@@ -57,6 +60,8 @@ class FlingDrawer extends StatelessWidget {
             leading: const Icon(Icons.info_outline),
             title: const Text("Info"),
             onTap: () {
+              final navigator = Navigator.of(context);
+
               PackageInfo.fromPlatform().then((packageInfo) => {
                     showAboutDialog(
                         context: context,
@@ -70,6 +75,25 @@ class FlingDrawer extends StatelessWidget {
                             child: Text(l10n.changelog),
                             onPressed: () => launchUrlString(
                                 "https://github.com/garritfra/fling/blob/main/CHANGELOG.md"),
+                          ),
+                          TextButton(
+                            child: Text(l10n.account_delete,
+                                style: const TextStyle(color: Colors.red)),
+                            onPressed: () => showConfirmDialog(
+                                context: context,
+                                content:
+                                    Text(l10n.action_account_delete_confirm),
+                                yesText: l10n.action_delete,
+                                yesAction: () async {
+                                  FlingUser? user =
+                                      await FlingUser.currentUser.first;
+
+                                  if (user != null) {
+                                    await user.deleteAccount();
+                                    // TODO: the app should listen for logout changes
+                                    navigator.popAndPushNamed('/login');
+                                  }
+                                }),
                           )
                         ],
                         applicationVersion: packageInfo.version)
