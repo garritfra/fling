@@ -12,6 +12,17 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Added an delete account button to the info menu ([#102](https://github.com/garritfra/fling/pull/102))
 
+### Maintenance
+
+- Bump cloud_firestore from 4.5.2 to 4.5.3
+- Bump firebase_core from 2.10.0 to 2.11.0
+- Bump firebase_crashlytics from 3.1.1 to 3.1.2
+- Bump firebase_ui_auth from 1.2.2 to 1.2.4
+- Bump package_info_plus from 3.1.0 to 3.1.2
+- Bump protobufjs and google-gax in /functions
+- Bump semver from 7.3.8 to 7.5.3 in /functions
+- Bump word-wrap from 1.2.3 to 1.2.4 in /functions
+
 ## v0.8.1 (2023-04-19)
 
 ### Added
