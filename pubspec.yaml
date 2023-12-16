@@ -34,18 +34,18 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  cloud_firestore: 4.5.3
-  cloud_functions: 4.1.1
-  cupertino_icons: 1.0.5
-  dynamic_color: 1.6.6
-  firebase_auth: 4.10.1
-  firebase_core: 2.17.0
-  firebase_crashlytics: 3.1.2
-  firebase_ui_auth: 1.2.4
+  cloud_firestore: ^4.13.6
+  cloud_functions: ^4.5.8
+  cupertino_icons: ^1.0.6
+  dynamic_color: ^1.6.8
+  firebase_auth: ^4.15.3
+  firebase_core: ^2.24.2
+  firebase_crashlytics: ^3.4.8
+  firebase_ui_auth: ^1.11.0
   intl: any # Can't be pinned :(
-  package_info_plus: 3.1.2
-  provider: 6.0.5
-  url_launcher: 6.1.10
+  package_info_plus: ^5.0.1
+  provider: ^6.1.1
+  url_launcher: ^6.2.2
 
 dev_dependencies:
   flutter_launcher_icons: 0.13.1
@@ -57,7 +57,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
 
 flutter_icons:
   android: "launcher_icon"
