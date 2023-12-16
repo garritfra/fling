@@ -101,26 +101,26 @@ packages:
     dependency: "direct main"
     description:
       name: cloud_functions
-      sha256: e22ff122e75ccb6d9d521415d35c25807ba6300932ec3c8ca8ccb73dc5aa39b6
+      sha256: f0e19534e1c0b6b76e0eb2009ffcd8e70db2f4fb75935f3f13151232e322a31d
       url: "https://pub.dev"
     source: hosted
-    version: "4.1.1"
+    version: "4.4.2"
   cloud_functions_platform_interface:
     dependency: transitive
     description:
       name: cloud_functions_platform_interface
-      sha256: d92bd40b3fbcfe32babac91c6423725ace783880f9d06c7c92d44249afc3abfb
+      sha256: "52540251242dcda056724271c10bc81685e69a0c9e0512d4ce9943106cb71665"
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.1"
+    version: "5.5.2"
   cloud_functions_web:
     dependency: transitive
     description:
       name: cloud_functions_web
-      sha256: deffdf2f54d47d88192b82d331065f4a419e49616d1b662785af64556a1760ce
+      sha256: b5d84c50ed3eee5d347150c266d7e428fd87373c9471a76f53f20a7abd9f1b39
       url: "https://pub.dev"
     source: hosted
-    version: "4.4.1"
+    version: "4.6.2"
   collection:
     dependency: transitive
     description:
