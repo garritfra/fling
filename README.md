@@ -15,6 +15,14 @@ To compile this project, you have to do the following:
     * **iOS**: TODO
 4. Run the app via `flutter run`
 
+## Rebuilding translations
+
+Run this whenever you updated the translations.
+
+```
+flutter gen-l10n
+```
+
 ## Release Workflow
 
 1. Update version info in `pubspec.yaml`
