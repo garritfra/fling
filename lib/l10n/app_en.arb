@@ -1,4 +1,6 @@
 {
+    "account_delete": "Delete account",
+    "action_account_delete_confirm": "Do you really want to delete your account? This operation can not be undone!",
     "action_cancel": "Cancel",
     "action_delete": "Delete",
     "action_delete_checked": "Delete checked entries",

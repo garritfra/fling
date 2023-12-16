@@ -1,4 +1,6 @@
 {
+    "account_delete": "Account löschen",
+    "action_account_delete_confirm": "Bist du dir sicher, dass du deinen Account löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden!",
     "action_cancel": "Abbrechen",
     "action_delete": "Löschen",
     "action_delete_checked": "Erledigte Einträge löschen",
