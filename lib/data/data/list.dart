@@ -56,9 +56,15 @@ class FlingListModel extends ChangeNotifier {
 
   void deleteChecked() async {
     WriteBatch batch = firestore.batch();
-    await ref.collection("items").where("checked", isEqualTo: true).get().then(
-        (values) => values.docs
-            .forEach((snapshot) => batch.delete(snapshot.reference)));
+    await ref
+        .collection("items")
+        .where("checked", isEqualTo: true)
+        .get()
+        .then((values) {
+      for (var snapshot in values.docs) {
+        batch.delete(snapshot.reference);
+      }
+    });
 
     await batch.commit();
   }

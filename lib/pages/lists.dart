@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:fling/data/data/household.dart';
 import 'package:fling/data/data/list.dart';
@@ -7,7 +5,6 @@ import 'package:fling/data/data/user.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:fling/pages/list.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ListsPage extends StatefulWidget {
@@ -119,18 +116,18 @@ class _ListsPageState extends State<ListsPage> {
 
     void showInviteDialog() {
       TextEditingController textController = TextEditingController();
-      String? errorText;
+      NavigatorState navigator = Navigator.of(context);
 
       Future<void> onInviteUserPressed() async {
         var callable = functions.httpsCallable('inviteToHouseholdByEmail');
         var user = await FlingUser.currentUser.first;
 
-        var result = await callable({
+        await callable({
           "householdId": user?.currentHouseholdId ?? "",
           "email": textController.text,
         });
 
-        Navigator.of(context).pop();
+        navigator.pop();
       }
 
       showDialog(
@@ -197,6 +194,7 @@ class _ListsPageState extends State<ListsPage> {
 
     onAddListPressed() {
       TextEditingController textController = TextEditingController();
+      NavigatorState navigator = Navigator.of(context);
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -218,7 +216,7 @@ class _ListsPageState extends State<ListsPage> {
                                   name: textController.text)
                               .save();
                         }
-                        Navigator.of(context).pop();
+                        navigator.pop();
                       },
                       child: Text(l10n.action_done)),
                 ],

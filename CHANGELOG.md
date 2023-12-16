@@ -14,6 +14,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Maintenance
 
+- Fix linter warnings
 - Bump dart SDK from 2.19.6 to 3.1.0
 - Bump cloud_firestore from 4.5.2 to 4.13.6
 - Bump cloud_functions from 4.1.1 to 4.5.8
