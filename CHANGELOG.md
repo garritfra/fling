@@ -14,15 +14,22 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Maintenance
 
-- Bump cloud_firestore from 4.5.2 to 4.5.3
-- Bump dynamic_color from 1.6.3 to 1.6.6
-- Bump firebase_core from 2.10.0 to 2.11.0
-- Bump firebase_crashlytics from 3.1.1 to 3.1.2
-- Bump firebase_ui_auth from 1.2.2 to 1.2.4
-- Bump package_info_plus from 3.1.0 to 3.1.2
+- Bump dart SDK from 2.19.6 to 3.1.0
+- Bump cloud_firestore from 4.5.2 to 4.13.6
+- Bump cloud_functions from 4.1.1 to 4.5.8
+- Bump cupertino_icons from 1.0.5 to 1.0.6
+- Bump dart SDK version from 2.19.6 to 3.1.0
+- Bump dynamic_color from 1.6.3 to 1.6.8
 - Bump firebase-functions from 3.18.0 to 4.5.0 in /functions
+- Bump firebase_auth from 4.4.2 to 4.15.3
+- Bump firebase_core from 2.10.0 to 2.24.2
+- Bump firebase_crashlytics from 3.1.1 to 3.4.8
+- Bump firebase_ui_auth from 1.2.2 to 1.11.0
+- Bump package_info_plus from 3.1.0 to 5.0.1
 - Bump protobufjs and google-gax in /functions
+- Bump provider from 6.0.5 to 6.1.1
 - Bump semver from 7.3.8 to 7.5.3 in /functions
+- Bump url_launcher from 6.1.10 to 6.2.2
 - Bump word-wrap from 1.2.3 to 1.2.4 in /functions
 
 ## v0.8.1 (2023-04-19)
