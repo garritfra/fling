@@ -146,10 +146,18 @@ class _ListsPageState extends State<ListsPage> {
                       },
                       child: Text(l10n.action_done)),
                 ],
-                content: TextField(
-                  controller: textController,
-                  autofocus: true,
-                  keyboardType: TextInputType.emailAddress,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    TextField(
+                      decoration:
+                          InputDecoration(hintText: l10n.user_invite_hint),
+                      controller: textController,
+                      autofocus: true,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                  ],
                 ),
               ));
     }

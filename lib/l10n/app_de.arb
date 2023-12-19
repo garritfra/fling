@@ -25,5 +25,6 @@
     "item_name": "Name",
     "lists": "Listen",
     "status_error": "Etwas ist schiefgelaufen.",
-    "user_invite": "Nutzer einladen"
+    "user_invite": "Nutzer einladen",
+    "user_invite_hint": "freund@beispiel.de"
 }

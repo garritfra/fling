@@ -25,5 +25,6 @@
     "item_name": "Name",
     "lists": "Lists",
     "status_error": "Something went wrong.",
-    "user_invite": "Invite user"
+    "user_invite": "Invite user",
+    "user_invite_hint": "friend@example.com"
 }
