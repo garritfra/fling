@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> {
               child: Center(
                   child: Text(
                 AppLocalizations.of(context)!.household_create,
-                style: Theme.of(context).textTheme.button,
+                style: Theme.of(context).textTheme.labelLarge,
               )),
             ),
           ),
@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
               child: Center(
                   child: Text(
                 AppLocalizations.of(context)!.lists,
-                style: Theme.of(context).textTheme.button,
+                style: Theme.of(context).textTheme.labelLarge,
               )),
             ),
           ),
