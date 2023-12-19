@@ -1,4 +1,3 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:fling/data/data/household.dart';
 import 'package:fling/data/data/list.dart';
 import 'package:fling/data/data/user.dart';
@@ -20,8 +19,6 @@ enum HouseholdMenuListAction {
 }
 
 class _ListsPageState extends State<ListsPage> {
-  final functions = FirebaseFunctions.instance;
-
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
@@ -115,17 +112,13 @@ class _ListsPageState extends State<ListsPage> {
     }
 
     void showInviteDialog() {
-      TextEditingController textController = TextEditingController();
+      TextEditingController inviteEmailController = TextEditingController();
       NavigatorState navigator = Navigator.of(context);
 
       Future<void> onInviteUserPressed() async {
-        var callable = functions.httpsCallable('inviteToHouseholdByEmail');
         var user = await FlingUser.currentUser.first;
-
-        await callable({
-          "householdId": user?.currentHouseholdId ?? "",
-          "email": textController.text,
-        });
+        var household = await (await user?.currentHousehold)?.first;
+        household?.inviteByEmail(inviteEmailController.text);
 
         navigator.pop();
       }
@@ -153,7 +146,7 @@ class _ListsPageState extends State<ListsPage> {
                     TextField(
                       decoration:
                           InputDecoration(hintText: l10n.user_invite_hint),
-                      controller: textController,
+                      controller: inviteEmailController,
                       autofocus: true,
                       keyboardType: TextInputType.emailAddress,
                     ),
@@ -170,7 +163,6 @@ class _ListsPageState extends State<ListsPage> {
 
       void onUpdate(String id) {
         user?.setCurrentHouseholdId(id);
-        user?.notifyListeners();
         Navigator.pop(context);
       }
 

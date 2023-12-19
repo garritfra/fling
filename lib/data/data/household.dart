@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:fling/data/data/list.dart';
 import 'package:flutter/foundation.dart';
 import 'user.dart';
@@ -8,6 +9,7 @@ class HouseholdModel extends ChangeNotifier {
   String name;
 
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  FirebaseFunctions functions = FirebaseFunctions.instance;
 
   HouseholdModel({this.id, required this.name});
 
@@ -51,6 +53,16 @@ class HouseholdModel extends ChangeNotifier {
     (await ref).collection("members").doc(user?.uid).delete();
     notifyListeners();
     return this;
+  }
+
+  Future<void> inviteByEmail(String email) async {
+    var callable = functions.httpsCallable('inviteToHouseholdByEmail');
+    var user = await FlingUser.currentUser.first;
+
+    await callable({
+      "householdId": user?.currentHouseholdId ?? "",
+      "email": email,
+    });
   }
 
   Future<Stream<List<FlingListModel>>> get lists async {
