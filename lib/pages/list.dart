@@ -1,7 +1,7 @@
-import 'package:fling/data/data/household.dart';
-import 'package:fling/data/data/list.dart';
-import 'package:fling/data/data/list_item.dart';
-import 'package:fling/data/data/user.dart';
+import 'package:fling/data/household.dart';
+import 'package:fling/data/list.dart';
+import 'package:fling/data/list_item.dart';
+import 'package:fling/data/user.dart';
 import 'package:fling/layout/confirm_dialog.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';

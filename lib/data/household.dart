@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:fling/data/data/list.dart';
+import 'package:fling/data/list.dart';
 import 'package:flutter/foundation.dart';
 import 'user.dart';
 
