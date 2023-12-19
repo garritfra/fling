@@ -1,13 +1,12 @@
-import 'package:fling/data/data/household.dart';
-import 'package:fling/data/data/list.dart';
-import 'package:fling/data/data/user.dart';
+import 'package:fling/data/household.dart';
+import 'package:fling/data/list.dart';
+import 'package:fling/data/list_item.dart';
+import 'package:fling/data/user.dart';
 import 'package:fling/layout/confirm_dialog.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import '../data/data/list_item.dart';
 
 class ListPageArguments {
   final FlingListModel list;

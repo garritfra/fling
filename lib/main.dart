@@ -2,7 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:fling/pages/household_add.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:fling/data/data/user.dart';
+import 'package:fling/data/user.dart';
 import 'package:fling/pages/list.dart';
 import 'package:fling/pages/lists.dart';
 import 'package:flutter/material.dart';

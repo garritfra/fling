@@ -1,8 +1,7 @@
-import 'package:fling/data/data/household.dart';
+import 'package:fling/data/household.dart';
+import 'package:fling/data/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import '../data/data/user.dart';
 
 class AddHousehold extends StatefulWidget {
   const AddHousehold({super.key});

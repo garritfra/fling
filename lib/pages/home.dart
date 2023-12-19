@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fling/data/data/household.dart';
-import 'package:fling/data/data/user.dart';
+import 'package:fling/data/household.dart';
+import 'package:fling/data/user.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
