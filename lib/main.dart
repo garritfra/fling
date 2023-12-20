@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fba;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'firebase_options.dart';
@@ -43,8 +44,33 @@ class FlingApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var providers = [EmailAuthProvider()];
 
+    final router = GoRouter(
+      initialLocation:
+          fba.FirebaseAuth.instance.currentUser == null ? '/login' : '/lists',
+      routes: [
+        GoRoute(path: '/lists', builder: (context, state) => const ListsPage()),
+        GoRoute(path: '/list', builder: (context, state) => const ListPage()),
+        GoRoute(
+            path: '/household_add',
+            builder: (context, state) => const AddHousehold()),
+        GoRoute(
+            path: '/login',
+            builder: (context, state) => SignInScreen(
+                  providers: providers,
+                  actions: [
+                    AuthStateChangeAction<SignedIn>((context, state) {
+                      context.go('/');
+                    }),
+                    AuthStateChangeAction<UserCreated>((context, state) {
+                      context.go('/');
+                    }),
+                  ],
+                )),
+      ],
+    );
+
     return DynamicColorBuilder(
-      builder: (lightDynamic, darkDynamic) => MaterialApp(
+      builder: (lightDynamic, darkDynamic) => MaterialApp.router(
         localizationsDelegates: const [
           AppLocalizations.delegate, // Add this line
           GlobalMaterialLocalizations.delegate,
@@ -62,27 +88,7 @@ class FlingApp extends StatelessWidget {
         darkTheme: ThemeData(
             useMaterial3: true,
             colorScheme: darkDynamic ?? ThemeData.dark().colorScheme),
-        initialRoute:
-            fba.FirebaseAuth.instance.currentUser == null ? '/login' : '/',
-        routes: <String, WidgetBuilder>{
-          '/login': (context) {
-            return SignInScreen(
-              providers: providers,
-              actions: [
-                AuthStateChangeAction<SignedIn>((context, state) {
-                  Navigator.pushReplacementNamed(context, '/');
-                }),
-                AuthStateChangeAction<UserCreated>((context, state) {
-                  Navigator.pushReplacementNamed(context, '/');
-                }),
-              ],
-            );
-          },
-          '/lists': ((context) => const ListsPage()),
-          '/list': ((context) => const ListPage()),
-          '/household_add': ((context) => const AddHousehold())
-        },
-        home: const ListsPage(),
+        routerConfig: router,
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:fling/data/household.dart';
 import 'package:fling/data/user.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -17,7 +18,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     FirebaseAuth.instance.authStateChanges().listen((user) => {
-          if (user == null) {Navigator.popAndPushNamed(context, "/login")}
+          if (user == null) {context.go("/login")}
         });
 
     Widget buildCreateHouseholdButton() {
@@ -48,8 +49,7 @@ class _HomePageState extends State<HomePage> {
           color: const Color.fromARGB(255, 51, 138, 126),
           child: InkWell(
             onTap: () {
-              // TODO: Possible memory leak. Proper navigation concept needed
-              Navigator.pushNamed(context, '/lists');
+              context.go('/lists');
             },
             child: SizedBox(
               height: 100,

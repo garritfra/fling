@@ -5,6 +5,7 @@ import 'package:fling/layout/drawer.dart';
 import 'package:fling/pages/list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 
 class ListsPage extends StatefulWidget {
   const ListsPage({super.key});
@@ -24,7 +25,7 @@ class _ListsPageState extends State<ListsPage> {
     var l10n = AppLocalizations.of(context)!;
 
     void onAddhousehold() {
-      Navigator.pushNamed(context, "/household_add");
+      context.go("/household_add");
     }
 
     void showListActionsDialog(FlingListModel list) {
@@ -65,8 +66,8 @@ class _ListsPageState extends State<ListsPage> {
                           FlingListModel list = lists.elementAt(index);
 
                           return ListTile(
-                            onTap: () => Navigator.pushNamed(context, '/list',
-                                arguments: ListPageArguments(list)),
+                            onTap: () => context.go('/list',
+                                extra: ListPageArguments(list)),
                             onLongPress: () => showListActionsDialog(list),
                             key: Key(list.id ?? list.name),
                             title: Text(list.name),
