@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fling/data/user.dart';
 import 'package:flutter/foundation.dart';
 
 import 'list_item.dart';
@@ -15,6 +16,19 @@ class FlingListModel extends ChangeNotifier {
   factory FlingListModel.fromMap(
       Map<String, dynamic> data, String id, String householdId) {
     return FlingListModel(id: id, name: data["name"], householdId: householdId);
+  }
+
+  static Future<FlingListModel?> findById(String id) async {
+    var user = await FlingUser.currentUser.first;
+    var household = await (await user?.currentHousehold)?.first;
+
+    var snap = await (await household?.ref)?.collection("lists").doc(id).get();
+    var data = snap?.data() ?? {};
+    if (data != {}) {
+      return FlingListModel.fromMap(data, id, household!.id!);
+    } else {
+      return null;
+    }
   }
 
   Future<Stream<QuerySnapshot<Object?>>> get items async {

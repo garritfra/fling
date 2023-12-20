@@ -5,6 +5,7 @@ import 'package:fling/data/user.dart';
 import 'package:fling/layout/confirm_dialog.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -34,10 +35,10 @@ class _ListPageState extends State<ListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as ListPageArguments;
     var l10n = AppLocalizations.of(context)!;
 
+    ListPageArguments args =
+        GoRouterState.of(context).extra! as ListPageArguments;
     FlingListModel list = args.list;
 
     Widget buildDeleteButton() {
@@ -171,7 +172,7 @@ class _ListPageState extends State<ListPage> {
                         actions: [
                           buildDeleteButton(),
                         ],
-                        title: Text(args.list.name),
+                        title: Text(list.name),
                       ),
                       drawer: const FlingDrawer(),
                       body: Center(

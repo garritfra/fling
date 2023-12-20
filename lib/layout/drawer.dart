@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fling/data/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -42,8 +43,7 @@ class FlingDrawer extends StatelessWidget {
                 ListTile(
                   title: Text(AppLocalizations.of(context)!.lists),
                   onTap: () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacementNamed(context, '/lists');
+                    context.go('/lists');
                   },
                 ),
 
@@ -58,8 +58,6 @@ class FlingDrawer extends StatelessWidget {
             leading: const Icon(Icons.info_outline),
             title: const Text("Info"),
             onTap: () {
-              final navigator = Navigator.of(context);
-
               PackageInfo.fromPlatform().then((packageInfo) => {
                     showAboutDialog(
                         context: context,
@@ -89,7 +87,7 @@ class FlingDrawer extends StatelessWidget {
                                   if (user != null) {
                                     await user.deleteAccount();
                                     // TODO: the app should listen for logout changes
-                                    navigator.popAndPushNamed('/login');
+                                    context.go('/login');
                                   }
                                 }),
                           )
@@ -104,7 +102,7 @@ class FlingDrawer extends StatelessWidget {
             onTap: () {
               FirebaseAuth.instance.signOut();
               // TODO: the app should listen for logout changes
-              Navigator.popAndPushNamed(context, '/login');
+              context.go('/login');
             },
           ),
         ],
