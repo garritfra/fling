@@ -13,6 +13,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 - Web Deployment ([#119](https://github.com/garritfra/fling/pull/119))
 - Display example input in user invite dialog ([#124](https://github.com/garritfra/fling/pull/124))
 
+### Maintenance
+
+- Minor architecture refactorings ([#126](https://github.com/garritfra/fling/pull/126))
+
 ## v0.8.2 (2023-12-16)
 
 ### Added
