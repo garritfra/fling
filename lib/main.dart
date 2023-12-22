@@ -1,6 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:fling/pages/household_add.dart';
+import 'package:fling/pages/login.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:fling/data/user.dart';
 import 'package:fling/pages/list.dart';
@@ -8,7 +9,6 @@ import 'package:fling/pages/lists.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fba;
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -41,8 +41,6 @@ class FlingApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var providers = [EmailAuthProvider()];
-
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) => MaterialApp(
         localizationsDelegates: const [
@@ -65,19 +63,7 @@ class FlingApp extends StatelessWidget {
         initialRoute:
             fba.FirebaseAuth.instance.currentUser == null ? '/login' : '/',
         routes: <String, WidgetBuilder>{
-          '/login': (context) {
-            return SignInScreen(
-              providers: providers,
-              actions: [
-                AuthStateChangeAction<SignedIn>((context, state) {
-                  Navigator.pushReplacementNamed(context, '/');
-                }),
-                AuthStateChangeAction<UserCreated>((context, state) {
-                  Navigator.pushReplacementNamed(context, '/');
-                }),
-              ],
-            );
-          },
+          '/login': (context) => const LoginPage(),
           '/lists': ((context) => const ListsPage()),
           '/list': ((context) => const ListPage()),
           '/household_add': ((context) => const AddHousehold())
