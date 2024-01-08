@@ -35,7 +35,7 @@ dependencies:
     sdk: flutter
 
   cloud_firestore: ^4.14.0
-  cloud_functions: ^4.5.8
+  cloud_functions: ^4.6.0
   cupertino_icons: ^1.0.6
   dynamic_color: ^1.6.9
   firebase_auth: ^4.15.3
