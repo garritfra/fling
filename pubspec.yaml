@@ -41,7 +41,7 @@ dependencies:
   firebase_auth: ^4.17.3
   firebase_core: ^2.25.4
   firebase_crashlytics: ^3.4.14
-  firebase_ui_auth: ^1.12.1
+  firebase_ui_auth: ^1.13.0
   intl: any # Can't be pinned :(
   package_info_plus: ^5.0.1
   provider: ^6.1.1
