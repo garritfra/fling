@@ -38,7 +38,7 @@ dependencies:
   cloud_functions: ^4.6.5
   cupertino_icons: ^1.0.6
   dynamic_color: ^1.6.9
-  firebase_auth: ^4.17.3
+  firebase_auth: ^4.17.4
   firebase_core: ^2.25.4
   firebase_crashlytics: ^3.4.14
   firebase_ui_auth: ^1.13.0
