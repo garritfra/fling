@@ -44,7 +44,7 @@ dependencies:
   firebase_ui_auth: ^1.13.0
   intl: any # Can't be pinned :(
   package_info_plus: ^5.0.1
-  provider: ^6.1.1
+  provider: ^6.1.2
   url_launcher: ^6.2.5
 
 dev_dependencies:
