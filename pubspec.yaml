@@ -39,7 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   dynamic_color: ^1.7.0
   firebase_auth: ^4.17.6
-  firebase_core: ^2.25.4
+  firebase_core: ^2.27.0
   firebase_crashlytics: ^3.4.16
   firebase_ui_auth: ^1.13.1
   intl: any # Can't be pinned :(
