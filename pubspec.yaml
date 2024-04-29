@@ -36,16 +36,16 @@ dependencies:
 
   cloud_firestore: ^4.15.8
   cloud_functions: ^4.6.8
-  cupertino_icons: ^1.0.6
+  cupertino_icons: ^1.0.8
   dynamic_color: ^1.7.0
   firebase_auth: ^4.17.8
   firebase_core: ^2.25.4
   firebase_crashlytics: ^3.4.18
-  firebase_ui_auth: ^1.13.1
+  firebase_ui_auth: ^1.14.0
   intl: any # Can't be pinned :(
   package_info_plus: ^5.0.1
   provider: ^6.1.2
-  url_launcher: ^6.2.5
+  url_launcher: ^6.2.6
 
 dev_dependencies:
   flutter_launcher_icons: 0.13.1
