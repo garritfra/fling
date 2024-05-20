@@ -15,7 +15,7 @@ jobs:
           flutter-version: '3.16.4'
           cache: true
       - run: flutter doctor -v
-      - uses: actions/checkout@v4.1.5
+      - uses: actions/checkout@v4.1.6
       - run: flutter pub get
       - run: flutter build -v web --release
       - uses: FirebaseExtended/action-hosting-deploy@v0
