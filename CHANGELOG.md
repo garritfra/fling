@@ -8,6 +8,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## xxx
 
+## v0.8.5 (2024-07-16)
+
+### Maintenance
+
+- Bump dart SDK from 3.1.0 to 3.22.2
+
 ## v0.8.4 (2024-07-16)
 
 ### Maintenance
