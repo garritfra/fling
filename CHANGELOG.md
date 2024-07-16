@@ -8,6 +8,22 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## xxx
 
+## v0.8.4 (2024-07-16)
+
+### Maintenance
+
+- Fix linter warnings
+- Bump cloud_firestore from 4.13.6 to 4.15.8
+- Bump cloud_functions from 4.5.8 to 4.6.8
+- Bump cupertino_icons from 1.0.6 to 1.0.8
+- Bump dynamic_color from 1.6.8 to 1.7.0
+- Bump firebase_auth from 4.15.3 to 4.17.8
+- Bump firebase_core from 2.24.2 to 2.25.4
+- Bump firebase_crashlytics from 3.4.8 to 3.4.18
+- Bump firebase_ui_auth from 1.11.0 to 1.14.0
+- Bump provider from 6.1.1 to 6.1.2
+- Bump url_launcher from 6.2.2 to 6.3.0
+
 ## v0.8.3 (2023-12-20)
 
 ### Added

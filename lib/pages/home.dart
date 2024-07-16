@@ -16,8 +16,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth.instance.authStateChanges().listen((user) => {
-          if (user == null) {Navigator.popAndPushNamed(context, "/login")}
+    FirebaseAuth.instance.authStateChanges().listen((user) {
+          if (user == null) {
+            Navigator.popAndPushNamed(context, "/login");
+          }
         });
 
     Widget buildCreateHouseholdButton() {
