@@ -1,16 +1,16 @@
 import 'package:fling/data/household.dart';
-import 'package:fling/data/list.dart';
+import 'package:fling/data/template.dart';
 import 'package:fling/data/user.dart';
 import 'package:fling/layout/drawer.dart';
-import 'package:fling/pages/list.dart';
+import 'package:fling/pages/template.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class ListsPage extends StatefulWidget {
-  const ListsPage({super.key});
+class TemplatesPage extends StatefulWidget {
+  const TemplatesPage({super.key});
 
   @override
-  State<ListsPage> createState() => _ListsPageState();
+  State<TemplatesPage> createState() => _TemplatesPageState();
 }
 
 enum HouseholdMenuListAction {
@@ -18,7 +18,7 @@ enum HouseholdMenuListAction {
   deleteHousehold,
 }
 
-class _ListsPageState extends State<ListsPage> {
+class _TemplatesPageState extends State<TemplatesPage> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
@@ -27,11 +27,11 @@ class _ListsPageState extends State<ListsPage> {
       Navigator.pushNamed(context, "/household_add");
     }
 
-    void showListActionsDialog(FlingListModel list) {
+    void showTemplateActionsDialog(FlingTemplateModel template) {
       showDialog(
           context: context,
           builder: ((context) => AlertDialog(
-                title: Text(l10n.list_delete),
+                title: Text(l10n.template_delete),
                 content: Text(l10n.action_sure),
                 actions: [
                   TextButton(
@@ -41,7 +41,7 @@ class _ListsPageState extends State<ListsPage> {
                       child: Text(l10n.action_cancel)),
                   TextButton(
                       onPressed: () {
-                        list.delete();
+                        template.delete();
                         Navigator.of(context).pop();
                       },
                       child: Text(l10n.action_delete)),
@@ -49,27 +49,30 @@ class _ListsPageState extends State<ListsPage> {
               )));
     }
 
-    Widget buildLists(HouseholdModel household) {
+    Widget buildTemplates(HouseholdModel household) {
       return Expanded(
         child: FutureBuilder(
-            future: household.lists,
-            builder: (context, lists) {
+            future: household.templates,
+            builder: (context, templates) {
               return StreamBuilder(
-                  stream: lists.data,
+                  stream: templates.data,
                   builder: (context, snapshot) {
-                    var lists = snapshot.data ?? [];
+                    var templates = snapshot.data ?? [];
 
                     return ListView.builder(
-                        itemCount: lists.length,
+                        itemCount: templates.length,
                         itemBuilder: (BuildContext context, int index) {
-                          FlingListModel list = lists.elementAt(index);
+                          FlingTemplateModel template =
+                              templates.elementAt(index);
 
                           return ListTile(
-                            onTap: () => Navigator.pushNamed(context, '/list',
-                                arguments: ListPageArguments(list)),
-                            onLongPress: () => showListActionsDialog(list),
-                            key: Key(list.id ?? list.name),
-                            title: Text(list.name),
+                            onTap: () => Navigator.pushNamed(
+                                context, '/template',
+                                arguments: TemplatePageArguments(template)),
+                            onLongPress: () =>
+                                showTemplateActionsDialog(template),
+                            key: Key(template.id ?? template.name),
+                            title: Text(template.name),
                           );
                         });
                   });
@@ -92,7 +95,7 @@ class _ListsPageState extends State<ListsPage> {
       showDialog(
         context: context,
         builder: ((context) => AlertDialog(
-              title: Text(l10n.list_delete),
+              title: Text(l10n.template_delete),
               content: Text(l10n.action_sure),
               actions: [
                 TextButton(
@@ -192,13 +195,13 @@ class _ListsPageState extends State<ListsPage> {
                   )))));
     }
 
-    onAddListPressed() {
+    onAddTemplatePressed() {
       TextEditingController textController = TextEditingController();
       NavigatorState navigator = Navigator.of(context);
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
-                title: Text(l10n.list_create),
+                title: Text(l10n.template_create),
                 actions: [
                   TextButton(
                       onPressed: () {
@@ -211,7 +214,7 @@ class _ListsPageState extends State<ListsPage> {
                         String? householdId = user?.currentHouseholdId;
 
                         if (householdId != null) {
-                          FlingListModel(
+                          FlingTemplateModel(
                                   householdId: householdId,
                                   name: textController.text)
                               .save();
@@ -273,7 +276,7 @@ class _ListsPageState extends State<ListsPage> {
 
                     return Scaffold(
                       appBar: AppBar(
-                        title: Text(AppLocalizations.of(context)!.lists),
+                        title: Text(AppLocalizations.of(context)!.templates),
                         actions: household.hasData
                             ? [
                                 buildSwitchHouseholdAction(),
@@ -283,7 +286,7 @@ class _ListsPageState extends State<ListsPage> {
                       ),
                       floatingActionButton: household.hasData
                           ? FloatingActionButton(
-                              onPressed: onAddListPressed,
+                              onPressed: onAddTemplatePressed,
                               child: const Icon(Icons.add))
                           : null,
                       drawer: const FlingDrawer(),
@@ -292,7 +295,7 @@ class _ListsPageState extends State<ListsPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             if (household.hasData)
-                              buildLists(household.data!)
+                              buildTemplates(household.data!)
                             else
                               buildEmptyHouseholds(),
                           ],
