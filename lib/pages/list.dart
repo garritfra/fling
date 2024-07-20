@@ -24,6 +24,7 @@ class ListPage extends StatefulWidget {
 
 class _ListPageState extends State<ListPage> {
   final newItemController = TextEditingController();
+  final newItemFocusNode = FocusNode();
 
   @override
   void dispose() {
@@ -94,9 +95,11 @@ class _ListPageState extends State<ListPage> {
         // TODO: use subscribed model in state
         child: TextField(
             controller: newItemController,
+            focusNode: newItemFocusNode,
             onSubmitted: (value) {
               list.addItem(value);
               newItemController.clear();
+              newItemFocusNode.requestFocus();
             },
             decoration: InputDecoration(
               hintText: l10n.item_hint,
@@ -108,6 +111,7 @@ class _ListPageState extends State<ListPage> {
 
     Widget buildListItem(ListItem item) {
       var textController = TextEditingController(text: item.text);
+
       return Card(
         child: ListTile(
           onTap: () => showDialog(

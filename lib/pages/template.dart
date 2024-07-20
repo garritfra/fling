@@ -22,6 +22,7 @@ class TemplatePage extends StatefulWidget {
 
 class _TemplatePageState extends State<TemplatePage> {
   final newItemController = TextEditingController();
+  final newItemFocusNode = FocusNode();
 
   @override
   void dispose() {
@@ -45,9 +46,11 @@ class _TemplatePageState extends State<TemplatePage> {
         // TODO: use subscribed model in state
         child: TextField(
             controller: newItemController,
+            focusNode: newItemFocusNode,
             onSubmitted: (value) {
               template.addItem(value);
               newItemController.clear();
+              newItemFocusNode.requestFocus();
             },
             decoration: InputDecoration(
               hintText: l10n.item_hint,
