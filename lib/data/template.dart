@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fling/data/list.dart';
 import 'package:flutter/foundation.dart';
 
 import 'template_item.dart';
@@ -66,5 +67,13 @@ class FlingTemplateModel extends ChangeNotifier {
     id = ref.id;
     notifyListeners();
     return this;
+  }
+
+  Future<void> applyTolist(FlingListModel list) async {
+    await for (var snapshot in await items) {
+      for (var itemDoc in snapshot.docs) {
+        list.addItem(itemDoc.get('text'));
+      }
+    }
   }
 }

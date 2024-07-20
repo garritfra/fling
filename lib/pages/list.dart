@@ -1,6 +1,7 @@
 import 'package:fling/data/household.dart';
 import 'package:fling/data/list.dart';
 import 'package:fling/data/list_item.dart';
+import 'package:fling/data/template.dart';
 import 'package:fling/data/user.dart';
 import 'package:fling/layout/confirm_dialog.dart';
 import 'package:fling/layout/drawer.dart';
@@ -51,6 +52,40 @@ class _ListPageState extends State<ListPage> {
                 Navigator.of(context).pop();
                 list.deleteChecked();
               }));
+    }
+
+    Future<void> showListTemplatesDialog() async {
+      FlingUser? user = await FlingUser.currentUser.first;
+      HouseholdModel? household = await (await user?.currentHousehold)?.first;
+      List<FlingTemplateModel> templates =
+          await ((await household?.templates)?.first) ?? [];
+
+      Future<void> onAdd(FlingTemplateModel template) async {
+        template.applyTolist(list);
+        Navigator.pop(context);
+      }
+
+      showDialog(
+          context: context,
+          builder: ((context) => AlertDialog(
+              title: Text(l10n.templates),
+              content: SizedBox(
+                  width: double.maxFinite,
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      ...templates.map((template) => ListTile(
+                            onTap: () => onAdd(template),
+                            title: Text(template.name),
+                          )),
+                    ],
+                  )))));
+    }
+
+    Widget buildAddFromTemplateButton() {
+      return IconButton(
+          icon: const Icon(Icons.playlist_add),
+          onPressed: () => showListTemplatesDialog());
     }
 
     Widget buildItemTextField() {
@@ -169,6 +204,7 @@ class _ListPageState extends State<ListPage> {
                     return Scaffold(
                       appBar: AppBar(
                         actions: [
+                          buildAddFromTemplateButton(),
                           buildDeleteButton(),
                         ],
                         title: Text(args.list.name),
