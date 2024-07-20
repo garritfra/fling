@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+xxx
+
+## v0.9.0 (2024-07-20)
+
 ### Added
 
 - Manage and apply templates to lists ([#255](https://github.com/garritfra/fling/pull/255))
