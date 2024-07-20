@@ -11,6 +11,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Manage and apply templates to lists ([#255](https://github.com/garritfra/fling/pull/255))
+- Keep text field active after adding a new item ([#256](https://github.com/garritfra/fling/pull/256))
 
 ## v0.8.5 (2024-07-16)
 
