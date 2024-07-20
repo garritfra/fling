@@ -61,7 +61,7 @@ class _ListPageState extends State<ListPage> {
           await ((await household?.templates)?.first) ?? [];
 
       Future<void> onAdd(FlingTemplateModel template) async {
-        template.applyTolist(list);
+        template.applyToList(list);
         Navigator.pop(context);
       }
 

@@ -69,7 +69,7 @@ class FlingTemplateModel extends ChangeNotifier {
     return this;
   }
 
-  Future<void> applyTolist(FlingListModel list) async {
+  Future<void> applyToList(FlingListModel list) async {
     await for (var snapshot in await items) {
       for (var itemDoc in snapshot.docs) {
         list.addItem(itemDoc.get('text'));
