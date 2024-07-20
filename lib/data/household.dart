@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:fling/data/list.dart';
+import 'package:fling/data/template.dart';
 import 'package:flutter/foundation.dart';
 import 'user.dart';
 
@@ -70,6 +71,14 @@ class HouseholdModel extends ChangeNotifier {
 
     return snapshot.map((snap) => snap.docs
         .map((doc) => FlingListModel.fromMap(doc.data(), doc.id, id!))
+        .toList());
+  }
+
+  Future<Stream<List<FlingTemplateModel>>> get templates async {
+    var snapshot = (await ref).collection("templates").snapshots();
+
+    return snapshot.map((snap) => snap.docs
+        .map((doc) => FlingTemplateModel.fromMap(doc.data(), doc.id, id!))
         .toList());
   }
 }

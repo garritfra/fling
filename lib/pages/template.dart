@@ -1,28 +1,26 @@
 import 'package:fling/data/household.dart';
-import 'package:fling/data/list.dart';
-import 'package:fling/data/list_item.dart';
 import 'package:fling/data/template.dart';
+import 'package:fling/data/template_item.dart';
 import 'package:fling/data/user.dart';
-import 'package:fling/layout/confirm_dialog.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class ListPageArguments {
-  final FlingListModel list;
+class TemplatePageArguments {
+  final FlingTemplateModel template;
 
-  ListPageArguments(this.list);
+  TemplatePageArguments(this.template);
 }
 
-class ListPage extends StatefulWidget {
-  const ListPage({super.key});
+class TemplatePage extends StatefulWidget {
+  const TemplatePage({super.key});
 
   @override
-  State<ListPage> createState() => _ListPageState();
+  State<TemplatePage> createState() => _TemplatePageState();
 }
 
-class _ListPageState extends State<ListPage> {
+class _TemplatePageState extends State<TemplatePage> {
   final newItemController = TextEditingController();
 
   @override
@@ -36,57 +34,10 @@ class _ListPageState extends State<ListPage> {
   @override
   Widget build(BuildContext context) {
     final args =
-        ModalRoute.of(context)!.settings.arguments as ListPageArguments;
+        ModalRoute.of(context)!.settings.arguments as TemplatePageArguments;
     var l10n = AppLocalizations.of(context)!;
 
-    FlingListModel list = args.list;
-
-    Widget buildDeleteButton() {
-      return IconButton(
-          icon: const Icon(Icons.delete_sweep),
-          color: Colors.red,
-          onPressed: () => showConfirmDialog(
-              context: context,
-              yesText: l10n.action_delete_checked,
-              yesAction: () {
-                Navigator.of(context).pop();
-                list.deleteChecked();
-              }));
-    }
-
-    Future<void> showListTemplatesDialog() async {
-      FlingUser? user = await FlingUser.currentUser.first;
-      HouseholdModel? household = await (await user?.currentHousehold)?.first;
-      List<FlingTemplateModel> templates =
-          await ((await household?.templates)?.first) ?? [];
-
-      Future<void> onAdd(FlingTemplateModel template) async {
-        template.applyToList(list);
-        Navigator.pop(context);
-      }
-
-      showDialog(
-          context: context,
-          builder: ((context) => AlertDialog(
-              title: Text(l10n.templates),
-              content: SizedBox(
-                  width: double.maxFinite,
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      ...templates.map((template) => ListTile(
-                            onTap: () => onAdd(template),
-                            title: Text(template.name),
-                          )),
-                    ],
-                  )))));
-    }
-
-    Widget buildAddFromTemplateButton() {
-      return IconButton(
-          icon: const Icon(Icons.playlist_add),
-          onPressed: () => showListTemplatesDialog());
-    }
+    FlingTemplateModel template = args.template;
 
     Widget buildItemTextField() {
       return Container(
@@ -95,7 +46,7 @@ class _ListPageState extends State<ListPage> {
         child: TextField(
             controller: newItemController,
             onSubmitted: (value) {
-              list.addItem(value);
+              template.addItem(value);
               newItemController.clear();
             },
             decoration: InputDecoration(
@@ -106,7 +57,7 @@ class _ListPageState extends State<ListPage> {
       );
     }
 
-    Widget buildListItem(ListItem item) {
+    Widget buildTemplateItem(TemplateItem item) {
       var textController = TextEditingController(text: item.text);
       return Card(
         child: ListTile(
@@ -123,8 +74,8 @@ class _ListPageState extends State<ListPage> {
                 TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      list.addItem(textController.text);
-                      list.deleteItem(item);
+                      template.addItem(textController.text);
+                      template.deleteItem(item);
                     },
                     child: Text(l10n.action_done)),
               ],
@@ -135,20 +86,14 @@ class _ListPageState extends State<ListPage> {
               ),
             ),
           ),
-          leading: Checkbox(
-            value: item.checked,
-            onChanged: (checked) {
-              list.toggleItem(item);
-            },
-          ),
           title: Text(item.text),
         ),
       );
     }
 
-    Widget buildItemList() {
+    Widget buildItemTemplate() {
       return FutureBuilder(
-          future: list.items,
+          future: template.items,
           builder: (context, snapshot) {
             return Expanded(
                 child: StreamBuilder(
@@ -162,8 +107,8 @@ class _ListPageState extends State<ListPage> {
                         return const Center(child: CircularProgressIndicator());
                       }
 
-                      List<ListItem> items = snapshot.data!.docs
-                          .map<ListItem>((doc) => ListItem.fromMap({
+                      List<TemplateItem> items = snapshot.data!.docs
+                          .map<TemplateItem>((doc) => TemplateItem.fromMap({
                                 "id": doc.id,
                                 ...doc.data() as Map<String, dynamic>
                               }))
@@ -173,20 +118,15 @@ class _ListPageState extends State<ListPage> {
                           itemCount: items.length,
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
                           itemBuilder: (BuildContext context, int index) {
-                            ListItem item = items.elementAt(index);
+                            TemplateItem item = items.elementAt(index);
 
-                            Widget itemView = buildListItem(item);
+                            Widget itemView = buildTemplateItem(item);
 
-                            if (item.checked) {
-                              return Dismissible(
-                                  onDismissed: (direction) =>
-                                      list.deleteItem(item),
-                                  key: Key(item.id),
-                                  child: itemView);
-                            } else {
-                              return Container(
-                                  key: Key(item.id), child: itemView);
-                            }
+                            return Dismissible(
+                                onDismissed: (direction) =>
+                                    template.deleteItem(item),
+                                key: Key(item.id),
+                                child: itemView);
                           });
                     }));
           });
@@ -203,11 +143,7 @@ class _ListPageState extends State<ListPage> {
                       AsyncSnapshot<HouseholdModel> household) {
                     return Scaffold(
                       appBar: AppBar(
-                        actions: [
-                          buildAddFromTemplateButton(),
-                          buildDeleteButton(),
-                        ],
-                        title: Text(args.list.name),
+                        title: Text(args.template.name),
                       ),
                       drawer: const FlingDrawer(),
                       body: Center(
@@ -215,7 +151,7 @@ class _ListPageState extends State<ListPage> {
                           width: 600.0,
                           child: Column(
                             children: [
-                              buildItemList(),
+                              buildItemTemplate(),
                               buildItemTextField(),
                             ],
                           ),

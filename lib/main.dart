@@ -2,6 +2,8 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:fling/pages/household_add.dart';
 import 'package:fling/pages/login.dart';
+import 'package:fling/pages/template.dart';
+import 'package:fling/pages/templates.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:fling/data/user.dart';
 import 'package:fling/pages/list.dart';
@@ -66,6 +68,8 @@ class FlingApp extends StatelessWidget {
           '/login': (context) => const LoginPage(),
           '/lists': ((context) => const ListsPage()),
           '/list': ((context) => const ListPage()),
+          '/templates': ((context) => const TemplatesPage()),
+          '/template': ((context) => const TemplatePage()),
           '/household_add': ((context) => const AddHousehold())
         },
         home: const ListsPage(),

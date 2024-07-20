@@ -46,6 +46,13 @@ class FlingDrawer extends StatelessWidget {
                     Navigator.pushReplacementNamed(context, '/lists');
                   },
                 ),
+                ListTile(
+                  title: Text(AppLocalizations.of(context)!.templates),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacementNamed(context, '/templates');
+                  },
+                ),
 
                 // Spacer(),
               ],

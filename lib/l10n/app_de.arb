@@ -9,9 +9,6 @@
     "action_sure": "Bist du sicher?",
     "bug_report": "Fehler melden",
     "changelog": "Changelog",
-    "list_create": "Liste erstellen",
-    "list_delete": "Liste löschen",
-    "lists": "Listen",
     "home": "Home",
     "household_add": "Haushalt hinzufügen",
     "household_create": "Haushalt erstellen",
@@ -23,8 +20,13 @@
     "item_add": "Item hinzufügen",
     "item_hint": "Nudeln",
     "item_name": "Name",
+    "list_create": "Liste erstellen",
+    "list_delete": "Liste löschen",
     "lists": "Listen",
     "status_error": "Etwas ist schiefgelaufen.",
+    "template_create": "Vorlage erstellen",
+    "template_delete": "Vorlage löschen",
+    "templates": "Vorlagen",
     "user_invite": "Nutzer einladen",
     "user_invite_hint": "freund@beispiel.de"
 }
