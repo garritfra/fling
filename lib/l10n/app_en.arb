@@ -9,9 +9,6 @@
     "action_sure": "Are you sure?",
     "bug_report": "Report a problem",
     "changelog": "Changelog",
-    "list_create": "Create list",
-    "list_delete": "Delete list",
-    "lists": "Lists",
     "home": "Home",
     "household_add": "Add household",
     "household_create": "Create household",
@@ -23,8 +20,13 @@
     "item_add": "Add item",
     "item_hint": "Pasta",
     "item_name": "Name",
+    "list_create": "Create list",
+    "list_delete": "Delete list",
     "lists": "Lists",
     "status_error": "Something went wrong.",
+    "template_create": "Create template",
+    "template_delete": "Delete template",
+    "templates": "Templates",
     "user_invite": "Invite user",
     "user_invite_hint": "friend@example.com"
 }
