@@ -29,15 +29,15 @@ jobs:
           flutter-version: '3.22.2'
           cache: true
       - run: flutter doctor -v
-      - uses: actions/checkout@v4.2.0
+      - uses: actions/checkout@v4.2.2
       - run: flutter pub get
 
       - name: Checkout code
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.2
 
       # Setup Ruby, Bundler, and Gemfile dependencies
       - name: Setup Fastlane
-        uses: ruby/setup-ruby@v1.195.0
+        uses: ruby/setup-ruby@v1.199.0
         with:
           ruby-version: "3.2.2"
           bundler-cache: true
