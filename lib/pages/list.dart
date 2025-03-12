@@ -109,15 +109,98 @@ class _ListPageState extends State<ListPage> {
       );
     }
 
+    Widget buildTagChip(String tag) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        margin: const EdgeInsets.only(right: 4),
+        decoration: BoxDecoration(
+          color: Colors.blue.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          tag,
+          style: const TextStyle(fontSize: 10, color: Colors.blue),
+        ),
+      );
+    }
+
     Widget buildListItem(ListItem item) {
       var textController = TextEditingController(text: item.text);
 
-      return Card(
-        child: ListTile(
-          onTap: () => showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
+      void showEditItemDialog() {
+        List<String> editedTags = List.from(item.tags);
+
+        var tagController = TextEditingController();
+
+        showDialog(
+          context: context,
+          builder: (context) => StatefulBuilder(
+            builder: (context, setState) => AlertDialog(
               title: Text(l10n.action_edit_entry),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: textController,
+                      autofocus: true,
+                      decoration: InputDecoration(hintText: l10n.item_name),
+                    ),
+                    const SizedBox(height: 16),
+                    Text("Tags:",
+                        style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: editedTags
+                          .map((tag) => Chip(
+                                label: Text(tag),
+                                deleteIcon: const Icon(Icons.close, size: 18),
+                                onDeleted: () {
+                                  setState(() {
+                                    editedTags.remove(tag);
+                                  });
+                                },
+                              ))
+                          .toList(),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: tagController,
+                            decoration: const InputDecoration(
+                              hintText: "Add tag",
+                              isDense: true,
+                            ),
+                            onSubmitted: (value) {
+                              if (value.isNotEmpty) {
+                                setState(() {
+                                  editedTags.add(value);
+                                  tagController.clear();
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            if (tagController.text.isNotEmpty) {
+                              setState(() {
+                                editedTags.add(tagController.text);
+                                tagController.clear();
+                              });
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -127,18 +210,19 @@ class _ListPageState extends State<ListPage> {
                 TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      list.addItem(textController.text);
+                      list.addItem(textController.text, tags: editedTags);
                       list.deleteItem(item);
                     },
                     child: Text(l10n.action_done)),
               ],
-              content: TextField(
-                controller: textController,
-                autofocus: true,
-                decoration: InputDecoration(hintText: l10n.item_name),
-              ),
             ),
           ),
+        );
+      }
+
+      return Card(
+        child: ListTile(
+          onTap: showEditItemDialog,
           leading: Checkbox(
             value: item.checked,
             onChanged: (checked) {
@@ -146,6 +230,19 @@ class _ListPageState extends State<ListPage> {
             },
           ),
           title: Text(item.text),
+          subtitle: item.tags.isNotEmpty
+              ? Wrap(
+                  spacing: 4,
+                  children: item.tags
+                      .map((tag) => Chip(
+                            labelStyle: const TextStyle(fontSize: 10),
+                            padding: const EdgeInsets.all(0),
+                            label: Text(tag),
+                            visualDensity: VisualDensity.compact,
+                          ))
+                      .toList(),
+                )
+              : null,
         ),
       );
     }

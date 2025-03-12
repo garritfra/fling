@@ -33,9 +33,9 @@ class FlingListModel extends ChangeNotifier {
         .doc(id);
   }
 
-  void addItem(String text) async {
-    ListItem item =
-        ListItem(checked: false, id: text.hashCode.toString(), text: text);
+  void addItem(String text, {List<String> tags = const []}) async {
+    ListItem item = ListItem(
+        checked: false, id: text.hashCode.toString(), text: text, tags: tags);
 
     var items = ref.collection("items");
 
