@@ -109,21 +109,6 @@ class _ListPageState extends State<ListPage> {
       );
     }
 
-    Widget buildTagChip(String tag) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        margin: const EdgeInsets.only(right: 4),
-        decoration: BoxDecoration(
-          color: Colors.blue.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          tag,
-          style: const TextStyle(fontSize: 10, color: Colors.blue),
-        ),
-      );
-    }
-
     Widget buildListItem(ListItem item) {
       var textController = TextEditingController(text: item.text);
 

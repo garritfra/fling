@@ -31,8 +31,9 @@ class FlingTemplateModel extends ChangeNotifier {
         .doc(id);
   }
 
-  void addItem(String text) async {
-    TemplateItem item = TemplateItem(id: text.hashCode.toString(), text: text);
+  void addItem(String text, {List<String> tags = const []}) async {
+    TemplateItem item =
+        TemplateItem(id: text.hashCode.toString(), text: text, tags: tags);
 
     var items = ref.collection("items");
 
@@ -72,7 +73,18 @@ class FlingTemplateModel extends ChangeNotifier {
   Future<void> applyToList(FlingListModel list) async {
     await for (var snapshot in await items) {
       for (var itemDoc in snapshot.docs) {
-        list.addItem(itemDoc.get('text'), tags: [name]);
+        var itemData = itemDoc.data() as Map<String, dynamic>;
+
+        List<String> itemTags = [];
+        if (itemData['tags'] != null) {
+          itemTags = List<String>.from(itemData['tags']);
+        }
+
+        if (!itemTags.contains(name)) {
+          itemTags.add(name);
+        }
+
+        list.addItem(itemDoc.get('text'), tags: itemTags);
       }
     }
   }
