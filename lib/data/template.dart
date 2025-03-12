@@ -75,13 +75,10 @@ class FlingTemplateModel extends ChangeNotifier {
       for (var itemDoc in snapshot.docs) {
         var itemData = itemDoc.data() as Map<String, dynamic>;
 
-        List<String> itemTags = [];
+        List<String> itemTags = [name];
+
         if (itemData['tags'] != null) {
           itemTags = List<String>.from(itemData['tags']);
-        }
-
-        if (!itemTags.contains(name)) {
-          itemTags.add(name);
         }
 
         list.addItem(itemDoc.get('text'), tags: itemTags);
