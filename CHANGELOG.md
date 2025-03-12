@@ -10,6 +10,27 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 xxx
 
+## v0.10.0 (2025-03-12)
+
+### Added
+
+- Tag functionality for improved organization 
+  - Add tags to lists ([0778444](https://github.com/garritfra/fling/commit/0778444))
+  - Add tags to templates ([71212ab](https://github.com/garritfra/fling/commit/71212ab))
+
+### Maintenance
+
+- Bump firebase-admin from 12.2.0 to 13.1.0 in /functions
+- Bump typescript from 5.5.2 to 5.7.3 in /functions
+- Bump actions/checkout from 4.1.7 to 4.2.2
+- Bump ruby/setup-ruby from 1.187.0 to 1.221.0
+- Bump flutter_launcher_icons from 0.13.1 to 0.14.3
+- Bump url_launcher from 6.3.0 to 6.3.1
+- Bump kotlin_version from 1.9.24 to 2.0.21 in /android
+- Bump eslint-plugin-import from 2.30.0 to 2.31.0 in /functions
+- Bump webrick from 1.8.1 to 1.8.2 in /android
+- Bump rexml from 3.2.8 to 3.3.9 in /android
+
 ## v0.9.0 (2024-07-20)
 
 ### Added
