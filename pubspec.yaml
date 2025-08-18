@@ -34,16 +34,16 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  cloud_firestore: ^4.15.8
-  cloud_functions: ^4.6.8
+  cloud_firestore: ^6.0.0
+  cloud_functions: ^6.0.0
   cupertino_icons: ^1.0.8
   dynamic_color: ^1.7.0
-  firebase_auth: ^4.17.8
-  firebase_core: ^2.25.4
-  firebase_crashlytics: ^3.4.18
-  firebase_ui_auth: ^1.14.0
+  firebase_auth: ^6.0.1
+  firebase_core: ^4.0.0
+  firebase_crashlytics: ^5.0.0
+  firebase_ui_auth: ^3.0.0
   intl: any # Can't be pinned :(
-  package_info_plus: ^5.0.1
+  package_info_plus: ^8.3.1
   provider: ^6.1.5
   url_launcher: ^6.3.1
 
