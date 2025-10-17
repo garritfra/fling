@@ -12,6 +12,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Migrate to declarative Gradle plugin syntax
 - Bump Gradle from 7.4 to 9.1
+- Bump Android Gradle Plugin from 7.1.3 to 8.7.3
+- Bump Kotlin from 2.0.21 to 2.1.0
+- Bump Flutter in CI from 3.22.2/3.29.1 to 3.35.6
 - Bump typescript from 5.8.3 to 5.9.3 in /functions
 - Bump ruby/setup-ruby from 1.221.0 to 1.265.0
 - Bump rexml from 3.3.9 to 3.4.2 in /android
