@@ -18,10 +18,6 @@ class FlingUser extends ChangeNotifier {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     String? uid = FirebaseAuth.instance.currentUser?.uid;
-
-    if (uid == null) {
-      return const Stream.empty();
-    }
     var snapshots = firestore.collection("users").doc(uid).snapshots();
     return snapshots.asyncMap((snapshot) async {
       if (snapshot.data() == null) {

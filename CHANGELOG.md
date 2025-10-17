@@ -8,7 +8,21 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
-xxx
+### Maintenance
+
+- Migrate to declarative Gradle plugin syntax
+- Bump Gradle from 7.4 to 8.4
+- Bump Android Gradle Plugin from 7.1.3 to 8.3.0
+- Bump typescript from 5.8.3 to 5.9.3 in /functions
+- Bump ruby/setup-ruby from 1.221.0 to 1.265.0
+- Bump rexml from 3.3.9 to 3.4.2 in /android
+- Bump actions/setup-java from 4 to 5
+- Bump actions/checkout from 4.2.2 to 5.0.0
+- Bump form-data from 2.5.3 to 2.5.5 in /functions
+- Bump eslint-plugin-import from 2.31.0 to 2.32.0 in /functions
+- Bump flutter_launcher_icons from 0.14.3 to 0.14.4
+- Bump firebase-admin from 13.1.0 to 13.3.0 in /functions
+- Bump provider from 6.1.2 to 6.1.5
 
 ## v0.10.0 (2025-03-12)
 

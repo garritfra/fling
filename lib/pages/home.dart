@@ -4,7 +4,8 @@ import 'package:fling/data/user.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fling/l10n/app_localizations.dart';
+import 'package:fling/l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,10 +18,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     FirebaseAuth.instance.authStateChanges().listen((user) {
-          if (user == null) {
-            Navigator.popAndPushNamed(context, "/login");
-          }
-        });
+      if (user == null) {
+        Navigator.popAndPushNamed(context, "/login");
+      }
+    });
 
     Widget buildCreateHouseholdButton() {
       return Expanded(
