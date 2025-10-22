@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Fixed
+
+- Sort templates by name ([#429](https://github.com/garritfra/fling/pull/429))
+
 ### Maintenance
 
 - Update flutter and gradle versions ([#428](https://github.com/garritfra/fling/pull/428))

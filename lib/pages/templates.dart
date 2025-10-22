@@ -58,6 +58,7 @@ class _TemplatesPageState extends State<TemplatesPage> {
                   stream: templates.data,
                   builder: (context, snapshot) {
                     var templates = snapshot.data ?? [];
+                    templates.sort((a, b) => a.name.compareTo(b.name));
 
                     return ListView.builder(
                         itemCount: templates.length,
