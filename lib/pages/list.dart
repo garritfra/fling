@@ -3,11 +3,11 @@ import 'package:fling/data/list.dart';
 import 'package:fling/data/list_item.dart';
 import 'package:fling/data/template.dart';
 import 'package:fling/data/user.dart';
+import 'package:fling/l10n/app_localizations.dart';
 import 'package:fling/layout/confirm_dialog.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ListPageArguments {
   final FlingListModel list;
@@ -60,6 +60,7 @@ class _ListPageState extends State<ListPage> {
       HouseholdModel? household = await (await user?.currentHousehold)?.first;
       List<FlingTemplateModel> templates =
           await ((await household?.templates)?.first) ?? [];
+      templates.sort((a, b) => a.name.compareTo(b.name));
 
       Future<void> onAdd(FlingTemplateModel template) async {
         template.applyToList(list);

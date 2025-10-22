@@ -10,12 +10,12 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5.0.0
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.2'
+          flutter-version-file: pubspec.yaml
           cache: true
       - run: flutter doctor -v
-      - uses: actions/checkout@v4.2.2
       - run: flutter pub get
       - run: flutter build -v web --release
       - uses: FirebaseExtended/action-hosting-deploy@v0

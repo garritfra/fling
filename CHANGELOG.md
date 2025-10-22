@@ -6,9 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic
 Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v0.10.1 (2025-10-22)
 
-xxx
+### Fixed
+
+- Sort templates by name ([#429](https://github.com/garritfra/fling/pull/429))
+
+### Maintenance
+
+- Update flutter and gradle versions ([#428](https://github.com/garritfra/fling/pull/428))
+- Bump typescript from 5.8.3 to 5.9.3 in /functions ([#426](https://github.com/garritfra/fling/pull/426))
+- Bump ruby/setup-ruby from 1.247.0 to 1.265.0 ([#427](https://github.com/garritfra/fling/pull/427), [#425](https://github.com/garritfra/fling/pull/425), [#424](https://github.com/garritfra/fling/pull/424), [#417](https://github.com/garritfra/fling/pull/417))
+- Bump rexml from 3.3.9 to 3.4.2 in /android ([#423](https://github.com/garritfra/fling/pull/423))
+- Bump actions/setup-java from 4 to 5 ([#414](https://github.com/garritfra/fling/pull/414))
+- Bump actions/checkout from 4.2.2 to 5.0.0 ([#410](https://github.com/garritfra/fling/pull/410))
+- Bump form-data to 2.5.5 in /functions ([#400](https://github.com/garritfra/fling/pull/400))
 
 ## v0.10.0 (2025-03-12)
 
