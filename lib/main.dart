@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:fling/l10n/app_localizations.dart';
 import 'package:fling/pages/household_add.dart';
 import 'package:fling/pages/login.dart';
 import 'package:fling/pages/template.dart';
@@ -13,7 +14,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fba;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -46,7 +46,7 @@ class FlingApp extends StatelessWidget {
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) => MaterialApp(
         localizationsDelegates: const [
-          AppLocalizations.delegate, // Add this line
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
