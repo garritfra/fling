@@ -1,10 +1,10 @@
 import 'package:fling/data/household.dart';
 import 'package:fling/data/template.dart';
 import 'package:fling/data/user.dart';
+import 'package:fling/l10n/app_localizations.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:fling/pages/template.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TemplatesPage extends StatefulWidget {
   const TemplatesPage({super.key});
