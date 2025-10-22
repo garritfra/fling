@@ -1,5 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="de.garritfra.fling">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
    <application
         android:label="fling"
         android:name="${applicationName}"
