@@ -46,7 +46,7 @@ dependencies:
   intl: any # Can't be pinned :(
   package_info_plus: ^5.0.1
   provider: ^6.1.5
-  url_launcher: ^6.3.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_launcher_icons: 0.14.4
