@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
-          java-version: '11' # TODO: Update
+          java-version: '21'
       - uses: subosito/flutter-action@v2
         with:
           flutter-version-file: pubspec.yaml
