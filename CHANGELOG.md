@@ -8,7 +8,9 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
-xxx
+### Fixed
+
+- Sort templates by name ([#429](https://github.com/garritfra/fling/pull/429))
 
 ## v0.10.0 (2025-03-12)
 
