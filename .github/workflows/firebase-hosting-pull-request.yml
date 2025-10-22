@@ -11,12 +11,12 @@ jobs:
     if: '${{ github.event.pull_request.head.repo.full_name == github.repository }}'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v5.0.0
       - uses: subosito/flutter-action@v2
         with:
           flutter-version-file: pubspec.yaml
           cache: true
       - run: flutter doctor -v
-      - uses: actions/checkout@v5.0.0
       - run: flutter pub get
       - run: flutter build -v web --release
       - uses: FirebaseExtended/action-hosting-deploy@v0
