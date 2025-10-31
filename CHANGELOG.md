@@ -8,6 +8,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## v0.10.2 (2025-10-31)
+
 ### Fixed
 
 - Fix text input field being obscured by navigation bar on Android
