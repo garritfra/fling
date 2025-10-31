@@ -30,21 +30,7 @@ jobs:
       - run: flutter pub get
       - run: flutter test
       - run: flutter build ${{ matrix.target }}
-      - name: Upload APK artifact
-        if: matrix.target == 'apk --debug'
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
-          path: build/app/outputs/flutter-apk/*.apk
-      - name: Upload App Bundle artifact
-        if: matrix.target == 'appbundle --debug'
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-bundle
-          path: build/app/outputs/bundle/debug/*.aab
-      - name: Upload Web artifact
-        if: matrix.target == 'web'
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-build
-          path: build/web/
+          name: build-${{ matrix.target }}
+          path: build/
