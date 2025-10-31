@@ -10,6 +10,7 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Fix text input field being obscured by navigation bar on Android
 - Fix Firebase Functions build by updating import to use v1 API compatibility layer
 
 ## v0.10.1 (2025-10-22)

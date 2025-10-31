@@ -297,14 +297,16 @@ class _ListPageState extends State<ListPage> {
                         title: Text(args.list.name),
                       ),
                       drawer: const FlingDrawer(),
-                      body: Center(
-                        child: SizedBox(
-                          width: 600.0,
-                          child: Column(
-                            children: [
-                              buildItemList(),
-                              buildItemTextField(),
-                            ],
+                      body: SafeArea(
+                        child: Center(
+                          child: SizedBox(
+                            width: 600.0,
+                            child: Column(
+                              children: [
+                                buildItemList(),
+                                buildItemTextField(),
+                              ],
+                            ),
                           ),
                         ),
                       ),
