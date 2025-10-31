@@ -247,14 +247,16 @@ class _TemplatePageState extends State<TemplatePage> {
                         title: Text(args.template.name),
                       ),
                       drawer: const FlingDrawer(),
-                      body: Center(
-                        child: SizedBox(
-                          width: 600.0,
-                          child: Column(
-                            children: [
-                              buildItemTemplate(),
-                              buildItemTextField(),
-                            ],
+                      body: SafeArea(
+                        child: Center(
+                          child: SizedBox(
+                            width: 600.0,
+                            child: Column(
+                              children: [
+                                buildItemTemplate(),
+                                buildItemTextField(),
+                              ],
+                            ),
                           ),
                         ),
                       ),
