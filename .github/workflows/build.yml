@@ -30,7 +30,7 @@ jobs:
       - run: flutter pub get
       - run: flutter test
       - run: flutter build ${{ matrix.target }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: build-${{ matrix.target }}
           path: build/
