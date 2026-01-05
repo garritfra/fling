@@ -33,7 +33,7 @@ jobs:
       - run: flutter pub get
       # Setup Ruby, Bundler, and Gemfile dependencies
       - name: Setup Fastlane
-        uses: ruby/setup-ruby@v1.270.0
+        uses: ruby/setup-ruby@v1.278.0
         with:
           ruby-version: "3.2.2"
           bundler-cache: true
