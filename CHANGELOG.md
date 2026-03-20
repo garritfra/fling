@@ -12,6 +12,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Tab layout for lists: lists now appear as horizontally scrollable tabs, replacing the separate list overview/detail navigation ([#511](https://github.com/garritfra/fling/pull/511))
 
+### Fixed
+
+- Keep keyboard visible when returning to app from background ([#510](https://github.com/garritfra/fling/pull/510))
+
 ## v0.10.2 (2025-10-31)
 
 ### Fixed
