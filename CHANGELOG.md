@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Maintenance
+
+- Upgrade Firebase Functions runtime from Node 16 to Node 22 ([#512](https://github.com/garritfra/fling/pull/512))
+
 ## v0.10.2 (2025-10-31)
 
 ### Fixed
