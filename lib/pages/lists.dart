@@ -252,7 +252,7 @@ class _ListsPageState extends State<ListsPage> {
                                               decoration: InputDecoration(
                                                   hintText: l10n.item_name),
                                               keyboardType:
-                                                  TextInputType.emailAddress,
+                                                  TextInputType.text,
                                             ),
                                           ));
                                 }
@@ -305,8 +305,8 @@ class _TabListsViewState extends State<_TabListsView>
   @override
   void initState() {
     super.initState();
-    _tabController =
-        TabController(length: widget.lists.length, vsync: this);
+    final len = widget.lists.length;
+    _tabController = TabController(length: len > 0 ? len : 1, vsync: this);
   }
 
   @override
@@ -315,12 +315,11 @@ class _TabListsViewState extends State<_TabListsView>
     if (oldWidget.lists.length != widget.lists.length) {
       final previousIndex = _tabController.index;
       _tabController.dispose();
+      final len = widget.lists.length;
       _tabController = TabController(
-        length: widget.lists.length,
+        length: len > 0 ? len : 1,
         vsync: this,
-        initialIndex: widget.lists.isEmpty
-            ? 0
-            : previousIndex.clamp(0, widget.lists.length - 1),
+        initialIndex: len > 0 ? previousIndex.clamp(0, len - 1) : 0,
       );
     }
   }
@@ -429,9 +428,8 @@ class _ListItemsViewState extends State<_ListItemsView>
     final list = widget.list;
 
     Widget buildListItem(ListItem item) {
-      var textController = TextEditingController(text: item.text);
-
       void showEditItemDialog() {
+        var textController = TextEditingController(text: item.text);
         List<String> editedTags = List.from(item.tags);
         var tagController = TextEditingController();
 
@@ -514,8 +512,9 @@ class _ListItemsViewState extends State<_ListItemsView>
                 TextButton(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      list.addItem(textController.text, tags: editedTags);
-                      list.deleteItem(item);
+                      item.text = textController.text;
+                      item.tags = editedTags;
+                      list.updateItem(item);
                     },
                     child: Text(l10n.action_done)),
               ],
@@ -555,8 +554,11 @@ class _ListItemsViewState extends State<_ListItemsView>
       FlingUser? user = await FlingUser.currentUser.first;
       HouseholdModel? household =
           await (await user?.currentHousehold)?.first;
-      List<FlingTemplateModel> templates =
-          await ((await household?.templates)?.first) ?? [];
+      List<FlingTemplateModel> templates = [];
+      if (household != null) {
+        final templatesStream = await household.templates;
+        templates = await templatesStream.first;
+      }
       templates.sort((a, b) => a.name.compareTo(b.name));
 
       Future<void> onAdd(FlingTemplateModel template) async {
@@ -636,7 +638,9 @@ class _ListItemsViewState extends State<_ListItemsView>
             controller: _newItemController,
             focusNode: _newItemFocusNode,
             onSubmitted: (value) {
-              list.addItem(value);
+              final trimmed = value.trim();
+              if (trimmed.isEmpty) return;
+              list.addItem(trimmed);
               _newItemController.clear();
               _newItemFocusNode.requestFocus();
             },

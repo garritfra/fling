@@ -49,6 +49,10 @@ class FlingListModel extends ChangeNotifier {
     await ref.collection("items").doc(item.id).update(item.toMap());
   }
 
+  void updateItem(ListItem item) async {
+    await ref.collection("items").doc(item.id).update(item.toMap());
+  }
+
   void deleteItem(ListItem item) async {
     var itemRef = ref.collection("items").doc(item.id);
     await itemRef.delete();
