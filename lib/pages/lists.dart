@@ -371,6 +371,17 @@ class _TabListsViewState extends State<_TabListsView>
       appBar: AppBar(
         title: widget.appBarTitle,
         actions: widget.appBarActions,
+        bottom: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          tabs: widget.lists.map((list) {
+            return GestureDetector(
+              onLongPress: () => _showDeleteListDialog(context, list),
+              child: Tab(text: list.name),
+            );
+          }).toList(),
+        ),
       ),
       drawer: const FlingDrawer(),
       body: TabBarView(
@@ -378,17 +389,6 @@ class _TabListsViewState extends State<_TabListsView>
         children: widget.lists
             .map((list) => _ListItemsView(list: list))
             .toList(),
-      ),
-      bottomNavigationBar: TabBar(
-        controller: _tabController,
-        isScrollable: true,
-        tabAlignment: TabAlignment.start,
-        tabs: widget.lists.map((list) {
-          return GestureDetector(
-            onLongPress: () => _showDeleteListDialog(context, list),
-            child: Tab(text: list.name),
-          );
-        }).toList(),
       ),
     );
   }
