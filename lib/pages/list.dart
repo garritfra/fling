@@ -22,15 +22,28 @@ class ListPage extends StatefulWidget {
   State<ListPage> createState() => _ListPageState();
 }
 
-class _ListPageState extends State<ListPage> {
+class _ListPageState extends State<ListPage> with WidgetsBindingObserver {
   final newItemController = TextEditingController();
   final newItemFocusNode = FocusNode();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && newItemFocusNode.hasFocus) {
+      newItemFocusNode.requestFocus();
+    }
+  }
+
+  @override
   void dispose() {
-    // Clean up the controller when the widget is removed from the
-    // widget tree.
+    WidgetsBinding.instance.removeObserver(this);
     newItemController.dispose();
+    newItemFocusNode.dispose();
     super.dispose();
   }
 
