@@ -8,6 +8,10 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Added
+
+- Tab layout for lists: lists now appear as horizontally scrollable tabs, replacing the separate list overview/detail navigation ([#511](https://github.com/garritfra/fling/pull/511))
+
 ### Maintenance
 
 - Upgrade Firebase Functions runtime from Node 16 to Node 22 ([#512](https://github.com/garritfra/fling/pull/512))

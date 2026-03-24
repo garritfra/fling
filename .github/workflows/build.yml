@@ -30,7 +30,10 @@ jobs:
       - run: flutter pub get
       - run: flutter test
       - run: flutter build ${{ matrix.target }}
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: build-${{ matrix.target }}
-          path: build/
+          path: |
+            build/app/outputs/flutter-apk/*.apk
+            build/app/outputs/bundle/**/*.aab
+            build/web/
