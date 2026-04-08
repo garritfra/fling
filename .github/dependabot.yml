@@ -8,16 +8,16 @@ updates:
   - package-ecosystem: "pub" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "monthly"
   - package-ecosystem: "github-actions" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "monthly"
   - package-ecosystem: "gradle" # See documentation for possible values
     directory: "/android" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "monthly"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/functions" # Location of package manifests
     schedule:
-      interval: "weekly"
+      interval: "monthly"
