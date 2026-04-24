@@ -17,14 +17,21 @@ module.exports = {
     },
     "boundaries/elements": [
       { type: "core",     pattern: "src/core/*",                   capture: ["domain"] },
-      { type: "feature",  pattern: "src/features/*",               capture: ["feature"] },
-      { type: "routes",   pattern: "src/features/*/routes.ts",     capture: ["feature"] },
-      { type: "service",  pattern: "src/features/*/service.ts",    capture: ["feature"] },
-      { type: "repo",     pattern: "src/features/*/repo.ts",       capture: ["feature"] },
-      { type: "schemas",  pattern: "src/features/*/schemas.ts",    capture: ["feature"] },
-      { type: "events",   pattern: "src/features/*/events.ts",     capture: ["feature"] },
-      { type: "triggers", pattern: "src/features/*/triggers.ts",   capture: ["feature"] },
-      { type: "module",   pattern: "src/features/*/module.ts",     capture: ["feature"] },
+      // File-specific patterns must (a) precede the generic `feature` folder
+      // pattern and (b) use `mode: "file"`. Default mode is `folder` which
+      // silently appends `/**/*` to the pattern, so a file like
+      // src/features/lists/routes.ts never matches the "routes" pattern
+      // under default mode and the routes/service/repo direction rules
+      // never fire.
+      { type: "routes",   pattern: "src/features/*/routes.ts",   mode: "file", capture: ["feature"] },
+      { type: "service",  pattern: "src/features/*/service.ts",  mode: "file", capture: ["feature"] },
+      { type: "repo",     pattern: "src/features/*/repo.ts",     mode: "file", capture: ["feature"] },
+      { type: "schemas",  pattern: "src/features/*/schemas.ts",  mode: "file", capture: ["feature"] },
+      { type: "events",   pattern: "src/features/*/events.ts",   mode: "file", capture: ["feature"] },
+      { type: "triggers", pattern: "src/features/*/triggers.ts", mode: "file", capture: ["feature"] },
+      { type: "module",   pattern: "src/features/*/module.ts",   mode: "file", capture: ["feature"] },
+      // Generic feature folder fallback (any other file under a feature dir).
+      { type: "feature",  pattern: "src/features/*",             capture: ["feature"] },
       { type: "api",      pattern: "src/api/*" },
     ],
   },

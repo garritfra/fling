@@ -26,6 +26,12 @@ const fixtures: Array<{ name: string; filePath: string; code: string; mustError:
     code: `import { FEATURE_NAME } from "../me/module";\nexport const x = FEATURE_NAME;\n`,
     mustError: /element-types|boundaries/,
   },
+  {
+    name: "routes cannot import repo directly (must go through service)",
+    filePath: "src/features/lists/routes.ts",
+    code: `import { x } from "./repo";\nexport const r = x;\n`,
+    mustError: /element-types|boundaries/,
+  },
 ];
 
 describe("ESLint boundaries", () => {
