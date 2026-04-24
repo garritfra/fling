@@ -9,7 +9,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "google",
   ],
-  ignorePatterns: ["lib/**", "node_modules/**", "scripts/**", "migrations/**", "test/**"],
+  ignorePatterns: ["lib/**", "node_modules/**", "scripts/**", "migrations/**", "test/**", "vitest.config.ts"],
   rules: {
     "quotes": ["error", "double", { "avoidEscape": true }],
     "max-len": ["warn", { "code": 100 }],
