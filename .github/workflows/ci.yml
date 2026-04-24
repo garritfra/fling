@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+permissions: read-all
+
+env:
+  RESOURCE_DIR: functions
+
+jobs:
+  backend:
+    name: backend (lint + tsc + vitest + rules)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: functions
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - run: npm ci --no-audit
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npx vitest run --exclude 'test/rules/**' --exclude 'test/api/**'
+      - name: Install firebase-tools
+        run: npm install -g firebase-tools@^13.29.0
+      - name: Run emulator-backed tests (rules + api)
+        run: |
+          firebase emulators:exec --only firestore,auth --project fling-rules-test \
+            "npx vitest run test/rules test/api"
+
+  flutter:
+    name: flutter (analyze + test + boundaries)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: pubspec.yaml
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - name: Flutter import-boundary check
+        run: ./scripts/check-flutter-imports.sh
+      - run: flutter test
+
+  contracts:
+    name: contracts (openapi + dart client drift)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version-file: pubspec.yaml
+          cache: true
+      - name: Install backend deps
+        run: npm ci --no-audit
+        working-directory: functions
+      - name: Regenerate OpenAPI + Dart client
+        run: ./scripts/generate-dart-client.sh
+      - name: Fail if generated artefacts drifted
+        run: |
+          if ! git diff --exit-code -- openapi/openapi.json lib/core/api/generated; then
+            echo "::error::OpenAPI / Dart client is out of date. Run scripts/generate-dart-client.sh and commit." >&2
+            exit 1
+          fi
+
+  deploy:
+    name: deploy (functions + firestore rules)
+    needs: [backend, flutter, contracts]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - name: Install backend deps
+        run: npm ci --no-audit
+        working-directory: ${{ env.RESOURCE_DIR }}
+      - name: Build functions
+        run: npm run build
+        working-directory: ${{ env.RESOURCE_DIR }}
+      - name: Deploy to Firebase
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only functions,firestore --force
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
