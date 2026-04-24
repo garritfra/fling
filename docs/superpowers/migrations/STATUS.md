@@ -5,7 +5,7 @@
 > Source of truth for "where are we right now?" in the rewrite.
 
 - **Spec:** [`docs/superpowers/specs/2026-04-24-fling-rewrite-design.md`](../specs/2026-04-24-fling-rewrite-design.md)
-- **Last updated:** 2026-04-24 (initial spec approved, no work started)
+- **Last updated:** 2026-04-24 (Phase 0 plan published; execution kicked off)
 
 ## Status legend
 
@@ -19,7 +19,7 @@
 
 | Phase | Name | Goal (one line) | Status | Plan | Started | Completed |
 |---|---|---|---|---|---|---|
-| 0 | Foundation | All scaffolding (CI, deps, lint boundaries, empty Hono app, emulator, migrations runner). No user-visible change. | ⬜ | _not yet written_ | — | — |
+| 0 | Foundation | All scaffolding (CI, deps, lint boundaries, empty Hono app, emulator, migrations runner). No user-visible change. | 🟡 | [phase-0-foundation.md](./phase-0-foundation.md) | 2026-04-24 | — |
 | 1 | `me` slice + API foundation | First end-to-end vertical slice. Replaces `setupUser` / `deleteUser`. | ⬜ | _not yet written_ | — | — |
 | 2 | Households + members + invites | New first-class invite flow. Replaces `cacheJoinHousehold` / `cacheLeaveHousehold` / `inviteToHouseholdByEmail`. | ⬜ | _not yet written_ | — | — |
 | 3 | Lists | All list and item mutations through API. Offline queue + optimistic updates wired up. | ⬜ | _not yet written_ | — | — |
@@ -113,3 +113,4 @@ moves a phase.
 | Date | Phase | Transition | PR | Notes |
 |---|---|---|---|---|
 | 2026-04-24 | — | Spec approved | — | Initial design committed |
+| 2026-04-24 | 0 | Started | — | Phase 0 plan published (`phase-0-foundation.md`) |
