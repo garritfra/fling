@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, it } from "vitest";
 import {
   initializeTestEnvironment,
   RulesTestEnvironment,
@@ -61,5 +61,24 @@ describe("firestore.rules baseline", () => {
     const anon = env.unauthenticatedContext().firestore();
     await assertFails(anon.doc("users/alice").get());
     await assertFails(anon.doc("households/h1").get());
+  });
+
+  it("a signed-in user can create a brand-new household + first member doc", async () => {
+    const alice = env.authenticatedContext("alice").firestore();
+    await assertSucceeds(alice.doc("households/h_new").set({ name: "Home" }));
+    await assertSucceeds(alice.doc("households/h_new/members/alice").set({}));
+  });
+
+  it("known-loose invariant: a non-member CAN add themselves to an existing household (Phase 2 will close this)", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await db.doc("households/h_bob").set({ name: "Bob's place" });
+      await db.doc("households/h_bob/members/bob").set({});
+    });
+    const alice = env.authenticatedContext("alice").firestore();
+    // Alice (not a member of h_bob) self-adds. Currently permitted by the
+    // Phase-0 carve-out. If this assertion ever fails, you tightened the
+    // members/{uid} rule — confirm that was intentional and update Phase 2.
+    await assertSucceeds(alice.doc("households/h_bob/members/alice").set({}));
   });
 });

@@ -15,7 +15,11 @@ service cloud.firestore {
     }
 
     // Households + nested data: any household member can read & write.
-    // Phase 1+ tightens this collection-by-collection.
+    // NOTE(phase-0): the create carve-outs below are deliberately loose to
+    // mirror today's client behaviour. The /members/{uid} rule lets ANY
+    // signed-in user add themselves to ANY household, not just brand-new
+    // ones. This is a known issue; Phase 2 replaces the carve-out with the
+    // first-class invite flow. See docs/superpowers/specs/2026-04-24-fling-rewrite-design.md §6.4.
     match /households/{hid} {
       allow read, write: if isMember(hid)
                          || (signedIn() && request.method == 'create');
