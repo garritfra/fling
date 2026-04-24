@@ -1,9 +1,20 @@
 import * as functions from "firebase-functions/v1";
+import {onRequest} from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import {app} from "./api/app";
+import {handle} from "./api/adapter";
 
 admin.initializeApp();
 const db = admin.firestore();
 const auth = admin.auth();
+
+// ----- v2: REST API (Hono) -----------------------------------------------
+export const api = onRequest(
+    {region: "us-central1", cors: true, maxInstances: 10},
+    (req, res) => handle(app, req, res),
+);
+
+// ----- v1: legacy callables & triggers (untouched until Phase 1+) --------
 
 exports.cacheJoinHousehold = functions.firestore
     .document("households/{householdId}/members/{memberId}")
