@@ -7,13 +7,21 @@
         "node_modules",
         ".git",
         "firebase-debug.log",
-        "firebase-debug.*.log"
+        "firebase-debug.*.log",
+        "test",
+        "scripts",
+        "migrations",
+        "vitest.config.ts"
       ],
       "predeploy": [
         "npm --prefix \"$RESOURCE_DIR\" run build"
       ]
     }
   ],
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
   "hosting": {
     "public": "build/web",
     "ignore": [
@@ -22,10 +30,15 @@
       "**/node_modules/**"
     ],
     "rewrites": [
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+      { "source": "**", "destination": "/index.html" }
     ]
+  },
+  "emulators": {
+    "auth":      { "port": 9099 },
+    "functions": { "port": 5001 },
+    "firestore": { "port": 8080 },
+    "hosting":   { "port": 5000 },
+    "ui":        { "enabled": true, "port": 4000 },
+    "singleProjectMode": true
   }
 }

@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+
+    function isMember(hid) {
+      return signedIn()
+        && exists(/databases/$(db)/documents/households/$(hid)/members/$(request.auth.uid));
+    }
+
+    // Users can read & write their own user doc (current Flutter behaviour).
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Households + nested data: any household member can read & write.
+    // Phase 1+ tightens this collection-by-collection.
+    match /households/{hid} {
+      allow read, write: if isMember(hid)
+                         || (signedIn() && request.method == 'create');
+
+      match /members/{uid} {
+        allow read, write: if isMember(hid)
+                           || (signedIn() && request.auth.uid == uid && request.method == 'create');
+      }
+
+      match /lists/{lid}/{document=**} {
+        allow read, write: if isMember(hid);
+      }
+
+      match /templates/{tid}/{document=**} {
+        allow read, write: if isMember(hid);
+      }
+    }
+  }
+}
