@@ -5,7 +5,7 @@
 > Source of truth for "where are we right now?" in the rewrite.
 
 - **Spec:** [`docs/superpowers/specs/2026-04-24-fling-rewrite-design.md`](../specs/2026-04-24-fling-rewrite-design.md)
-- **Last updated:** 2026-04-24 (Phase 0 plan published; execution kicked off)
+- **Last updated:** 2026-04-24 (Phase 0 implementation complete; awaiting prod deploy + smoke)
 
 ## Status legend
 
@@ -35,15 +35,15 @@ just before each phase begins) link back to these.
 
 ### Phase 0 — Foundation
 
-- [ ] `firestore.rules` committed mirroring current behaviour
-- [ ] CI workflow runs `backend`, `flutter`, `contracts` jobs on PRs
-- [ ] Firebase emulator boots locally via `scripts/dev.sh`
-- [ ] `functions/` includes Hono + Vitest + `@hono/zod-openapi`; empty `api` function deployed
-- [ ] Flutter deps added: `riverpod`, `freezed`, `json_serializable`, `go_router`, `connectivity_plus`, `shared_preferences`
-- [ ] `core/` and `features/` directories scaffolded in both backend and Flutter
-- [ ] Lint boundary rule active (presentation ↛ data; application ↛ presentation; cross-feature ↛ direct import)
-- [ ] `migrations/` runner present with empty initial migration
-- [ ] No user-visible change in production
+- [x] `firestore.rules` committed mirroring current behaviour
+- [x] CI workflow runs `backend`, `flutter`, `contracts` jobs on PRs
+- [x] Firebase emulator boots locally via `scripts/dev.sh`
+- [x] `functions/` includes Hono + Vitest + `@hono/zod-openapi`; empty `api` function _built_ (deploy to prod in final merge step)
+- [x] Flutter deps added: `flutter_riverpod`, `freezed`, `json_serializable`, `go_router`, `connectivity_plus`, `shared_preferences`
+- [x] `core/` and `features/` directories scaffolded in both backend and Flutter
+- [x] Lint boundary rule active (backend: `eslint-plugin-boundaries`; Flutter: `scripts/check-flutter-imports.sh` — grep-based stand-in because no published `import_lint` version is compatible with Flutter 3.35.6 / Dart 3.9.2. Migrate to `import_lint` when Flutter is bumped past Dart 3.10.)
+- [x] `migrations/` runner present with empty initial migration
+- [ ] No user-visible change in production _(verified after deploy; Task 14 of the phase plan)_
 
 ### Phase 1 — `me` slice + API foundation
 
@@ -114,3 +114,4 @@ moves a phase.
 |---|---|---|---|---|
 | 2026-04-24 | — | Spec approved | — | Initial design committed |
 | 2026-04-24 | 0 | Started | — | Phase 0 plan published (`phase-0-foundation.md`) |
+| 2026-04-24 | 0 | Implementation complete | — | Tasks 1–13 landed on branch `phase-0-foundation`; Task 14 (prod deploy + smoke) pending PR merge |
