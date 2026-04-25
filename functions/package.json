@@ -5,6 +5,11 @@
     "lint:fix": "eslint --ext .js,.ts --fix .",
     "build": "tsc",
     "build:watch": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "firebase emulators:exec --only firestore,auth 'vitest run --dir test/api'",
+    "openapi:generate": "tsx scripts/openapi.ts",
+    "migrate": "tsx migrations/runner.ts",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
@@ -12,21 +17,29 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "16"
+    "node": "20"
   },
   "main": "lib/index.js",
   "dependencies": {
+    "@hono/zod-openapi": "^0.18.4",
     "firebase-admin": "^13.7.0",
-    "firebase-functions": "^6.3.2"
+    "firebase-functions": "^6.3.2",
+    "hono": "^4.12.15",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^8.58.1",
     "@typescript-eslint/parser": "^8.58.1",
-    "eslint": "^8.56.0",
+    "@vitest/coverage-v8": "^2.1.9",
+    "eslint": "^8.57.0",
     "eslint-config-google": "^0.14.0",
+    "eslint-plugin-boundaries": "^4.2.2",
     "eslint-plugin-import": "^2.32.0",
     "firebase-functions-test": "^3.4.1",
-    "typescript": "^6.0.2"
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.9"
   },
   "private": true
 }

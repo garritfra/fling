@@ -44,3 +44,12 @@ app.*.map.json
 /android/app/release
 /android/.kotlin
 /android/build
+
+# git worktrees
+.worktrees/
+
+# firebase emulator state
+.emulator-data/
+
+# rollback snapshots (operations tool output)
+ops/snapshots/
