@@ -23,10 +23,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-if ! command -v rg >/dev/null 2>&1; then
-  echo "error: ripgrep (rg) is required. Install: brew install ripgrep" >&2
-  exit 2
-fi
+# Use POSIX grep (-rlF for recursive list-only fixed-string) so this works
+# on stock GitHub Actions Ubuntu runners without installing ripgrep.
+grep_imports() {
+  # grep_imports <needle> <dir>
+  # Echoes matching file paths, one per line; empty if no match.
+  grep -rlF --include='*.dart' -- "$1" "$2" 2>/dev/null || true
+}
 
 FAIL=0
 VIOLATIONS=()
@@ -42,7 +45,7 @@ for feature_path in lib/features/*/; do
 
   # Rule 1: presentation -> data within same feature
   if [ -d "${feature_path}presentation" ]; then
-    hits=$(rg -l "package:fling/features/${feature}/data/" "${feature_path}presentation" 2>/dev/null || true)
+    hits=$(grep_imports "package:fling/features/${feature}/data/" "${feature_path}presentation")
     if [ -n "$hits" ]; then
       while IFS= read -r f; do
         VIOLATIONS+=("$f imports package:fling/features/${feature}/data/ (presentation -> data within '${feature}')")
@@ -53,7 +56,7 @@ for feature_path in lib/features/*/; do
 
   # Rule 2: application -> presentation within same feature
   if [ -d "${feature_path}application" ]; then
-    hits=$(rg -l "package:fling/features/${feature}/presentation/" "${feature_path}application" 2>/dev/null || true)
+    hits=$(grep_imports "package:fling/features/${feature}/presentation/" "${feature_path}application")
     if [ -n "$hits" ]; then
       while IFS= read -r f; do
         VIOLATIONS+=("$f imports package:fling/features/${feature}/presentation/ (application -> presentation within '${feature}')")
@@ -67,7 +70,7 @@ for feature_path in lib/features/*/; do
     [ -d "$other_path" ] || continue
     other="$(basename "$other_path")"
     [ "$other" = "$feature" ] && continue
-    hits=$(rg -l "package:fling/features/${other}/" "$feature_path" 2>/dev/null || true)
+    hits=$(grep_imports "package:fling/features/${other}/" "$feature_path")
     if [ -n "$hits" ]; then
       while IFS= read -r f; do
         VIOLATIONS+=("$f imports package:fling/features/${other}/ (cross-feature: '${feature}' -> '${other}')")
