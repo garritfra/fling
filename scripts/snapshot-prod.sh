@@ -22,14 +22,17 @@
 #   scripts/snapshot-prod.sh --phase phase-0
 #   scripts/snapshot-prod.sh --phase phase-1 --project fling-list
 #
-# Requires: npx (Node), git.
-# Optional: gcloud (used for richer function metadata; skipped if absent).
+# Requires: gcloud (authed against the project), curl, python3, git.
+# Reason: firebase-tools has no command to fetch the live ruleset, so we
+# call the Firebase Rules + Firestore Admin REST APIs directly using a
+# gcloud user access token. firebase-tools is not used by this script.
 
 set -euo pipefail
 
 PROJECT="fling-list"
 PHASE=""
 NO_TAG=0
+GCLOUD_ACCOUNT=""
 
 usage() {
   sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
@@ -40,6 +43,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --project) PROJECT="$2"; shift 2 ;;
     --phase)   PHASE="$2";   shift 2 ;;
+    --account) GCLOUD_ACCOUNT="$2"; shift 2 ;;
     --no-tag)  NO_TAG=1;     shift ;;
     -h|--help) usage 0 ;;
     *) echo "unknown arg: $1" >&2; usage 2 ;;
@@ -54,12 +58,29 @@ fi
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-if ! command -v git >/dev/null; then
-  echo "error: git not on PATH" >&2; exit 2
+for cmd in git gcloud curl python3; do
+  if ! command -v "$cmd" >/dev/null; then
+    echo "error: $cmd not on PATH" >&2; exit 2
+  fi
+done
+
+ACCOUNT_FLAG=()
+if [ -n "$GCLOUD_ACCOUNT" ]; then
+  ACCOUNT_FLAG=(--account="$GCLOUD_ACCOUNT")
 fi
-if ! command -v npx >/dev/null; then
-  echo "error: npx (Node) not on PATH" >&2; exit 2
+
+if ! TOKEN=$(gcloud auth print-access-token "${ACCOUNT_FLAG[@]}" 2>/dev/null); then
+  echo "error: gcloud auth print-access-token failed. Run 'gcloud auth login' or pass --account <email>." >&2
+  exit 2
 fi
+
+api() {
+  # api <url>
+  curl -fsS \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "X-Goog-User-Project: $PROJECT" \
+    "$1"
+}
 
 TS="$(date -u +%Y-%m-%dT%H-%M-%SZ)"
 OUT="ops/snapshots/$PHASE/$TS"
@@ -69,32 +90,52 @@ echo "==> snapshotting project '$PROJECT' for '$PHASE' at $TS"
 echo "    output: $OUT"
 echo
 
-FB="npx --yes firebase-tools@^13.29.0"
-
 echo "[1/4] firestore rules"
-$FB firestore:rules:get "$PROJECT" > "$OUT/firestore.rules"
-echo "      $(wc -l < "$OUT/firestore.rules") lines captured"
+RULESET=$(api "https://firebaserules.googleapis.com/v1/projects/$PROJECT/releases/cloud.firestore" \
+  | python3 -c "import json,sys; print(json.load(sys.stdin)['rulesetName'])")
+api "https://firebaserules.googleapis.com/v1/$RULESET" \
+  | python3 -c "import json,sys; d=json.load(sys.stdin)
+for f in d['source']['files']: print(f['content'], end='')" \
+  > "$OUT/firestore.rules"
+echo "      $(wc -l < "$OUT/firestore.rules") lines captured (ruleset: $(basename "$RULESET"))"
 
 echo "[2/4] firestore indexes"
-$FB firestore:indexes --project "$PROJECT" > "$OUT/firestore.indexes.json"
-INDEX_COUNT=$(node -e "const i=require('$OUT/firestore.indexes.json'); console.log((i.indexes||[]).length)" 2>/dev/null || echo "?")
+api "https://firestore.googleapis.com/v1/projects/$PROJECT/databases/(default)/collectionGroups/-/indexes" \
+  | python3 -c "
+import json, sys
+raw = json.load(sys.stdin).get('indexes', [])
+out = []
+for ix in raw:
+    fields = []
+    for f in ix.get('fields', []):
+        # __name__ is implicit in firestore.indexes.json format; strip it.
+        if f.get('fieldPath') == '__name__':
+            continue
+        entry = {'fieldPath': f['fieldPath']}
+        if 'order' in f: entry['order'] = f['order']
+        if 'arrayConfig' in f: entry['arrayConfig'] = f['arrayConfig']
+        fields.append(entry)
+    out.append({
+        'collectionGroup': ix['name'].split('/collectionGroups/')[1].split('/')[0],
+        'queryScope': ix.get('queryScope', 'COLLECTION'),
+        'fields': fields,
+    })
+print(json.dumps({'indexes': out, 'fieldOverrides': []}, indent=2))
+" > "$OUT/firestore.indexes.json"
+INDEX_COUNT=$(python3 -c "import json; print(len(json.load(open('$OUT/firestore.indexes.json'))['indexes']))")
 echo "      $INDEX_COUNT composite indexes captured"
 
-echo "[3/4] function metadata"
-if command -v gcloud >/dev/null; then
-  {
-    echo "# Cloud Functions metadata for project=$PROJECT at $TS"
-    echo "# Format: name | runtime | entryPoint | region | gen"
-    gcloud functions list --project="$PROJECT" \
-      --format="csv[no-heading,separator=' | '](name,buildConfig.runtime,buildConfig.entryPoint,environment.locations,environment)" \
-      2>/dev/null \
-      || echo "# gcloud functions list failed (auth? IAM?)"
-  } > "$OUT/functions.metadata.txt"
-  echo "      $(grep -cv '^#' "$OUT/functions.metadata.txt" || true) functions captured"
-else
-  echo "# gcloud not installed; function metadata skipped." > "$OUT/functions.metadata.txt"
-  echo "      gcloud not installed; skipped (run 'brew install --cask google-cloud-sdk' to enable)"
-fi
+echo "[3/4] function metadata (Cloud Functions v1 + v2)"
+{
+  echo "# Cloud Functions metadata for project=$PROJECT at $TS"
+  echo "# Captured via 'gcloud functions list'"
+  echo
+  gcloud functions list --project="$PROJECT" \
+    --format="table(name,state,buildConfig.runtime,buildConfig.entryPoint,buildConfig.source.storageSource.bucket)" \
+    "${ACCOUNT_FLAG[@]}" 2>&1 \
+    || echo "# gcloud functions list failed (auth? IAM? unsupported region?)"
+} > "$OUT/functions.metadata.txt"
+echo "      $(grep -cv '^#' "$OUT/functions.metadata.txt" 2>/dev/null || echo 0) lines captured"
 
 echo "[4/4] git baseline + tag"
 git fetch origin main >/dev/null 2>&1 || true
