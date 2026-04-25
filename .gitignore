@@ -50,3 +50,6 @@ app.*.map.json
 
 # firebase emulator state
 .emulator-data/
+
+# rollback snapshots (operations tool output)
+ops/snapshots/
