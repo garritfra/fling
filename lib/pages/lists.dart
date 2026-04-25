@@ -1,11 +1,9 @@
 import 'package:fling/data/household.dart';
 import 'package:fling/data/list.dart';
-import 'package:fling/data/list_item.dart';
-import 'package:fling/data/template.dart';
 import 'package:fling/data/user.dart';
 import 'package:fling/l10n/app_localizations.dart';
-import 'package:fling/layout/confirm_dialog.dart';
 import 'package:fling/layout/drawer.dart';
+import 'package:fling/pages/list.dart';
 import 'package:flutter/material.dart';
 
 class ListsPage extends StatefulWidget {
@@ -25,17 +23,66 @@ class _ListsPageState extends State<ListsPage> {
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
 
-    void onAddHousehold() {
+    void onAddhousehold() {
       Navigator.pushNamed(context, "/household_add");
+    }
+
+    void showListActionsDialog(FlingListModel list) {
+      showDialog(
+          context: context,
+          builder: ((context) => AlertDialog(
+                title: Text(l10n.list_delete),
+                content: Text(l10n.action_sure),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(l10n.action_cancel)),
+                  TextButton(
+                      onPressed: () {
+                        list.delete();
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(l10n.action_delete)),
+                ],
+              )));
+    }
+
+    Widget buildLists(HouseholdModel household) {
+      return Expanded(
+        child: FutureBuilder(
+            future: household.lists,
+            builder: (context, lists) {
+              return StreamBuilder(
+                  stream: lists.data,
+                  builder: (context, snapshot) {
+                    var lists = snapshot.data ?? [];
+
+                    return ListView.builder(
+                        itemCount: lists.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          FlingListModel list = lists.elementAt(index);
+
+                          return ListTile(
+                            onTap: () => Navigator.pushNamed(context, '/list',
+                                arguments: ListPageArguments(list)),
+                            onLongPress: () => showListActionsDialog(list),
+                            key: Key(list.id ?? list.name),
+                            title: Text(list.name),
+                          );
+                        });
+                  });
+            }),
+      );
     }
 
     Widget buildEmptyHouseholds() {
       return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(l10n.household_empty),
           TextButton(
-              onPressed: onAddHousehold,
+              onPressed: onAddhousehold,
               child: Text(l10n.household_create_first))
         ],
       );
@@ -72,6 +119,7 @@ class _ListsPageState extends State<ListsPage> {
         var user = await FlingUser.currentUser.first;
         var household = await (await user?.currentHousehold)?.first;
         household?.inviteByEmail(inviteEmailController.text);
+
         navigator.pop();
       }
 
@@ -136,12 +184,49 @@ class _ListsPageState extends State<ListsPage> {
                             leading: const Icon(Icons.house),
                           )),
                       ListTile(
-                        onTap: () => onAddHousehold(),
+                        onTap: () => onAddhousehold(),
                         title: Text(l10n.household_add),
                         leading: const Icon(Icons.add),
                       )
                     ],
                   )))));
+    }
+
+    onAddListPressed() {
+      TextEditingController textController = TextEditingController();
+      NavigatorState navigator = Navigator.of(context);
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text(l10n.list_create),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(l10n.action_cancel)),
+                  TextButton(
+                      onPressed: () async {
+                        FlingUser? user = await FlingUser.currentUser.first;
+                        String? householdId = user?.currentHouseholdId;
+
+                        if (householdId != null) {
+                          FlingListModel(
+                                  householdId: householdId,
+                                  name: textController.text)
+                              .save();
+                        }
+                        navigator.pop();
+                      },
+                      child: Text(l10n.action_done)),
+                ],
+                content: TextField(
+                  controller: textController,
+                  autofocus: true,
+                  decoration: InputDecoration(hintText: l10n.item_name),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+              ));
     }
 
     return StreamBuilder(
@@ -154,7 +239,7 @@ class _ListsPageState extends State<ListsPage> {
               return StreamBuilder(
                   stream: householdSnapshot.data,
                   builder: (BuildContext context,
-                      AsyncSnapshot<HouseholdModel> householdAsync) {
+                      AsyncSnapshot<HouseholdModel> household) {
                     Widget buildSwitchHouseholdAction() {
                       return IconButton(
                           onPressed: showHouseholdSwitcher,
@@ -169,9 +254,8 @@ class _ListsPageState extends State<ListsPage> {
                                 showInviteDialog();
                                 break;
                               case HouseholdMenuListAction.deleteHousehold:
-                                if (householdAsync.data != null) {
-                                  showDeleteHouseholdDialog(
-                                      householdAsync.data!);
+                                if (household.data != null) {
+                                  showDeleteHouseholdDialog(household.data!);
                                 }
                                 break;
                             }
@@ -181,513 +265,43 @@ class _ListsPageState extends State<ListsPage> {
                                     value: HouseholdMenuListAction.inviteUser,
                                     child: Text(l10n.user_invite)),
                                 PopupMenuItem(
-                                    value: HouseholdMenuListAction
-                                        .deleteHousehold,
+                                    value:
+                                        HouseholdMenuListAction.deleteHousehold,
                                     child: Text(l10n.household_leave))
                               ]);
                     }
 
-                    if (!householdAsync.hasData) {
-                      return Scaffold(
-                        appBar: AppBar(
-                          title: Text(l10n.lists),
+                    return Scaffold(
+                      appBar: AppBar(
+                        title: Text(AppLocalizations.of(context)!.lists),
+                        actions: household.hasData
+                            ? [
+                                buildSwitchHouseholdAction(),
+                                buildMoreAction(),
+                              ]
+                            : null,
+                      ),
+                      floatingActionButton: household.hasData
+                          ? FloatingActionButton(
+                              onPressed: onAddListPressed,
+                              child: const Icon(Icons.add))
+                          : null,
+                      drawer: const FlingDrawer(),
+                      body: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            if (household.hasData)
+                              buildLists(household.data!)
+                            else
+                              buildEmptyHouseholds(),
+                          ],
                         ),
-                        drawer: const FlingDrawer(),
-                        body: Center(child: buildEmptyHouseholds()),
-                      );
-                    }
-
-                    final household = householdAsync.data!;
-
-                    return FutureBuilder(
-                        future: household.lists,
-                        builder: (context, listsStreamSnapshot) {
-                          return StreamBuilder(
-                              stream: listsStreamSnapshot.data,
-                              builder: (context,
-                                  AsyncSnapshot<List<FlingListModel>>
-                                      listsAsync) {
-                                final lists = listsAsync.data ?? [];
-
-                                void onAddListPressed() {
-                                  TextEditingController textController =
-                                      TextEditingController();
-                                  NavigatorState navigator =
-                                      Navigator.of(context);
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                            title: Text(l10n.list_create),
-                                            actions: [
-                                              TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                  child: Text(l10n
-                                                      .action_cancel)),
-                                              TextButton(
-                                                  onPressed: () async {
-                                                    FlingUser? user =
-                                                        await FlingUser
-                                                            .currentUser.first;
-                                                    String? householdId =
-                                                        user
-                                                            ?.currentHouseholdId;
-                                                    if (householdId != null) {
-                                                      FlingListModel(
-                                                              householdId:
-                                                                  householdId,
-                                                              name: textController
-                                                                  .text)
-                                                          .save();
-                                                    }
-                                                    navigator.pop();
-                                                  },
-                                                  child:
-                                                      Text(l10n.action_done)),
-                                            ],
-                                            content: TextField(
-                                              controller: textController,
-                                              autofocus: true,
-                                              decoration: InputDecoration(
-                                                  hintText: l10n.item_name),
-                                              keyboardType:
-                                                  TextInputType.text,
-                                            ),
-                                          ));
-                                }
-
-                                return _TabListsView(
-                                  lists: lists,
-                                  appBarActions: [
-                                    IconButton(
-                                      onPressed: onAddListPressed,
-                                      icon: const Icon(Icons.add),
-                                      tooltip: l10n.list_create,
-                                    ),
-                                    buildSwitchHouseholdAction(),
-                                    buildMoreAction(),
-                                  ],
-                                  appBarTitle: Text(l10n.lists),
-                                );
-                              });
-                        });
+                      ),
+                    );
                   });
             });
       },
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Tab view for lists
-// ---------------------------------------------------------------------------
-
-class _TabListsView extends StatefulWidget {
-  final List<FlingListModel> lists;
-  final List<Widget> appBarActions;
-  final Widget appBarTitle;
-
-  const _TabListsView({
-    required this.lists,
-    required this.appBarActions,
-    required this.appBarTitle,
-  });
-
-  @override
-  State<_TabListsView> createState() => _TabListsViewState();
-}
-
-class _TabListsViewState extends State<_TabListsView>
-    with TickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    final len = widget.lists.length;
-    _tabController = TabController(length: len > 0 ? len : 1, vsync: this);
-  }
-
-  @override
-  void didUpdateWidget(_TabListsView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.lists.length != widget.lists.length) {
-      final previousIndex = _tabController.index;
-      _tabController.dispose();
-      final len = widget.lists.length;
-      _tabController = TabController(
-        length: len > 0 ? len : 1,
-        vsync: this,
-        initialIndex: len > 0 ? previousIndex.clamp(0, len - 1) : 0,
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  void _showDeleteListDialog(BuildContext context, FlingListModel list) {
-    var l10n = AppLocalizations.of(context)!;
-    showDialog(
-        context: context,
-        builder: ((context) => AlertDialog(
-              title: Text(l10n.list_delete),
-              content: Text(l10n.action_sure),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(l10n.action_cancel)),
-                TextButton(
-                    onPressed: () {
-                      list.delete();
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(l10n.action_delete)),
-              ],
-            )));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.lists.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          title: widget.appBarTitle,
-          actions: widget.appBarActions,
-        ),
-        drawer: const FlingDrawer(),
-        body: const SizedBox.shrink(),
-      );
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: widget.appBarTitle,
-        actions: widget.appBarActions,
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabAlignment: TabAlignment.start,
-          tabs: widget.lists.map((list) {
-            return GestureDetector(
-              onLongPress: () => _showDeleteListDialog(context, list),
-              child: Tab(text: list.name),
-            );
-          }).toList(),
-        ),
-      ),
-      drawer: const FlingDrawer(),
-      body: TabBarView(
-        controller: _tabController,
-        children: widget.lists
-            .map((list) => _ListItemsView(list: list))
-            .toList(),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Items view for a single list
-// ---------------------------------------------------------------------------
-
-class _ListItemsView extends StatefulWidget {
-  final FlingListModel list;
-
-  const _ListItemsView({required this.list});
-
-  @override
-  State<_ListItemsView> createState() => _ListItemsViewState();
-}
-
-class _ListItemsViewState extends State<_ListItemsView>
-    with AutomaticKeepAliveClientMixin {
-  final _newItemController = TextEditingController();
-  final _newItemFocusNode = FocusNode();
-
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void dispose() {
-    _newItemController.dispose();
-    _newItemFocusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context);
-    var l10n = AppLocalizations.of(context)!;
-    final list = widget.list;
-
-    Widget buildListItem(ListItem item) {
-      void showEditItemDialog() {
-        var textController = TextEditingController(text: item.text);
-        List<String> editedTags = List.from(item.tags);
-        var tagController = TextEditingController();
-
-        showDialog(
-          context: context,
-          builder: (context) => StatefulBuilder(
-            builder: (context, setState) => AlertDialog(
-              title: Text(l10n.action_edit_entry),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      controller: textController,
-                      autofocus: true,
-                      decoration: InputDecoration(hintText: l10n.item_name),
-                    ),
-                    const SizedBox(height: 16),
-                    Text("Tags:",
-                        style: Theme.of(context).textTheme.titleMedium),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      children: editedTags
-                          .map((tag) => Chip(
-                                label: Text(tag),
-                                deleteIcon:
-                                    const Icon(Icons.close, size: 18),
-                                onDeleted: () {
-                                  setState(() {
-                                    editedTags.remove(tag);
-                                  });
-                                },
-                              ))
-                          .toList(),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: tagController,
-                            decoration: const InputDecoration(
-                              hintText: "Add tag",
-                              isDense: true,
-                            ),
-                            onSubmitted: (value) {
-                              if (value.isNotEmpty) {
-                                setState(() {
-                                  editedTags.add(value);
-                                  tagController.clear();
-                                });
-                              }
-                            },
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add),
-                          onPressed: () {
-                            if (tagController.text.isNotEmpty) {
-                              setState(() {
-                                editedTags.add(tagController.text);
-                                tagController.clear();
-                              });
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(l10n.action_cancel)),
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      item.text = textController.text;
-                      item.tags = editedTags;
-                      list.updateItem(item);
-                    },
-                    child: Text(l10n.action_done)),
-              ],
-            ),
-          ),
-        );
-      }
-
-      return Card(
-        child: ListTile(
-          onTap: showEditItemDialog,
-          leading: Checkbox(
-            value: item.checked,
-            onChanged: (checked) {
-              list.toggleItem(item);
-            },
-          ),
-          title: Text(item.text),
-          subtitle: item.tags.isNotEmpty
-              ? Wrap(
-                  spacing: 4,
-                  children: item.tags
-                      .map((tag) => Chip(
-                            labelStyle: const TextStyle(fontSize: 10),
-                            padding: const EdgeInsets.all(0),
-                            label: Text(tag),
-                            visualDensity: VisualDensity.compact,
-                          ))
-                      .toList(),
-                )
-              : null,
-        ),
-      );
-    }
-
-    Future<void> showListTemplatesDialog() async {
-      FlingUser? user = await FlingUser.currentUser.first;
-      HouseholdModel? household =
-          await (await user?.currentHousehold)?.first;
-      List<FlingTemplateModel> templates = [];
-      if (household != null) {
-        final templatesStream = await household.templates;
-        templates = await templatesStream.first;
-      }
-      templates.sort((a, b) => a.name.compareTo(b.name));
-
-      Future<void> onAdd(FlingTemplateModel template) async {
-        template.applyToList(list);
-        Navigator.pop(context);
-      }
-
-      showDialog(
-          context: context,
-          builder: ((context) => AlertDialog(
-              title: Text(l10n.templates),
-              content: SizedBox(
-                  width: double.maxFinite,
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      ...templates.map((template) => ListTile(
-                            onTap: () => onAdd(template),
-                            title: Text(template.name),
-                          )),
-                    ],
-                  )))));
-    }
-
-    Widget buildItemList() {
-      return Expanded(
-        child: FutureBuilder(
-            future: list.items,
-            builder: (context, snapshot) {
-              return StreamBuilder(
-                  stream: snapshot.data,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text(l10n.status_error);
-                    }
-
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    List<ListItem> items = snapshot.data!.docs
-                        .map<ListItem>((doc) => ListItem.fromMap({
-                              "id": doc.id,
-                              ...doc.data() as Map<String, dynamic>
-                            }))
-                        .toList();
-
-                    return ListView.builder(
-                        itemCount: items.length,
-                        padding:
-                            const EdgeInsets.symmetric(vertical: 4.0),
-                        itemBuilder: (BuildContext context, int index) {
-                          ListItem item = items.elementAt(index);
-                          Widget itemView = buildListItem(item);
-
-                          if (item.checked) {
-                            return Dismissible(
-                                onDismissed: (direction) =>
-                                    list.deleteItem(item),
-                                key: Key(item.id),
-                                child: itemView);
-                          } else {
-                            return Container(
-                                key: Key(item.id), child: itemView);
-                          }
-                        });
-                  });
-            }),
-      );
-    }
-
-    Widget buildItemTextField() {
-      return Container(
-        padding:
-            const EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
-        child: TextField(
-            controller: _newItemController,
-            focusNode: _newItemFocusNode,
-            onSubmitted: (value) {
-              final trimmed = value.trim();
-              if (trimmed.isEmpty) return;
-              list.addItem(trimmed);
-              _newItemController.clear();
-              _newItemFocusNode.requestFocus();
-            },
-            decoration: InputDecoration(
-              hintText: l10n.item_hint,
-              border: const OutlineInputBorder(),
-              labelText: l10n.item_add,
-            )),
-      );
-    }
-
-    return SafeArea(
-      child: Center(
-        child: SizedBox(
-          width: 600.0,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.playlist_add),
-                      onPressed: showListTemplatesDialog,
-                      tooltip: l10n.templates,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_sweep),
-                      color: Colors.red,
-                      onPressed: () => showConfirmDialog(
-                          context: context,
-                          yesText: l10n.action_delete_checked,
-                          yesAction: () {
-                            Navigator.of(context).pop();
-                            list.deleteChecked();
-                          }),
-                    ),
-                  ],
-                ),
-              ),
-              buildItemList(),
-              buildItemTextField(),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
