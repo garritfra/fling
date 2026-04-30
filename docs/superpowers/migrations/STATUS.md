@@ -5,7 +5,7 @@
 > Source of truth for "where are we right now?" in the rewrite.
 
 - **Spec:** [`docs/superpowers/specs/2026-04-24-fling-rewrite-design.md`](../specs/2026-04-24-fling-rewrite-design.md)
-- **Last updated:** 2026-04-26 (Phase 0 complete; deployed to prod, smoke verified)
+- **Last updated:** 2026-04-30 (Phase 1 started; plan published)
 
 ## Status legend
 
@@ -20,7 +20,7 @@
 | Phase | Name | Goal (one line) | Status | Plan | Started | Completed |
 |---|---|---|---|---|---|---|
 | 0 | Foundation | All scaffolding (CI, deps, lint boundaries, empty Hono app, emulator, migrations runner). No user-visible change. | ✅ | [phase-0-foundation.md](./phase-0-foundation.md) | 2026-04-24 | 2026-04-26 |
-| 1 | `me` slice + API foundation | First end-to-end vertical slice. Replaces `setupUser` / `deleteUser`. | ⬜ | _not yet written_ | — | — |
+| 1 | `me` slice + API foundation | First end-to-end vertical slice. Replaces `setupUser` / `deleteUser`. | 🟡 | [phase-1-me-slice.md](./phase-1-me-slice.md) | 2026-04-30 | — |
 | 2 | Households + members + invites | New first-class invite flow. Replaces `cacheJoinHousehold` / `cacheLeaveHousehold` / `inviteToHouseholdByEmail`. | ⬜ | _not yet written_ | — | — |
 | 3 | Lists | All list and item mutations through API. Offline queue + optimistic updates wired up. | ⬜ | _not yet written_ | — | — |
 | 4 | Templates | Same pattern as lists. `:applyTemplate` action live. | ⬜ | _not yet written_ | — | — |
@@ -116,3 +116,4 @@ moves a phase.
 | 2026-04-24 | 0 | Started | — | Phase 0 plan published (`phase-0-foundation.md`) |
 | 2026-04-24 | 0 | Implementation complete | — | Tasks 1–13 landed on branch `phase-0-foundation`; Task 14 (prod deploy + smoke) pending PR merge |
 | 2026-04-26 | 0 | Completed | [#540](https://github.com/garritfra/fling/pull/540) | Deployed via `ci.yml` deploy job; `api` function live at `/v1/healthz`; Flutter prod app smoke confirmed |
+| 2026-04-30 | 1 | Started | — | Phase 1 plan published (`phase-1-me-slice.md`) |
