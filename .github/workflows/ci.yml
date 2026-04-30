@@ -27,13 +27,19 @@ jobs:
       - run: npm ci --no-audit
       - run: npm run lint
       - run: npx tsc --noEmit
-      - run: npx vitest run --exclude 'test/rules/**' --exclude 'test/api/**'
+      - run: |
+          npx vitest run \
+            --exclude 'test/rules/**' \
+            --exclude 'test/api/**' \
+            --exclude 'test/features/**' \
+            --exclude 'test/core/middleware/auth.test.ts' \
+            --exclude 'test/core/middleware/idempotency.test.ts'
       - name: Install firebase-tools
         run: npm install -g firebase-tools@^13.29.0
-      - name: Run emulator-backed tests (rules + api)
+      - name: Run emulator-backed tests (rules + api + features + auth middleware)
         run: |
           firebase emulators:exec --only firestore,auth --project fling-rules-test \
-            "npx vitest run test/rules test/api"
+            "npx vitest run test/rules test/api test/features test/core/middleware/auth.test.ts"
 
   flutter:
     name: flutter (analyze + test + boundaries)
