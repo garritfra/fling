@@ -10,6 +10,7 @@ import 'package:fling_api/src/auth/basic_auth.dart';
 import 'package:fling_api/src/auth/bearer_auth.dart';
 import 'package:fling_api/src/auth/oauth.dart';
 import 'package:fling_api/src/api/default_api.dart';
+import 'package:fling_api/src/api/me_api.dart';
 
 class FlingApi {
   static const String basePath = r'http://localhost';
@@ -69,5 +70,11 @@ class FlingApi {
   /// by doing that all interceptors will not be executed
   DefaultApi getDefaultApi() {
     return DefaultApi(dio, serializers);
+  }
+
+  /// Get MeApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  MeApi getMeApi() {
+    return MeApi(dio, serializers);
   }
 }

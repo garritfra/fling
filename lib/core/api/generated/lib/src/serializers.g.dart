@@ -8,7 +8,12 @@ part of 'serializers.dart';
 
 Serializers _$serializers = (Serializers().toBuilder()
       ..add(Health.serializer)
-      ..add(HealthStatusEnum.serializer))
+      ..add(HealthStatusEnum.serializer)
+      ..add(Me.serializer)
+      ..add(PatchMe.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>()))
     .build();
 
 // ignore_for_file: deprecated_member_use_from_same_package,type=lint
