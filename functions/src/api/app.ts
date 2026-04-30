@@ -21,16 +21,16 @@ export const app = new OpenAPIHono();
 installErrorHandler(app);
 app.use("*", requestIdMiddleware());
 
-// Public endpoints (no auth) come before the auth middleware mount.
+// Public endpoints — registered before the auth middleware so they are accessible without a token.
 app.openapi(healthzRoute, (c) =>
   c.json({status: "ok" as const, version: process.env.K_REVISION ?? "dev"}),
 );
-
-// Authenticated /v1/* routes.
-app.use("/v1/*", authMiddleware());
-registerMeRoutes(app);
 
 app.doc("/v1/openapi.json", {
   openapi: "3.0.3",
   info: {title: "Fling API", version: "1.0.0"},
 });
+
+// Authenticated /v1/* routes — auth middleware applies to everything registered after this point.
+app.use("/v1/*", authMiddleware());
+registerMeRoutes(app);
