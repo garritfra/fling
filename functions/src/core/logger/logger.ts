@@ -6,7 +6,8 @@ export interface Logger {
   error(msg: string, fields?: Record<string, unknown>): void;
 }
 
-function emit(level: "INFO" | "WARN" | "ERROR", msg: string, fields?: Record<string, unknown>): void {
+type Level = "INFO" | "WARN" | "ERROR";
+function emit(level: Level, msg: string, fields?: Record<string, unknown>): void {
   const line = JSON.stringify({severity: level, message: msg, ...fields});
   if (level === "ERROR") console.error(line);
   else if (level === "WARN") console.warn(line);

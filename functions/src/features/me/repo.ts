@@ -54,8 +54,8 @@ export async function createUserDoc(uid: string, email: string | null): Promise<
     display_name: null,
     household_ids: [],
     current_household_id: null,
-    households: [],            // legacy, dual-write
-    current_household: null,   // legacy, dual-write
+    households: [], // legacy, dual-write
+    current_household: null, // legacy, dual-write
     schema_version: 1,
     created_at: FieldValue.serverTimestamp(),
     updated_at: FieldValue.serverTimestamp(),

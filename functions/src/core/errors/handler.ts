@@ -8,7 +8,8 @@ export function installErrorHandler(app: Hono | OpenAPIHono): void {
   app.onError((err, c) => {
     if (err instanceof ZodError) {
       const wrapped = new BadRequest("Validation failed", {issues: err.issues});
-      return c.json({error: {code: wrapped.code, message: wrapped.message, details: wrapped.details}}, 400);
+      const {code, message, details} = wrapped;
+      return c.json({error: {code, message, details}}, 400);
     }
     if (err instanceof AppError) {
       const body: {error: {code: string; message: string; details?: Record<string, unknown>}} = {

@@ -18,7 +18,10 @@ const getMeRoute = createRoute({
   responses: {
     200: {description: "The caller", content: {"application/json": {schema: MeSchema}}},
     401: {description: "Unauthorized", content: {"application/json": {schema: ErrorSchema}}},
-    404: {description: "User document not found", content: {"application/json": {schema: ErrorSchema}}},
+    404: {
+      description: "User document not found",
+      content: {"application/json": {schema: ErrorSchema}},
+    },
   },
 });
 
