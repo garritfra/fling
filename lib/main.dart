@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fba;
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderScope;
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
@@ -30,12 +31,19 @@ Future<void> main() async {
 
   Stream<FlingUser?> user = FlingUser.currentUser;
 
-  runApp(MultiProvider(providers: [
-    StreamProvider<FlingUser?>(
-      create: (context) => user,
-      initialData: null,
-    )
-  ], child: const FlingApp()));
+  runApp(
+    ProviderScope(
+      child: MultiProvider(
+        providers: [
+          StreamProvider<FlingUser?>(
+            create: (context) => user,
+            initialData: null,
+          ),
+        ],
+        child: const FlingApp(),
+      ),
+    ),
+  );
 }
 
 class FlingApp extends StatelessWidget {
