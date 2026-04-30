@@ -2,6 +2,8 @@
 .openapi-generator-ignore
 README.md
 analysis_options.yaml
+doc/ApiError.md
+doc/ApiErrorError.md
 doc/DefaultApi.md
 doc/Health.md
 doc/Me.md
@@ -18,12 +20,16 @@ lib/src/auth/basic_auth.dart
 lib/src/auth/bearer_auth.dart
 lib/src/auth/oauth.dart
 lib/src/date_serializer.dart
+lib/src/model/api_error.dart
+lib/src/model/api_error_error.dart
 lib/src/model/date.dart
 lib/src/model/health.dart
 lib/src/model/me.dart
 lib/src/model/patch_me.dart
 lib/src/serializers.dart
 pubspec.yaml
+test/api_error_error_test.dart
+test/api_error_test.dart
 test/default_api_test.dart
 test/health_test.dart
 test/me_api_test.dart

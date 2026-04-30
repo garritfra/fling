@@ -1,7 +1,15 @@
-import {OpenAPIHono, createRoute} from "@hono/zod-openapi";
+import {z, OpenAPIHono, createRoute} from "@hono/zod-openapi";
 import {MeSchema, PatchMeSchema} from "./schemas";
 import {getRequestContext} from "../../core/context/request_context";
 import * as service from "./service";
+
+const ErrorSchema = z.object({
+  error: z.object({
+    code: z.string(),
+    message: z.string(),
+    details: z.unknown().optional(),
+  }),
+}).openapi("ApiError");
 
 const getMeRoute = createRoute({
   method: "get",
@@ -9,6 +17,8 @@ const getMeRoute = createRoute({
   tags: ["me"],
   responses: {
     200: {description: "The caller", content: {"application/json": {schema: MeSchema}}},
+    401: {description: "Unauthorized", content: {"application/json": {schema: ErrorSchema}}},
+    404: {description: "User document not found", content: {"application/json": {schema: ErrorSchema}}},
   },
 });
 
@@ -19,6 +29,8 @@ const patchMeRoute = createRoute({
   request: {body: {required: true, content: {"application/json": {schema: PatchMeSchema}}}},
   responses: {
     200: {description: "Updated", content: {"application/json": {schema: MeSchema}}},
+    400: {description: "Validation error", content: {"application/json": {schema: ErrorSchema}}},
+    401: {description: "Unauthorized", content: {"application/json": {schema: ErrorSchema}}},
   },
 });
 

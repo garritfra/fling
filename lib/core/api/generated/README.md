@@ -71,6 +71,8 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [ApiError](doc/ApiError.md)
+ - [ApiErrorError](doc/ApiErrorError.md)
  - [Health](doc/Health.md)
  - [Me](doc/Me.md)
  - [PatchMe](doc/PatchMe.md)

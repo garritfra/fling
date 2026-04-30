@@ -32,7 +32,6 @@ beforeAll(async () => {
   }
   aliceUid = u.uid;
   aliceToken = await exchangeCustomTokenForId(await getAuth().createCustomToken(u.uid));
-  await service.createUser(u.uid, "alice@example.com");
 });
 
 beforeEach(async () => {
@@ -71,5 +70,37 @@ describe("GET /v1/me", () => {
     expect(body.householdIds).toEqual([]);
     expect(body.currentHouseholdId).toBeNull();
     expect(body.displayName).toBeNull();
+  });
+});
+
+describe("PATCH /v1/me", () => {
+  it("401 without a token", async () => {
+    const res = await buildApp().request("/v1/me", {
+      method: "PATCH",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({displayName: "Alice"}),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("updates displayName and returns the updated doc", async () => {
+    const res = await buildApp().request("/v1/me", {
+      method: "PATCH",
+      headers: {Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json"},
+      body: JSON.stringify({displayName: "Alice Updated"}),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.displayName).toBe("Alice Updated");
+    expect(body.email).toBe("alice@example.com");
+  });
+
+  it("400 on unknown field (strict schema)", async () => {
+    const res = await buildApp().request("/v1/me", {
+      method: "PATCH",
+      headers: {Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json"},
+      body: JSON.stringify({unknownField: "x"}),
+    });
+    expect(res.status).toBe(400);
   });
 });

@@ -7,6 +7,8 @@ part of 'serializers.dart';
 // **************************************************************************
 
 Serializers _$serializers = (Serializers().toBuilder()
+      ..add(ApiError.serializer)
+      ..add(ApiErrorError.serializer)
       ..add(Health.serializer)
       ..add(HealthStatusEnum.serializer)
       ..add(Me.serializer)

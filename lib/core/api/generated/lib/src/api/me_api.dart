@@ -8,6 +8,7 @@ import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
+import 'package:fling_api/src/model/api_error.dart';
 import 'package:fling_api/src/model/me.dart';
 import 'package:fling_api/src/model/patch_me.dart';
 
