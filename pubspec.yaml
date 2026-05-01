@@ -49,7 +49,7 @@ dependencies:
   firebase_ui_auth: ^1.14.0
   flutter_riverpod: ^2.6.1
   freezed_annotation: ^2.4.4
-  go_router: ^14.6.1
+  go_router: ^17.2.2
   intl: any # Can't be pinned :(
   json_annotation: ^4.9.0
   one_of: ^1.5.0
