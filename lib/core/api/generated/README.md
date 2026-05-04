@@ -65,11 +65,17 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*DefaultApi*](doc/DefaultApi.md) | [**v1HealthzGet**](doc/DefaultApi.md#v1healthzget) | **GET** /v1/healthz | 
+[*MeApi*](doc/MeApi.md) | [**v1MeGet**](doc/MeApi.md#v1meget) | **GET** /v1/me | 
+[*MeApi*](doc/MeApi.md) | [**v1MePatch**](doc/MeApi.md#v1mepatch) | **PATCH** /v1/me | 
 
 
 ## Documentation For Models
 
+ - [ApiError](doc/ApiError.md)
+ - [ApiErrorError](doc/ApiErrorError.md)
  - [Health](doc/Health.md)
+ - [Me](doc/Me.md)
+ - [PatchMe](doc/PatchMe.md)
 
 
 ## Documentation For Authorization

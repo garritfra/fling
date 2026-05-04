@@ -11,6 +11,11 @@ export 'package:fling_api/src/serializers.dart';
 export 'package:fling_api/src/model/date.dart';
 
 export 'package:fling_api/src/api/default_api.dart';
+export 'package:fling_api/src/api/me_api.dart';
 
+export 'package:fling_api/src/model/api_error.dart';
+export 'package:fling_api/src/model/api_error_error.dart';
 export 'package:fling_api/src/model/health.dart';
+export 'package:fling_api/src/model/me.dart';
+export 'package:fling_api/src/model/patch_me.dart';
 

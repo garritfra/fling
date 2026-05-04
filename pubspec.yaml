@@ -76,6 +76,11 @@ dev_dependencies:
   freezed: ^2.5.7
   json_serializable: ^6.8.0
   riverpod_lint: ^2.6.1
+  fake_cloud_firestore: ^2.5.2
+  firebase_auth_mocks: ^0.13.0
+
+dependency_overrides:
+  rxdart: ^0.28.0
 
 flutter_icons:
   android: "launcher_icon"

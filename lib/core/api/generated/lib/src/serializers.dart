@@ -14,12 +14,20 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:fling_api/src/date_serializer.dart';
 import 'package:fling_api/src/model/date.dart';
 
+import 'package:fling_api/src/model/api_error.dart';
+import 'package:fling_api/src/model/api_error_error.dart';
 import 'package:fling_api/src/model/health.dart';
+import 'package:fling_api/src/model/me.dart';
+import 'package:fling_api/src/model/patch_me.dart';
 
 part 'serializers.g.dart';
 
 @SerializersFor([
+  ApiError,
+  ApiErrorError,
   Health,
+  Me,
+  PatchMe,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..add(const OneOfSerializer())
