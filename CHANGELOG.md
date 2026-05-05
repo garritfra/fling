@@ -8,6 +8,12 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## v0.11.1 (2026-05-05)
+
+### Fixed
+
+- Bump Android Gradle Plugin 8.7.3 → 8.9.1. Required by `androidx.core:core:1.17.0`, `androidx.core:core-ktx:1.17.0` and `androidx.browser:browser:1.9.0` (transitive dependencies of Flutter plugins); the v0.11.0 Play Store deploy failed at `:app:checkReleaseAarMetadata` because the project still pinned AGP 8.7.3.
+
 ## v0.11.0 (2026-05-05)
 
 ### Added
