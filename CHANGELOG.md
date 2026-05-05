@@ -8,6 +8,8 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+## v0.11.0 (2026-05-05)
+
 ### Added
 
 - Phase 1 Slice 1 — `GET /v1/me` and `PATCH /v1/me` end-to-end ([#543](https://github.com/garritfra/fling/pull/543)):
