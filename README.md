@@ -30,3 +30,4 @@ flutter gen-l10n
 3. Commit with name of version
 4. `git tag -a <new tag> -m "$(git shortlog <previous tag>..HEAD)"`
 5. `git push --tags`
+6. Stage a GitHub release with the contents of the changelog
