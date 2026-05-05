@@ -8,6 +8,56 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
 
+### Added
+
+- Phase 1 Slice 1 — `GET /v1/me` and `PATCH /v1/me` end-to-end ([#543](https://github.com/garritfra/fling/pull/543)):
+  - Backend: `RequestContext`, structured logger, `AppError` hierarchy + Hono error handler, `requestId` middleware, Firebase ID-token auth middleware, and a `me` feature slice (`schemas`, `repo`, `service`, `routes`, `events`); `/v1/openapi.json` served unauthenticated
+  - Flutter: Riverpod-based `features/me` read path; `ProviderScope` bootstrap
+  - Tooling: `CONTRIBUTING.md` with local dev / emulator / API testing / migrations workflow; backend tests now run under the Firebase emulator in CI; hosting emulator moved to port 5050 (5000 conflicts with AirPlay)
+
+### Reverted
+
+- Revert tab layout for lists ([#511](https://github.com/garritfra/fling/pull/511))
+
+### Infrastructure
+
+Phase 0 of the rewrite — foundation work, no user-facing changes ([#540](https://github.com/garritfra/fling/pull/540)):
+
+- **Backend (Hono API):** empty v1 API behind `/v1/healthz` with OpenAPI spec; `openapi:generate` script and committed baseline; idempotent migration runner with `000-initial` baseline
+- **Flutter:** added `riverpod`, `freezed`, `go_router`, `connectivity`, `shared_preferences` deps and scaffold; generated `dart-dio` client from OpenAPI
+- **Slice scaffolding:** `core/` and `features/` directories under `functions/`
+- **Lint / boundaries:** backend boundary rules (no cross-feature, no core→feature); inner-feature boundary rules now actually fire; grep-based Flutter import-boundary check (CI-portable)
+- **Rules / Firestore:** baseline `firestore.rules` mirroring current behaviour; Phase-0 carve-out documented and tested; Vitest rules tests against the emulator
+- **CI / ops:** unified `ci.yml` (backend, flutter, contracts, deploy); tolerate pre-existing info-level analyzer findings; `scripts/snapshot-prod.sh` for pre-merge rollback snapshots, preserving all 5 live composite indexes via REST API; `scripts/dev.sh` for the Firebase emulator suite
+- **Toolchain:** Node 20, TypeScript 5, normalised ESLint config in `functions/`
+- **Docs:** rewrite design spec, migration status tracker, Phase 0 plan (closed — prod deploy + smoke verified)
+
+### Maintenance
+
+- Change Dependabot update schedule to monthly
+- Bump `firebase-admin` from 13.5.0 to 13.7.0 in /functions ([#444](https://github.com/garritfra/fling/pull/444), [#485](https://github.com/garritfra/fling/pull/485), [#498](https://github.com/garritfra/fling/pull/498))
+- Bump `fast-xml-parser` from 5.3.4 to 5.7.1 in /functions ([#492](https://github.com/garritfra/fling/pull/492), [#496](https://github.com/garritfra/fling/pull/496), [#507](https://github.com/garritfra/fling/pull/507), [#509](https://github.com/garritfra/fling/pull/509), [#538](https://github.com/garritfra/fling/pull/538))
+- Bump `protobufjs` from 7.4.0 to 7.5.5 in /functions ([#537](https://github.com/garritfra/fling/pull/537))
+- Bump `lodash` from 4.17.21 to 4.18.1 in /functions ([#476](https://github.com/garritfra/fling/pull/476), [#533](https://github.com/garritfra/fling/pull/533))
+- Bump `node-forge` from 1.3.1 to 1.4.0 in /functions ([#452](https://github.com/garritfra/fling/pull/452), [#520](https://github.com/garritfra/fling/pull/520))
+- Bump `js-yaml` from 3.14.1 to 3.14.2 in /functions ([#447](https://github.com/garritfra/fling/pull/447))
+- Bump `path-to-regexp` from 0.1.12 to 0.1.13 in /functions ([#526](https://github.com/garritfra/fling/pull/526))
+- Bump `picomatch` from 2.3.1 to 2.3.2 in /functions ([#519](https://github.com/garritfra/fling/pull/519))
+- Bump `flatted` from 3.2.7 to 3.4.2 in /functions ([#508](https://github.com/garritfra/fling/pull/508))
+- Bump `brace-expansion` in /functions ([#528](https://github.com/garritfra/fling/pull/528))
+- Bump `minimatch`, `qs`, `express`, `jws`, `@google-cloud/storage` in /functions ([#454](https://github.com/garritfra/fling/pull/454), [#468](https://github.com/garritfra/fling/pull/468), [#484](https://github.com/garritfra/fling/pull/484), [#495](https://github.com/garritfra/fling/pull/495))
+- Bump `typescript` from 5.9.3 to 6.0.2 in /functions ([#521](https://github.com/garritfra/fling/pull/521))
+- Bump `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser` in /functions ([#504](https://github.com/garritfra/fling/pull/504), [#505](https://github.com/garritfra/fling/pull/505), [#515](https://github.com/garritfra/fling/pull/515), [#524](https://github.com/garritfra/fling/pull/524), [#530](https://github.com/garritfra/fling/pull/530), [#535](https://github.com/garritfra/fling/pull/535), [#536](https://github.com/garritfra/fling/pull/536))
+- Bump `cupertino_icons` from 1.0.8 to 1.0.9 ([#525](https://github.com/garritfra/fling/pull/525))
+- Bump `org.jetbrains.kotlin.android` in /android ([#465](https://github.com/garritfra/fling/pull/465), [#488](https://github.com/garritfra/fling/pull/488), [#516](https://github.com/garritfra/fling/pull/516), [#552](https://github.com/garritfra/fling/pull/552))
+- Bump `gradle-wrapper` from 9.1.0 to 9.4.1 in /android ([#483](https://github.com/garritfra/fling/pull/483), [#502](https://github.com/garritfra/fling/pull/502), [#517](https://github.com/garritfra/fling/pull/517))
+- Bump `aws-sdk-s3` from 1.141.0 to 1.208.0 in /android ([#462](https://github.com/garritfra/fling/pull/462))
+- Bump `faraday` from 1.10.3 to 1.10.5 in /android ([#489](https://github.com/garritfra/fling/pull/489))
+- Bump `actions/upload-artifact` from 4 to 7 ([#442](https://github.com/garritfra/fling/pull/442), [#459](https://github.com/garritfra/fling/pull/459), [#499](https://github.com/garritfra/fling/pull/499))
+- Bump `actions/checkout` from 5.0.0 to 6.0.2 ([#456](https://github.com/garritfra/fling/pull/456), [#480](https://github.com/garritfra/fling/pull/480))
+- Bump `actions/setup-node` from 4 to 6 ([#547](https://github.com/garritfra/fling/pull/547))
+- Bump `ruby/setup-ruby` from 1.266.0 to 1.306.0 ([#443](https://github.com/garritfra/fling/pull/443), [#450](https://github.com/garritfra/fling/pull/450), [#457](https://github.com/garritfra/fling/pull/457), [#461](https://github.com/garritfra/fling/pull/461), [#470](https://github.com/garritfra/fling/pull/470), [#474](https://github.com/garritfra/fling/pull/474), [#478](https://github.com/garritfra/fling/pull/478), [#482](https://github.com/garritfra/fling/pull/482), [#487](https://github.com/garritfra/fling/pull/487), [#501](https://github.com/garritfra/fling/pull/501), [#506](https://github.com/garritfra/fling/pull/506), [#514](https://github.com/garritfra/fling/pull/514), [#522](https://github.com/garritfra/fling/pull/522), [#534](https://github.com/garritfra/fling/pull/534), [#548](https://github.com/garritfra/fling/pull/548))
+
 ## v0.10.2 (2025-10-31)
 
 ### Fixed
