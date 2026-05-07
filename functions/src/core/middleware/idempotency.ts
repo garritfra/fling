@@ -1,9 +1,24 @@
-import type {MiddlewareHandler} from "hono";
+import type {Context, MiddlewareHandler} from "hono";
 import {createHash} from "node:crypto";
 import {Conflict} from "../errors/app_error";
 import {lookup, save} from "../idempotency/repo";
+import {getRequestContext} from "../context/request_context";
 
 const WRITE_METHODS = new Set(["POST", "PATCH", "PUT", "DELETE"]);
+
+/**
+ * Returns the uid from the RequestContext (set by the auth middleware in
+ * production) if available, else falls back to the shorthand `c.set("uid", ...)`
+ * slot used by lightweight test harnesses that don't mount the full auth
+ * pipeline. Returns undefined for anonymous requests.
+ */
+function readUid(c: Context): string | undefined {
+  try {
+    return getRequestContext(c).uid;
+  } catch {
+    return c.get("uid") as string | undefined;
+  }
+}
 
 export function idempotencyMiddleware(): MiddlewareHandler {
   return async (c, next) => {
@@ -16,7 +31,7 @@ export function idempotencyMiddleware(): MiddlewareHandler {
       await next();
       return;
     }
-    const uid = c.get("uid") as string | undefined;
+    const uid = readUid(c);
     if (!uid) {
       // Idempotency requires an authenticated principal — pass through
       // if anonymous (auth gate will reject anyway).

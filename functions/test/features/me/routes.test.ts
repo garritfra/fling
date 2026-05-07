@@ -6,6 +6,7 @@ import {getFirestore} from "firebase-admin/firestore";
 import {registerMeRoutes} from "../../../src/features/me/module";
 import {requestIdMiddleware} from "../../../src/core/middleware/request_id";
 import {authMiddleware} from "../../../src/core/middleware/auth";
+import {idempotencyMiddleware} from "../../../src/core/middleware/idempotency";
 import {installErrorHandler} from "../../../src/core/errors/handler";
 import * as service from "../../../src/features/me/service";
 
@@ -38,6 +39,8 @@ beforeEach(async () => {
   const db = getFirestore();
   const users = await db.collection("users").listDocuments();
   await Promise.all(users.map((d) => d.delete()));
+  const idemKeys = await db.collection("idempotency_keys").listDocuments();
+  await Promise.all(idemKeys.map((d) => d.delete()));
   await service.createUser(aliceUid, "alice@example.com");
 });
 
@@ -50,6 +53,7 @@ function buildApp(): OpenAPIHono {
   installErrorHandler(app);
   app.use("*", requestIdMiddleware());
   app.use("/v1/*", authMiddleware());
+  app.use("/v1/*", idempotencyMiddleware());
   registerMeRoutes(app);
   return app;
 }
@@ -95,6 +99,17 @@ describe("PATCH /v1/me", () => {
     expect(body.email).toBe("alice@example.com");
   });
 
+  it("updates currentHouseholdId and dual-writes the legacy field", async () => {
+    const res = await buildApp().request("/v1/me", {
+      method: "PATCH",
+      headers: {Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json"},
+      body: JSON.stringify({currentHouseholdId: "h-xyz"}),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.currentHouseholdId).toBe("h-xyz");
+  });
+
   it("400 on unknown field (strict schema)", async () => {
     const res = await buildApp().request("/v1/me", {
       method: "PATCH",
@@ -102,5 +117,41 @@ describe("PATCH /v1/me", () => {
       body: JSON.stringify({unknownField: "x"}),
     });
     expect(res.status).toBe(400);
+  });
+
+  it("idempotency: same key + same body returns the same response without re-running", async () => {
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${aliceToken}`,
+      "Idempotency-Key": "patch-1",
+    };
+    const body = JSON.stringify({displayName: "Alice"});
+    const r1 = await buildApp().request("/v1/me", {method: "PATCH", headers, body});
+    const r2 = await buildApp().request("/v1/me", {method: "PATCH", headers, body});
+    expect(r1.status).toBe(200);
+    expect(r2.status).toBe(200);
+    const b1 = await r1.json();
+    const b2 = await r2.json();
+    expect(b2).toEqual(b1);
+  });
+
+  it("idempotency: same key + different body returns 409", async () => {
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${aliceToken}`,
+      "Idempotency-Key": "patch-2",
+    };
+    const r1 = await buildApp().request("/v1/me", {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({displayName: "Alice"}),
+    });
+    const r2 = await buildApp().request("/v1/me", {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({displayName: "Bob"}),
+    });
+    expect(r1.status).toBe(200);
+    expect(r2.status).toBe(409);
   });
 });
