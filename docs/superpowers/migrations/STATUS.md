@@ -5,7 +5,7 @@
 > Source of truth for "where are we right now?" in the rewrite.
 
 - **Spec:** [`docs/superpowers/specs/2026-04-24-fling-rewrite-design.md`](../specs/2026-04-24-fling-rewrite-design.md)
-- **Last updated:** 2026-04-30 (Phase 1 started; plan published)
+- **Last updated:** 2026-05-07 (Phase 1 Slice 2 implementation complete on branch; PR #561 open)
 
 ## Status legend
 
@@ -117,3 +117,5 @@ moves a phase.
 | 2026-04-24 | 0 | Implementation complete | — | Tasks 1–13 landed on branch `phase-0-foundation`; Task 14 (prod deploy + smoke) pending PR merge |
 | 2026-04-26 | 0 | Completed | [#540](https://github.com/garritfra/fling/pull/540) | Deployed via `ci.yml` deploy job; `api` function live at `/v1/healthz`; Flutter prod app smoke confirmed |
 | 2026-04-30 | 1 | Started | — | Phase 1 plan published (`phase-1-me-slice.md`) |
+| 2026-05-04 | 1 | Slice 1 merged | [#543](https://github.com/garritfra/fling/pull/543) | `GET /v1/me` end-to-end. Tasks 0–7: core middleware (auth, request_id, errors, logger), `features/me/` schemas/repo/service/route, Flutter `Me` model + repo + Riverpod providers + `ProviderScope` bootstrap. Storage shape unchanged. |
+| 2026-05-07 | 1 | Slice 2 implementation complete | [#561](https://github.com/garritfra/fling/pull/561) | `PATCH /v1/me` + idempotency middleware + Flutter mutation queue + me writes wired through API. Tasks 8–13. Pending: merge, enable Firestore TTL on `idempotency_keys.expires_at`, prod smoke. |
