@@ -1,6 +1,5 @@
 import 'package:fling/data/household.dart';
 import 'package:fling/data/list.dart';
-import 'package:fling/data/user.dart';
 import 'package:fling/features/me/application/me_providers.dart';
 import 'package:fling/features/me/presentation/household_switcher_dialog.dart';
 import 'package:fling/l10n/app_localizations.dart';
@@ -115,10 +114,11 @@ class _ListsPageState extends ConsumerState<ListsPage> {
       NavigatorState navigator = Navigator.of(context);
 
       Future<void> onInviteUserPressed() async {
-        var user = await FlingUser.currentUser.first;
-        var household = await (await user?.currentHousehold)?.first;
-        household?.inviteByEmail(inviteEmailController.text);
-
+        final householdId = ref.read(currentHouseholdIdProvider);
+        if (householdId != null) {
+          final household = await HouseholdModel.fromId(householdId);
+          await household.inviteByEmail(inviteEmailController.text);
+        }
         navigator.pop();
       }
 
@@ -196,79 +196,65 @@ class _ListsPageState extends ConsumerState<ListsPage> {
               ));
     }
 
-    return StreamBuilder(
-      stream: FlingUser.currentUser,
-      builder: (BuildContext context, snapshot) {
-        var user = snapshot.data;
-        return FutureBuilder(
-            future: user?.currentHousehold,
-            builder: (context, householdSnapshot) {
-              return StreamBuilder(
-                  stream: householdSnapshot.data,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<HouseholdModel> household) {
-                    Widget buildSwitchHouseholdAction() {
-                      return IconButton(
-                          onPressed: showHouseholdSwitcher,
-                          icon: const Icon(Icons.swap_horiz));
-                    }
+    final HouseholdModel? household =
+        ref.watch(currentHouseholdProvider).valueOrNull;
 
-                    Widget buildMoreAction() {
-                      return PopupMenuButton(
-                          onSelected: (selection) {
-                            switch (selection) {
-                              case HouseholdMenuListAction.inviteUser:
-                                showInviteDialog();
-                                break;
-                              case HouseholdMenuListAction.deleteHousehold:
-                                if (household.data != null) {
-                                  showDeleteHouseholdDialog(household.data!);
-                                }
-                                break;
-                            }
-                          },
-                          itemBuilder: (context) => [
-                                PopupMenuItem(
-                                    value: HouseholdMenuListAction.inviteUser,
-                                    child: Text(l10n.user_invite)),
-                                PopupMenuItem(
-                                    value:
-                                        HouseholdMenuListAction.deleteHousehold,
-                                    child: Text(l10n.household_leave))
-                              ]);
-                    }
+    Widget buildSwitchHouseholdAction() {
+      return IconButton(
+          onPressed: showHouseholdSwitcher,
+          icon: const Icon(Icons.swap_horiz));
+    }
 
-                    return Scaffold(
-                      appBar: AppBar(
-                        title: Text(AppLocalizations.of(context)!.lists),
-                        actions: household.hasData
-                            ? [
-                                buildSwitchHouseholdAction(),
-                                buildMoreAction(),
-                              ]
-                            : null,
-                      ),
-                      floatingActionButton: household.hasData
-                          ? FloatingActionButton(
-                              onPressed: onAddListPressed,
-                              child: const Icon(Icons.add))
-                          : null,
-                      drawer: const FlingDrawer(),
-                      body: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            if (household.hasData)
-                              buildLists(household.data!)
-                            else
-                              buildEmptyHouseholds(),
-                          ],
-                        ),
-                      ),
-                    );
-                  });
-            });
-      },
+    Widget buildMoreAction() {
+      return PopupMenuButton(
+          onSelected: (selection) {
+            switch (selection) {
+              case HouseholdMenuListAction.inviteUser:
+                showInviteDialog();
+                break;
+              case HouseholdMenuListAction.deleteHousehold:
+                if (household != null) {
+                  showDeleteHouseholdDialog(household);
+                }
+                break;
+            }
+          },
+          itemBuilder: (context) => [
+                PopupMenuItem(
+                    value: HouseholdMenuListAction.inviteUser,
+                    child: Text(l10n.user_invite)),
+                PopupMenuItem(
+                    value: HouseholdMenuListAction.deleteHousehold,
+                    child: Text(l10n.household_leave))
+              ]);
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.lists),
+        actions: household != null
+            ? [
+                buildSwitchHouseholdAction(),
+                buildMoreAction(),
+              ]
+            : null,
+      ),
+      floatingActionButton: household != null
+          ? FloatingActionButton(
+              onPressed: onAddListPressed, child: const Icon(Icons.add))
+          : null,
+      drawer: const FlingDrawer(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            if (household != null)
+              buildLists(household)
+            else
+              buildEmptyHouseholds(),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fling/core/api/api_client.dart';
 import 'package:fling/core/api/mutation_queue.dart';
+import 'package:fling/data/household.dart';
 import 'package:fling/features/me/data/me_repository.dart';
 import 'package:fling/features/me/domain/me.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,6 +44,21 @@ final currentHouseholdIdProvider = Provider<String?>((ref) {
 
 final householdIdsProvider = Provider<List<String>>((ref) {
   return ref.watch(meProvider).valueOrNull?.householdIds ?? const <String>[];
+});
+
+/// Streams the [HouseholdModel] for the currently-active household. Emits
+/// `null` while no household is selected. Phase 2 will move this provider
+/// into `lib/features/households/`.
+final currentHouseholdProvider = StreamProvider<HouseholdModel?>((ref) {
+  final id = ref.watch(currentHouseholdIdProvider);
+  if (id == null) return Stream.value(null);
+  return ref
+      .watch(firestoreProvider)
+      .collection('households')
+      .doc(id)
+      .snapshots()
+      .map((snap) =>
+          snap.exists ? HouseholdModel.fromMap(snap.data() ?? {}, snap.id) : null);
 });
 
 class MeController {

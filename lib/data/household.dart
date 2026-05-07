@@ -36,9 +36,8 @@ class HouseholdModel extends ChangeNotifier {
   }
 
   /// The Firestore document for this household. Synchronous and bound to
-  /// the model's own [id]. Was previously coupled to
-  /// `FlingUser.currentHouseholdId`; that coupling moved into the Riverpod
-  /// `currentHouseholdIdProvider` at the page layer.
+  /// the model's own [id]. The "current household" coupling lives at the
+  /// page layer via Riverpod's `currentHouseholdIdProvider`.
   DocumentReference get ref =>
       firestore.collection("households").doc(id);
 
