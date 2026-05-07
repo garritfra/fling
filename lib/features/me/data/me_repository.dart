@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:fling/core/api/failures.dart';
 import 'package:fling/core/api/mutation_queue.dart';
+import 'package:fling/features/me/data/me_mutations.dart';
 import 'package:fling/features/me/domain/me.dart';
-// `fling_api` exports its own generated `Me` model (built_value); we use
-// the freezed domain `Me` from `features/me/domain/me.dart` instead, so we
-// hide the API one to keep the namespace unambiguous.
+// fling_api exports its own built_value `Me`; the freezed domain Me is the
+// one we operate on here.
 import 'package:fling_api/fling_api.dart' hide Me;
 
 class MeRepository {
@@ -29,7 +30,7 @@ class MeRepository {
       return mutations.overlay<Me>(
         base,
         (b, p) => _applyPatch(b, p.body),
-        resourceKey: 'me/$uid',
+        resourceKey: MeMutations.resourceKey(uid),
       );
     });
   }
@@ -42,54 +43,37 @@ class MeRepository {
     );
   }
 
-  Future<void> setCurrentHouseholdId(String uid, String householdId) async {
+  Future<void> setCurrentHouseholdId(String uid, String householdId) =>
+      _patchMe(uid, currentHouseholdId: householdId);
+
+  Future<void> setDisplayName(String uid, String displayName) =>
+      _patchMe(uid, displayName: displayName);
+
+  Future<void> _patchMe(
+    String uid, {
+    String? currentHouseholdId,
+    String? displayName,
+  }) async {
+    final body = <String, Object?>{
+      if (currentHouseholdId != null) 'currentHouseholdId': currentHouseholdId,
+      if (displayName != null) 'displayName': displayName,
+    };
     await mutations.enqueue(MutationSpec<void>(
-      type: 'me.patch',
-      resourceKey: 'me/$uid',
-      body: {'currentHouseholdId': householdId},
+      type: MeMutations.patchType,
+      resourceKey: MeMutations.resourceKey(uid),
+      body: body,
       call: (key) async {
         try {
           await api.getMeApi().v1MePatch(
-                patchMe: PatchMe((b) => b..currentHouseholdId = householdId),
+                patchMe: PatchMe((b) => b
+                  ..currentHouseholdId = currentHouseholdId
+                  ..displayName = displayName),
                 headers: {'Idempotency-Key': key},
               );
         } on DioException catch (e) {
-          throw _toFailure(e);
+          throw dioToApiFailure(e);
         }
       },
     ));
-  }
-
-  Future<void> setDisplayName(String uid, String displayName) async {
-    await mutations.enqueue(MutationSpec<void>(
-      type: 'me.patch',
-      resourceKey: 'me/$uid',
-      body: {'displayName': displayName},
-      call: (key) async {
-        try {
-          await api.getMeApi().v1MePatch(
-                patchMe: PatchMe((b) => b..displayName = displayName),
-                headers: {'Idempotency-Key': key},
-              );
-        } on DioException catch (e) {
-          throw _toFailure(e);
-        }
-      },
-    ));
-  }
-
-  /// Translate a `dio` failure into the queue's failure types so the
-  /// retry/drop policy in [MutationQueueImpl] can act on it.
-  Object _toFailure(DioException e) {
-    final status = e.response?.statusCode;
-    if (status == null) return const NetworkFailure();
-    final body = e.response?.data;
-    final code = (body is Map && body['error'] is Map)
-        ? ((body['error'] as Map)['code'] as String? ?? 'UNKNOWN')
-        : 'UNKNOWN';
-    final message = (body is Map && body['error'] is Map)
-        ? ((body['error'] as Map)['message'] as String? ?? e.message ?? '')
-        : (e.message ?? '');
-    return ApiFailure(status, code, message);
   }
 }

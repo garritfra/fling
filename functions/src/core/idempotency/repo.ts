@@ -6,7 +6,6 @@ export interface IdempotencyRecord {
   body: string;
   bodyHash: string;
   contentType: string;
-  expiresAt: Date;
 }
 
 function db() {
@@ -29,7 +28,6 @@ export async function lookup(uid: string, key: string): Promise<IdempotencyRecor
     body: d.body,
     bodyHash: d.body_hash,
     contentType: d.content_type,
-    expiresAt: (d.expires_at as Timestamp).toDate(),
   };
 }
 

@@ -6,38 +6,25 @@ import {getRequestContext} from "../context/request_context";
 
 const WRITE_METHODS = new Set(["POST", "PATCH", "PUT", "DELETE"]);
 
-/**
- * Returns the uid from the RequestContext (set by the auth middleware in
- * production) if available, else falls back to the shorthand `c.set("uid", ...)`
- * slot used by lightweight test harnesses that don't mount the full auth
- * pipeline. Returns undefined for anonymous requests.
- */
 function readUid(c: Context): string | undefined {
   try {
     return getRequestContext(c).uid;
   } catch {
+    // Fallback for test harnesses that set uid directly without mounting
+    // the full auth pipeline.
     return c.get("uid") as string | undefined;
   }
 }
 
 export function idempotencyMiddleware(): MiddlewareHandler {
   return async (c, next) => {
-    if (!WRITE_METHODS.has(c.req.method)) {
-      await next();
-      return;
-    }
     const key = c.req.header("idempotency-key");
-    if (!key) {
-      await next();
-      return;
-    }
     const uid = readUid(c);
-    if (!uid) {
-      // Idempotency requires an authenticated principal — pass through
-      // if anonymous (auth gate will reject anyway).
+    if (!WRITE_METHODS.has(c.req.method) || !key || !uid) {
       await next();
       return;
     }
+
     const rawBody = await c.req.raw.clone().text();
     const bodyHash = createHash("sha256").update(rawBody).digest("hex");
 
@@ -56,7 +43,7 @@ export function idempotencyMiddleware(): MiddlewareHandler {
     const body = await cloned.text();
     const contentType = cloned.headers.get("content-type") ?? "application/json";
     if (status >= 200 && status < 300) {
-      await save(uid, key, {status, body, bodyHash, contentType, expiresAt: new Date()});
+      await save(uid, key, {status, body, bodyHash, contentType});
     }
     return;
   };

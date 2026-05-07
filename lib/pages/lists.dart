@@ -2,6 +2,7 @@ import 'package:fling/data/household.dart';
 import 'package:fling/data/list.dart';
 import 'package:fling/data/user.dart';
 import 'package:fling/features/me/application/me_providers.dart';
+import 'package:fling/features/me/presentation/household_switcher_dialog.dart';
 import 'package:fling/l10n/app_localizations.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:fling/pages/list.dart';
@@ -153,60 +154,10 @@ class _ListsPageState extends ConsumerState<ListsPage> {
               ));
     }
 
-    Future<void> showHouseholdSwitcher() async {
-      showDialog(
-        context: context,
-        builder: (dialogContext) => Consumer(
-          builder: (ctx, ref, _) {
-            // Reactive: rebuild as soon as the cacheJoinHousehold v1
-            // trigger writes the new id into users/{uid}.households,
-            // so a freshly-created household shows up here without a
-            // full app refresh.
-            final ids = ref.watch(householdIdsProvider);
-            final activeId = ref.watch(currentHouseholdIdProvider);
-            return FutureBuilder<List<HouseholdModel>>(
-              future: Future.wait(ids.map(HouseholdModel.fromId)),
-              builder: (ctx, snap) {
-                final households = snap.data ?? const <HouseholdModel>[];
-                return AlertDialog(
-                  title: Text(l10n.households),
-                  content: SizedBox(
-                    width: double.maxFinite,
-                    child: ListView(
-                      shrinkWrap: true,
-                      children: [
-                        ...households.map((h) => ListTile(
-                              onTap: () async {
-                                await ref
-                                    .read(meControllerProvider)
-                                    .setCurrentHousehold(h.id!);
-                                if (!ctx.mounted) return;
-                                Navigator.pop(ctx);
-                              },
-                              title: Text(h.name),
-                              trailing: h.id == activeId
-                                  ? const Icon(Icons.check)
-                                  : null,
-                              leading: const Icon(Icons.house),
-                            )),
-                        ListTile(
-                          onTap: () {
-                            Navigator.pop(ctx);
-                            onAddhousehold();
-                          },
-                          title: Text(l10n.household_add),
-                          leading: const Icon(Icons.add),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-        ),
-      );
-    }
+    Future<void> showHouseholdSwitcher() => showHouseholdSwitcherDialog(
+          context,
+          onAddHousehold: onAddhousehold,
+        );
 
     onAddListPressed() {
       TextEditingController textController = TextEditingController();

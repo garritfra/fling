@@ -2,22 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:fling/core/api/failures.dart';
 import 'package:fling/core/api/idempotency_key.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class NetworkFailure implements Exception {
-  const NetworkFailure();
-}
-
-class ApiFailure implements Exception {
-  const ApiFailure(this.status, this.code, this.message);
-  final int status;
-  final String code;
-  final String message;
-  @override
-  String toString() => 'ApiFailure($status, $code): $message';
-}
+export 'package:fling/core/api/failures.dart' show ApiFailure, NetworkFailure;
 
 class MutationSpec<T> {
   MutationSpec({
@@ -214,11 +204,12 @@ final connectivityOnlineProvider = StreamProvider<bool>((ref) {
 
 final mutationQueueProvider = FutureProvider<MutationQueue>((ref) async {
   final prefs = await SharedPreferences.getInstance();
-  // Subscribe to the raw connectivity stream directly. We deliberately
-  // sidestep `connectivityOnlineProvider.stream` here because that
-  // accessor is deprecated in Riverpod 2 (slated for removal in 3.0).
+  // Sidestep `connectivityOnlineProvider.stream` — the `.stream` accessor
+  // is deprecated in Riverpod 2 and removed in 3.0.
   final online = Connectivity().onConnectivityChanged.map(
         (results) => results.any((r) => r != ConnectivityResult.none),
       );
-  return MutationQueueImpl(prefs: prefs, online: online);
+  final queue = MutationQueueImpl(prefs: prefs, online: online);
+  ref.onDispose(queue.dispose);
+  return queue;
 });
