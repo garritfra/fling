@@ -1,5 +1,5 @@
 import {OpenAPIHono, createRoute, z} from "@hono/zod-openapi";
-import {requestIdMiddleware, authMiddleware} from "../core/middleware";
+import {requestIdMiddleware, authMiddleware, idempotencyMiddleware} from "../core/middleware";
 import {installErrorHandler} from "../core/errors";
 import {registerMeRoutes} from "../features/me/module";
 
@@ -33,4 +33,5 @@ app.doc("/v1/openapi.json", {
 
 // Authenticated /v1/* routes — auth middleware applies to everything registered after this point.
 app.use("/v1/*", authMiddleware());
+app.use("/v1/*", idempotencyMiddleware());
 registerMeRoutes(app);
