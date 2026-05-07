@@ -5,7 +5,7 @@
 > Source of truth for "where are we right now?" in the rewrite.
 
 - **Spec:** [`docs/superpowers/specs/2026-04-24-fling-rewrite-design.md`](../specs/2026-04-24-fling-rewrite-design.md)
-- **Last updated:** 2026-05-07 (Phase 1 Slice 3 backend + Flutter complete on branch; rule-tighten deferred behind app rollout)
+- **Last updated:** 2026-05-07 (Phase 1 ✅ — Slice 3 deployed + Migration #1 applied; rule-tighten on `/users/{uid}` rescoped into Phase 2's rules-tightening pass, tracked in [#564](https://github.com/garritfra/fling/issues/564))
 
 ## Status legend
 
@@ -20,7 +20,7 @@
 | Phase | Name | Goal (one line) | Status | Plan | Started | Completed |
 |---|---|---|---|---|---|---|
 | 0 | Foundation | All scaffolding (CI, deps, lint boundaries, empty Hono app, emulator, migrations runner). No user-visible change. | ✅ | [phase-0-foundation.md](./phase-0-foundation.md) | 2026-04-24 | 2026-04-26 |
-| 1 | `me` slice + API foundation | First end-to-end vertical slice. Replaces `setupUser` / `deleteUser`. | 🟡 | [phase-1-me-slice.md](./phase-1-me-slice.md) | 2026-04-30 | — |
+| 1 | `me` slice + API foundation | First end-to-end vertical slice. Replaces `setupUser` / `deleteUser`. | ✅ | [phase-1-me-slice.md](./phase-1-me-slice.md) | 2026-04-30 | 2026-05-07 |
 | 2 | Households + members + invites | New first-class invite flow. Replaces `cacheJoinHousehold` / `cacheLeaveHousehold` / `inviteToHouseholdByEmail`. | ⬜ | _not yet written_ | — | — |
 | 3 | Lists | All list and item mutations through API. Offline queue + optimistic updates wired up. | ⬜ | _not yet written_ | — | — |
 | 4 | Templates | Same pattern as lists. `:applyTemplate` action live. | ⬜ | _not yet written_ | — | — |
@@ -47,14 +47,15 @@ just before each phase begins) link back to these.
 
 ### Phase 1 — `me` slice + API foundation
 
-- [ ] `core/api/` middleware: auth, idempotency, request_id, structured logging, error mapping
-- [ ] OpenAPI generation → Dart client pipeline working end-to-end
-- [ ] `core/api/mutation_queue.dart` implemented with optimistic-update overlay
-- [ ] Backend `features/me/` complete: `GET /v1/me`, `PATCH /v1/me` (full data export and cascading delete ship in Phase 5)
-- [ ] Flutter `features/me/` migrated to vertical slice; old `FlingUser` deleted
-- [ ] `setupUser` / `deleteUser` v1 functions replaced by v2 triggers in `features/me/triggers.ts` (deletion behaviour matches today: delete user doc only; cascade lands in Phase 5)
-- [ ] Migration #1 deployed: user docs gain `email`, `display_name`, `household_ids`, `current_household_id`, audit fields, `schema_version: 1`
-- [ ] Rule tightened: `/users/{uid}` is owner-only read _(deferred — needs a released app version with the new write path widely deployed first; the deployed v0.11.1 still writes `users/{uid}.current_household` directly via `FlingUser.setCurrentHouseholdId`. Lands in a follow-up PR after the rollout is complete.)_
+- [x] `core/api/` middleware: auth, idempotency, request_id, structured logging, error mapping
+- [x] OpenAPI generation → Dart client pipeline working end-to-end
+- [x] `core/api/mutation_queue.dart` implemented with optimistic-update overlay
+- [x] Backend `features/me/` complete: `GET /v1/me`, `PATCH /v1/me` (full data export and cascading delete ship in Phase 5)
+- [x] Flutter `features/me/` migrated to vertical slice; old `FlingUser` deleted
+- [x] `setupUser` / `deleteUser` v1 functions replaced by v2 triggers in `features/me/triggers.ts` (deletion behaviour matches today: delete user doc only; cascade lands in Phase 5)
+- [x] Migration #1 deployed: user docs gain `email`, `display_name`, `household_ids`, `current_household_id`, audit fields, `schema_version: 1` _(applied 2026-05-07 against `fling-list`; 47/47 user docs at `schema_version: 1` with both new and legacy fields populated; zero dual-write mismatches)_
+
+> **Note:** the rule-tighten on `/users/{uid}` originally listed under Phase 1 has been **rescoped to Phase 2** (see below). The rule belongs to the same client-write-deny pass as households / members / invites, and Phase 2 is the natural rollout boundary for the v0.12.0+ client that no longer writes `/users/{uid}` directly. Tracking issue: [#564](https://github.com/garritfra/fling/issues/564).
 
 ### Phase 2 — Households + members + invites
 
@@ -65,7 +66,7 @@ just before each phase begins) link back to these.
 - [ ] `cacheJoinHousehold` / `cacheLeaveHousehold` / `inviteToHouseholdByEmail` v1 functions deleted
 - [ ] Migration #2 deployed: members get `role` + `joined_at`; oldest member becomes `owner`; households get audit fields
 - [ ] Flutter `features/households/` migrated; old `HouseholdModel` deleted
-- [ ] Rules tightened: households + members + invites are read-only for clients
+- [ ] Rules tightened: `/users/{uid}` (rescoped from Phase 1, see [#564](https://github.com/garritfra/fling/issues/564)) + households + members + invites are read-only for clients
 
 ### Phase 3 — Lists
 
@@ -119,4 +120,7 @@ moves a phase.
 | 2026-04-30 | 1 | Started | — | Phase 1 plan published (`phase-1-me-slice.md`) |
 | 2026-05-04 | 1 | Slice 1 merged | [#543](https://github.com/garritfra/fling/pull/543) | `GET /v1/me` end-to-end. Tasks 0–7: core middleware (auth, request_id, errors, logger), `features/me/` schemas/repo/service/route, Flutter `Me` model + repo + Riverpod providers + `ProviderScope` bootstrap. Storage shape unchanged. |
 | 2026-05-07 | 1 | Slice 2 implementation complete | [#561](https://github.com/garritfra/fling/pull/561) | `PATCH /v1/me` + idempotency middleware + Flutter mutation queue + me writes wired through API. Tasks 8–13. Pending: merge, enable Firestore TTL on `idempotency_keys.expires_at`, prod smoke. |
-| 2026-05-07 | 1 | Slice 3 backend + Flutter complete | [#562](https://github.com/garritfra/fling/pull/562) | v2-organised auth triggers (`features/me/triggers.ts`), additive Migration #1 (`001-user-shape`), legacy member triggers dual-write `household_ids`, FlingUser deleted from Flutter. Tasks 15–18. Task 19 (rule tighten) **deferred**: it would break the deployed v0.11.1 client whose `FlingUser.setCurrentHouseholdId` writes `users/{uid}.current_household` directly. Lands in a follow-up PR once v0.12.0 (which uses PATCH /v1/me writes) is widely deployed. Migration #1 itself is fully back-compat — it preserves legacy `households` / `current_household` fields. |
+| 2026-05-07 | 1 | Slice 2 deployed | [#561](https://github.com/garritfra/fling/pull/561) | Merged + CI deploy job shipped functions to `fling-list`. Firestore TTL on `idempotency_keys.expires_at` enabled out-of-band: ACTIVE. Prod smoke confirmed. |
+| 2026-05-07 | 1 | Slice 3 backend + Flutter complete | [#562](https://github.com/garritfra/fling/pull/562) | v2-organised auth triggers (`features/me/triggers.ts`), additive Migration #1 (`001-user-shape`), legacy member triggers dual-write `household_ids`, FlingUser deleted from Flutter. Tasks 15–18. Task 19 (rule tighten) **deferred**: it would break the deployed v0.11.1 client whose `FlingUser.setCurrentHouseholdId` writes `users/{uid}.current_household` directly. Tracked in [#564](https://github.com/garritfra/fling/issues/564). Migration #1 itself is fully back-compat — it preserves legacy `households` / `current_household` fields. |
+| 2026-05-07 | 1 | Slice 3 deployed | [#562](https://github.com/garritfra/fling/pull/562) | Merged + CI deploy job shipped functions to `fling-list` (rules unchanged in this PR). Migration #1 applied: 47/47 user docs now at `schema_version: 1` with both new and legacy fields populated; zero dual-write mismatches. Idempotency verified (2nd run skips). Prod smoke confirmed on the new build; v0.11.1 back-compat confirmed. Perf finding (household create/switch latency) tracked in [#563](https://github.com/garritfra/fling/issues/563). |
+| 2026-05-07 | 1 | Completed | [#562](https://github.com/garritfra/fling/pull/562) | Phase 1 closed. The rule-tighten on `/users/{uid}` originally scoped to Phase 1 has been **rescoped to Phase 2's rules-tightening pass** ([#564](https://github.com/garritfra/fling/issues/564)) — it shares Phase 2's natural rollout boundary (the v0.12.0+ client that no longer writes /users/{uid} directly) and is thematically the same change as households / members / invites read-only. Phase 1's contract — replace `setupUser` / `deleteUser`, ship `me` slice end-to-end, lay down the API foundation — is met. |
