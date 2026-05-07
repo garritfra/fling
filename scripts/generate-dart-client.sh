@@ -17,5 +17,12 @@ npx --yes @openapitools/openapi-generator-cli@^2.13.5 generate \
   -o "$OUT" \
   --additional-properties=pubName=fling_api,pubAuthor=Fling,pubVersion=0.1.0,nullableFields=true,serializationLibrary=built_value
 
-# 3) Build runner for built_value generated code.
+# 3) Lift the generated package's Dart SDK lower bound to >=3.0.0 so its
+#    language version (and that of its built_value `*.g.dart` parts) matches
+#    the parent project's. The generator hardcodes `>=2.18.0`, which gives
+#    library files an implicit language version of 2.18 — incompatible with
+#    Dart 3 part-file checks once the parent project consumes the package.
+sed -i '' "s|sdk: '>=2.18.0 <4.0.0'|sdk: '>=3.0.0 <4.0.0'|" "$OUT/pubspec.yaml"
+
+# 4) Build runner for built_value generated code.
 ( cd "$OUT" && flutter pub get && dart run build_runner build --delete-conflicting-outputs )
