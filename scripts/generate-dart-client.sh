@@ -22,7 +22,9 @@ npx --yes @openapitools/openapi-generator-cli@^2.13.5 generate \
 #    the parent project's. The generator hardcodes `>=2.18.0`, which gives
 #    library files an implicit language version of 2.18 — incompatible with
 #    Dart 3 part-file checks once the parent project consumes the package.
-sed -i '' "s|sdk: '>=2.18.0 <4.0.0'|sdk: '>=3.0.0 <4.0.0'|" "$OUT/pubspec.yaml"
+#    `-i.bak` is the portable form: GNU sed (CI) and BSD sed (macOS) agree.
+sed -i.bak "s|sdk: '>=2.18.0 <4.0.0'|sdk: '>=3.0.0 <4.0.0'|" "$OUT/pubspec.yaml"
+rm -f "$OUT/pubspec.yaml.bak"
 
 # 4) Build runner for built_value generated code.
 ( cd "$OUT" && flutter pub get && dart run build_runner build --delete-conflicting-outputs )
