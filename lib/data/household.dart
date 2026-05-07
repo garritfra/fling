@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fling/data/list.dart';
 import 'package:fling/data/template.dart';
 import 'package:flutter/foundation.dart';
-import 'user.dart';
 
 class HouseholdModel extends ChangeNotifier {
   String? id;
@@ -35,49 +35,49 @@ class HouseholdModel extends ChangeNotifier {
     };
   }
 
-  Future<DocumentReference> get ref async {
-    FlingUser? user = await FlingUser.currentUser.first;
-    return firestore.collection("households").doc(user?.currentHouseholdId);
-  }
+  /// The Firestore document for this household. Synchronous and bound to
+  /// the model's own [id]. Was previously coupled to
+  /// `FlingUser.currentHouseholdId`; that coupling moved into the Riverpod
+  /// `currentHouseholdIdProvider` at the page layer.
+  DocumentReference get ref =>
+      firestore.collection("households").doc(id);
 
   Future<HouseholdModel> save() async {
-    FlingUser? user = await FlingUser.currentUser.first;
-    var ref = await firestore.collection("households").add(toMap());
-    await ref.collection("members").doc(user!.uid).set({});
-    id = ref.id;
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final newRef = await firestore.collection("households").add(toMap());
+    if (uid != null) {
+      await newRef.collection("members").doc(uid).set({});
+    }
+    id = newRef.id;
     notifyListeners();
     return this;
   }
 
   Future<HouseholdModel> leave() async {
-    FlingUser? user = await FlingUser.currentUser.first;
-    (await ref).collection("members").doc(user?.uid).delete();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      await ref.collection("members").doc(uid).delete();
+    }
     notifyListeners();
     return this;
   }
 
   Future<void> inviteByEmail(String email) async {
-    var callable = functions.httpsCallable('inviteToHouseholdByEmail');
-    var user = await FlingUser.currentUser.first;
-
+    final callable = functions.httpsCallable('inviteToHouseholdByEmail');
     await callable({
-      "householdId": user?.currentHouseholdId ?? "",
+      "householdId": id ?? "",
       "email": email,
     });
   }
 
-  Future<Stream<List<FlingListModel>>> get lists async {
-    var snapshot = (await ref).collection("lists").snapshots();
-
-    return snapshot.map((snap) => snap.docs
+  Stream<List<FlingListModel>> get lists {
+    return ref.collection("lists").snapshots().map((snap) => snap.docs
         .map((doc) => FlingListModel.fromMap(doc.data(), doc.id, id!))
         .toList());
   }
 
-  Future<Stream<List<FlingTemplateModel>>> get templates async {
-    var snapshot = (await ref).collection("templates").snapshots();
-
-    return snapshot.map((snap) => snap.docs
+  Stream<List<FlingTemplateModel>> get templates {
+    return ref.collection("templates").snapshots().map((snap) => snap.docs
         .map((doc) => FlingTemplateModel.fromMap(doc.data(), doc.id, id!))
         .toList());
   }

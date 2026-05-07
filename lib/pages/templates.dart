@@ -1,16 +1,19 @@
 import 'package:fling/data/household.dart';
 import 'package:fling/data/template.dart';
 import 'package:fling/data/user.dart';
+import 'package:fling/features/me/application/me_providers.dart';
+import 'package:fling/features/me/presentation/household_switcher_dialog.dart';
 import 'package:fling/l10n/app_localizations.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:fling/pages/template.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TemplatesPage extends StatefulWidget {
+class TemplatesPage extends ConsumerStatefulWidget {
   const TemplatesPage({super.key});
 
   @override
-  State<TemplatesPage> createState() => _TemplatesPageState();
+  ConsumerState<TemplatesPage> createState() => _TemplatesPageState();
 }
 
 enum HouseholdMenuListAction {
@@ -18,7 +21,7 @@ enum HouseholdMenuListAction {
   deleteHousehold,
 }
 
-class _TemplatesPageState extends State<TemplatesPage> {
+class _TemplatesPageState extends ConsumerState<TemplatesPage> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
@@ -51,31 +54,25 @@ class _TemplatesPageState extends State<TemplatesPage> {
 
     Widget buildTemplates(HouseholdModel household) {
       return Expanded(
-        child: FutureBuilder(
-            future: household.templates,
-            builder: (context, templates) {
-              return StreamBuilder(
-                  stream: templates.data,
-                  builder: (context, snapshot) {
-                    var templates = snapshot.data ?? [];
-                    templates.sort((a, b) => a.name.compareTo(b.name));
+        child: StreamBuilder(
+            stream: household.templates,
+            builder: (context, snapshot) {
+              var templates = snapshot.data ?? [];
+              templates.sort((a, b) => a.name.compareTo(b.name));
 
-                    return ListView.builder(
-                        itemCount: templates.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          FlingTemplateModel template =
-                              templates.elementAt(index);
+              return ListView.builder(
+                  itemCount: templates.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    FlingTemplateModel template = templates.elementAt(index);
 
-                          return ListTile(
-                            onTap: () => Navigator.pushNamed(
-                                context, '/template',
-                                arguments: TemplatePageArguments(template)),
-                            onLongPress: () =>
-                                showTemplateActionsDialog(template),
-                            key: Key(template.id ?? template.name),
-                            title: Text(template.name),
-                          );
-                        });
+                    return ListTile(
+                      onTap: () => Navigator.pushNamed(context, '/template',
+                          arguments: TemplatePageArguments(template)),
+                      onLongPress: () =>
+                          showTemplateActionsDialog(template),
+                      key: Key(template.id ?? template.name),
+                      title: Text(template.name),
+                    );
                   });
             }),
       );
@@ -159,42 +156,10 @@ class _TemplatesPageState extends State<TemplatesPage> {
               ));
     }
 
-    Future<void> showHouseholdSwitcher() async {
-      FlingUser? user = await FlingUser.currentUser.first;
-      var mapFutures =
-          user?.householdIds.map((id) => HouseholdModel.fromId(id)).toList();
-      List<HouseholdModel> households = await Future.wait(mapFutures ?? []);
-
-      void onUpdate(String id) {
-        user?.setCurrentHouseholdId(id);
-        Navigator.pop(context);
-      }
-
-      showDialog(
-          context: context,
-          builder: ((context) => AlertDialog(
-              title: Text(l10n.households),
-              content: SizedBox(
-                  width: double.maxFinite,
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      ...households.map((h) => ListTile(
-                            onTap: () => onUpdate(h.id!),
-                            title: Text(h.name),
-                            trailing: h.id == user?.currentHouseholdId
-                                ? const Icon(Icons.check)
-                                : null,
-                            leading: const Icon(Icons.house),
-                          )),
-                      ListTile(
-                        onTap: () => onAddhousehold(),
-                        title: Text(l10n.household_add),
-                        leading: const Icon(Icons.add),
-                      )
-                    ],
-                  )))));
-    }
+    Future<void> showHouseholdSwitcher() => showHouseholdSwitcherDialog(
+          context,
+          onAddHousehold: onAddhousehold,
+        );
 
     onAddTemplatePressed() {
       TextEditingController textController = TextEditingController();
@@ -211,8 +176,8 @@ class _TemplatesPageState extends State<TemplatesPage> {
                       child: Text(l10n.action_cancel)),
                   TextButton(
                       onPressed: () async {
-                        FlingUser? user = await FlingUser.currentUser.first;
-                        String? householdId = user?.currentHouseholdId;
+                        final householdId =
+                            ref.read(currentHouseholdIdProvider);
 
                         if (householdId != null) {
                           FlingTemplateModel(

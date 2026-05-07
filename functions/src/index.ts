@@ -1,6 +1,7 @@
 import * as functions from "firebase-functions/v1";
 import {onRequest} from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
+import {FieldValue} from "firebase-admin/firestore";
 import {app} from "./api/app";
 import {handle} from "./api/adapter";
 
@@ -31,7 +32,7 @@ exports.cacheJoinHousehold = functions.firestore
           .collection("users")
           .doc(memberId)
           .update({
-            households: admin.firestore.FieldValue.arrayUnion(householdId),
+            households: FieldValue.arrayUnion(householdId),
           });
     });
 
@@ -50,7 +51,7 @@ exports.cacheLeaveHousehold = functions.firestore
           .collection("users")
           .doc(memberId)
           .update({
-            households: admin.firestore.FieldValue.arrayRemove(householdId),
+            households: FieldValue.arrayRemove(householdId),
           });
     });
 

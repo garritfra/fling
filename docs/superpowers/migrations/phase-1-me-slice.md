@@ -3350,3 +3350,138 @@ git worktree remove .worktrees/phase-1-me-slice
   - The `dart-dio` generator's exact method/class names for `PATCH /v1/me` (referenced as `patchV1Me` and `PatchMe` in Task 12) should be verified against the freshly-generated `lib/core/api/generated/lib/src/api/default_api.dart` after Task 9. Adjust call sites if the generator chose different names.
   - Firestore TTL on `idempotency_keys.expires_at` is enabled out-of-band via `gcloud` after Slice 2 merges (Task 14, Step 2). The middleware functions correctly without it; expired records simply pile up until TTL is enabled.
   - Trigger SDK choice (`firebase-functions/v1`'s `auth.user()`) is intentional and documented in the plan header.
+
+---
+
+## Slice 2 retrospective — deltas worth knowing for Slice 3
+
+Captured during execution; corrects or sharpens what Tasks 8–13 say.
+Slice 3 builds on top of these.
+
+### Generated client — actual surface
+
+The dart-dio generator's emitted names differ from what Task 12 assumed:
+
+- Accessor is `api.getMeApi()`, not `api.getDefaultApi()` (the route is
+  tagged `me`, so the generator namespaces it under `MeApi`).
+- Method is `v1MePatch(...)`, not `patchV1Me(...)` (no `operationId` in the
+  spec → generator derives `<path><Verb>`).
+- The OpenAPI spec doesn't declare `Idempotency-Key` as a header parameter,
+  so the generated method has no `idempotencyKey:` arg. Pass it via the
+  existing `headers:` map: `headers: {'Idempotency-Key': key}`. (A future
+  hardening pass could declare it on the route + use the typed param.)
+
+### Generated package — pubspec wiring
+
+- Slice 1 generated the dart-dio client but didn't wire it into the parent
+  Flutter app. Slice 2 declares `fling_api` as a path dep on
+  `lib/core/api/generated` in `pubspec.yaml`. Without that, no
+  `package:fling_api/...` import resolves.
+- Import path is `package:fling_api/fling_api.dart` — the generated package
+  is a sibling pub package, not a re-exported folder under `fling`.
+- `fling_api` exports its own built_value `Me` model. The freezed domain
+  `Me` from `features/me/domain/me.dart` clashes by name. Use
+  `import 'package:fling_api/fling_api.dart' hide Me;` in any file that
+  uses both.
+- The generator hardcodes `sdk: '>=2.18.0 <4.0.0'` in the generated
+  `pubspec.yaml`. Under Dart 3.9 this triggers cascading "language version
+  override has to be the same in the library and its part(s)" errors as
+  soon as the parent project consumes the package. Two fixes both
+  required: bump the parent `pubspec.yaml` to `sdk: '>=3.0.0'`, and have
+  `scripts/generate-dart-client.sh` patch the generated package's SDK to
+  `>=3.0.0` after every regen (`sed -i.bak "..." && rm`; portable across
+  GNU and BSD sed).
+
+### Backend — real bugs that landed alongside the plan
+
+- The Task 8 middleware code reads `c.get("uid")` directly. The auth
+  middleware actually stores everything under `RequestContext`
+  (`__fling_request_context`), so in production the chain is broken: the
+  middleware sees `uid === undefined` and silently no-ops on every
+  authenticated write. Fix: read uid via `getRequestContext(c).uid`, with
+  a fallback to `c.set("uid")` for unit-test harnesses.
+- The middleware's error handler had `Not all code paths return a value`
+  under TS strict mode. Add an explicit `return;` after the `save()` call.
+- `IdempotencyRecord.expiresAt` was a dead field; `save()` always computes
+  the expiry from `TTL_MS`. Drop the field from the interface.
+- `features/me/routes.ts`'s PATCH route didn't list 404 (NotFound from
+  `getMe()`) or 409 (idempotency conflict) in its `responses`. Generated
+  clients had no signal that those status codes were reachable.
+- `app.ts`'s `app.doc("/v1/openapi.json", ...)` had no `servers` block, so
+  Swagger UI/Redoc had no concrete base URL. Now lists the production
+  deployment + the local emulator URL with `{project}` as a server var.
+- `firebase-admin@13` + `firebase-functions@6` + `functionsEmulatorRuntime`
+  combo: `admin.firestore.FieldValue` resolves to **undefined** when a v1
+  trigger fires (works in standalone Node — patched-require interaction).
+  `cacheJoinHousehold` and `cacheLeaveHousehold` need
+  `import {FieldValue} from "firebase-admin/firestore"` instead of the
+  namespace accessor.
+
+### Flutter — Riverpod / stream provider gotchas
+
+- `meProvider` must `await ref.watch(authStateProvider.future)`, not
+  `ref.watch(authStateProvider).valueOrNull`. The latter is null before
+  the StreamProvider has fired its first event and races the test
+  harness.
+- `connectivityOnlineProvider.stream` is deprecated in Riverpod 2.x and
+  removed in 3.0. `mutationQueueProvider` reads
+  `Connectivity().onConnectivityChanged` directly to avoid the warning;
+  the StreamProvider stays for UI consumers that want an `AsyncValue<bool>`.
+- `MutationQueueImpl` keeps a connectivity stream subscription. Wire
+  `ref.onDispose(queue.dispose)` in the FutureProvider so it's cleaned
+  up when Riverpod rebuilds.
+- The household-switcher dialog reads `user.householdIds` once at open
+  time. The `cacheJoinHousehold` trigger writes the new id into
+  `users/{uid}.households` asynchronously — so a freshly-created
+  household didn't appear until full app refresh. Fix: build dialog
+  body from a `Consumer` watching `householdIdsProvider` + a
+  `FutureBuilder<List<HouseholdModel>>` keyed off the id list. The
+  dialog now lives in
+  `lib/features/me/presentation/household_switcher_dialog.dart` so
+  `lists.dart` and `templates.dart` share one definition.
+- `HouseholdModel.ref` should bind to `this.id`, not
+  `FlingUser.currentHouseholdId`. Every `HouseholdModel` instance
+  already represents a single household; the prior coupling was a
+  latent bug (correct in practice only because callers always
+  operated on the active household).
+
+### Local-emulator UX
+
+The Flutter app had three "where do I talk to" decisions and only one
+(`apiBaseUrlProvider`) was wired through env. Setting `FLING_API_BASE_URL`
+alone didn't make the app emulator-bound — Firestore + Auth still hit
+prod, so tokens carried `aud: fling-list` and the local emulator
+(running as `fling-rules-test`) 401'd.
+
+Slice 2 introduces `lib/core/firebase/emulators.dart` and one flag,
+`--dart-define=FLING_USE_EMULATORS=true`, that wires Auth + Firestore +
+Functions emulators after `Firebase.initializeApp` AND auto-derives the
+API base URL. Document this in `CONTRIBUTING.md` for new contributors;
+the previous "set `FLING_API_BASE_URL`" instruction was misleading.
+
+### Test infra
+
+- Vitest defaults to thread-pool parallelism. Several suites do
+  collection-wide wipes in `beforeEach` (`users/`, `idempotency_keys/`)
+  against the same emulator instance; this races. Set `pool: "forks",
+  singleFork: true` in `vitest.config.ts`. Tradeoff: serializes file
+  execution (CI runtime grows linearly with suite count); a future
+  improvement is per-suite collection-prefix isolation.
+- `firebase emulators:exec` defaults to the `.firebaserc` project
+  (`fling-list`) which doesn't match `initializeApp({projectId:
+  "fling-rules-test"})` in test files → audience mismatch. CI uses
+  `--project fling-rules-test`; local dev runs of the test suite need
+  the same flag.
+- `auth.test.ts` and `routes.test.ts` both create `alice@example.com` in
+  `beforeAll`. Under singleFork, the second one fails ("EMAIL_EXISTS").
+  Make both tolerant of pre-existing accounts via `getUserByEmail` →
+  `createUser` fallback.
+
+### Plan checkboxes that no longer match the code
+
+The Task 5 PATCH route's documented responses changed (added 404, 409).
+The Task 8 middleware uses `getRequestContext(c).uid`. The Task 11
+queue exposes `failures.dart` (the failure types live there now, not
+inline in `mutation_queue.dart`). The Task 12 repo collapses the two
+`setX` methods into a single `_patchMe` private helper. None of these
+change behaviour vs. the plan, just the shape of the code.

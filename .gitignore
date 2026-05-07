@@ -21,6 +21,11 @@ migrate_working_dir/
 # is commented out by default.
 #.vscode/
 
+# Node-toolchain residue. functions/node_modules holds the backend
+# install; vite (used by vitest) drops a cache under ./node_modules/.vite
+# at the repo root when invoked from there. Both are recreated on demand.
+**/node_modules/
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id

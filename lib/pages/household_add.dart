@@ -1,26 +1,31 @@
 import 'package:fling/data/household.dart';
-import 'package:fling/data/user.dart';
+import 'package:fling/features/me/application/me_providers.dart';
 import 'package:fling/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class AddHousehold extends StatefulWidget {
+class AddHousehold extends ConsumerStatefulWidget {
   const AddHousehold({super.key});
 
   @override
-  State<AddHousehold> createState() => _AddHouseholdState();
+  ConsumerState<AddHousehold> createState() => _AddHouseholdState();
 }
 
-class _AddHouseholdState extends State<AddHousehold> {
+class _AddHouseholdState extends ConsumerState<AddHousehold> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController();
 
     Future<void> onCreateHousehold() async {
-      var household = await HouseholdModel(name: nameController.text).save();
-      var user = await FlingUser.currentUser.first;
-      user?.setCurrentHouseholdId(household.id!);
+      final household = await HouseholdModel(name: nameController.text).save();
+      // Switch the current household via the new API + mutation queue
+      // (PATCH /v1/me).
+      await ref
+          .read(meControllerProvider)
+          .setCurrentHousehold(household.id!);
 
+      if (!context.mounted) return;
       Navigator.pop(context);
     }
 

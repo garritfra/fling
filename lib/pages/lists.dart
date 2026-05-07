@@ -1,16 +1,19 @@
 import 'package:fling/data/household.dart';
 import 'package:fling/data/list.dart';
 import 'package:fling/data/user.dart';
+import 'package:fling/features/me/application/me_providers.dart';
+import 'package:fling/features/me/presentation/household_switcher_dialog.dart';
 import 'package:fling/l10n/app_localizations.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:fling/pages/list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ListsPage extends StatefulWidget {
+class ListsPage extends ConsumerStatefulWidget {
   const ListsPage({super.key});
 
   @override
-  State<ListsPage> createState() => _ListsPageState();
+  ConsumerState<ListsPage> createState() => _ListsPageState();
 }
 
 enum HouseholdMenuListAction {
@@ -18,7 +21,7 @@ enum HouseholdMenuListAction {
   deleteHousehold,
 }
 
-class _ListsPageState extends State<ListsPage> {
+class _ListsPageState extends ConsumerState<ListsPage> {
   @override
   Widget build(BuildContext context) {
     var l10n = AppLocalizations.of(context)!;
@@ -51,27 +54,23 @@ class _ListsPageState extends State<ListsPage> {
 
     Widget buildLists(HouseholdModel household) {
       return Expanded(
-        child: FutureBuilder(
-            future: household.lists,
-            builder: (context, lists) {
-              return StreamBuilder(
-                  stream: lists.data,
-                  builder: (context, snapshot) {
-                    var lists = snapshot.data ?? [];
+        child: StreamBuilder(
+            stream: household.lists,
+            builder: (context, snapshot) {
+              var lists = snapshot.data ?? [];
 
-                    return ListView.builder(
-                        itemCount: lists.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          FlingListModel list = lists.elementAt(index);
+              return ListView.builder(
+                  itemCount: lists.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    FlingListModel list = lists.elementAt(index);
 
-                          return ListTile(
-                            onTap: () => Navigator.pushNamed(context, '/list',
-                                arguments: ListPageArguments(list)),
-                            onLongPress: () => showListActionsDialog(list),
-                            key: Key(list.id ?? list.name),
-                            title: Text(list.name),
-                          );
-                        });
+                    return ListTile(
+                      onTap: () => Navigator.pushNamed(context, '/list',
+                          arguments: ListPageArguments(list)),
+                      onLongPress: () => showListActionsDialog(list),
+                      key: Key(list.id ?? list.name),
+                      title: Text(list.name),
+                    );
                   });
             }),
       );
@@ -155,42 +154,10 @@ class _ListsPageState extends State<ListsPage> {
               ));
     }
 
-    Future<void> showHouseholdSwitcher() async {
-      FlingUser? user = await FlingUser.currentUser.first;
-      var mapFutures =
-          user?.householdIds.map((id) => HouseholdModel.fromId(id)).toList();
-      List<HouseholdModel> households = await Future.wait(mapFutures ?? []);
-
-      void onUpdate(String id) {
-        user?.setCurrentHouseholdId(id);
-        Navigator.pop(context);
-      }
-
-      showDialog(
-          context: context,
-          builder: ((context) => AlertDialog(
-              title: Text(l10n.households),
-              content: SizedBox(
-                  width: double.maxFinite,
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      ...households.map((h) => ListTile(
-                            onTap: () => onUpdate(h.id!),
-                            title: Text(h.name),
-                            trailing: h.id == user?.currentHouseholdId
-                                ? const Icon(Icons.check)
-                                : null,
-                            leading: const Icon(Icons.house),
-                          )),
-                      ListTile(
-                        onTap: () => onAddhousehold(),
-                        title: Text(l10n.household_add),
-                        leading: const Icon(Icons.add),
-                      )
-                    ],
-                  )))));
-    }
+    Future<void> showHouseholdSwitcher() => showHouseholdSwitcherDialog(
+          context,
+          onAddHousehold: onAddhousehold,
+        );
 
     onAddListPressed() {
       TextEditingController textController = TextEditingController();
@@ -207,8 +174,8 @@ class _ListsPageState extends State<ListsPage> {
                       child: Text(l10n.action_cancel)),
                   TextButton(
                       onPressed: () async {
-                        FlingUser? user = await FlingUser.currentUser.first;
-                        String? householdId = user?.currentHouseholdId;
+                        final householdId =
+                            ref.read(currentHouseholdIdProvider);
 
                         if (householdId != null) {
                           FlingListModel(

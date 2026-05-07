@@ -47,11 +47,26 @@ This builds the Cloud Functions (`tsc`) and starts the full emulator suite. Emul
 In a second terminal:
 
 ```bash
-flutter run -d chrome \
-  --dart-define=FLING_API_BASE_URL=http://localhost:5001/fling-list/us-central1/api
+flutter run -d chrome --dart-define=FLING_USE_EMULATORS=true
 ```
 
-The app will talk to the local emulators for both Firestore realtime reads and the REST API.
+This flag does two things:
+
+- Re-routes Firebase Auth, Firestore, and Cloud Functions to the
+  local emulators (`127.0.0.1` on ports `9099`, `8080`, `5001`).
+  Auth tokens are minted with the right project audience, Firestore
+  reads come from the emulator, and `httpsCallable` hits the local
+  Functions emulator.
+- Auto-derives the REST-API base URL to
+  `http://127.0.0.1:5001/fling-list/us-central1/api`.
+
+If you need to point the API somewhere else (e.g. a remote dev box),
+set `FLING_API_BASE_URL=...` explicitly — it wins over the auto-derived
+URL. To override the emulator host, set `FLING_EMULATOR_HOST=<host>`
+(useful from a VM or WSL).
+
+> **Heads up:** the flag only takes effect in `kDebugMode`. Release
+> builds always go to production regardless of any env values.
 
 ---
 

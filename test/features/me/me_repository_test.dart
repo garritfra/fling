@@ -2,6 +2,8 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:fling/features/me/data/me_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../../_helpers/noop_dependencies.dart';
+
 void main() {
   group('MeRepository.watch', () {
     test('emits Me with new field names when present', () async {
@@ -13,7 +15,11 @@ void main() {
         'current_household_id': 'h1',
         'schema_version': 1,
       });
-      final repo = MeRepository(firestore: firestore);
+      final repo = MeRepository(
+        firestore: firestore,
+        api: NoopFlingApi(),
+        mutations: NoopMutationQueue(),
+      );
       final me = await repo.watch('alice').first;
       expect(me, isNotNull);
       expect(me!.uid, 'alice');
@@ -29,7 +35,11 @@ void main() {
         'households': ['h1'],
         'current_household': 'h1',
       });
-      final repo = MeRepository(firestore: firestore);
+      final repo = MeRepository(
+        firestore: firestore,
+        api: NoopFlingApi(),
+        mutations: NoopMutationQueue(),
+      );
       final me = await repo.watch('alice').first;
       expect(me!.householdIds, ['h1']);
       expect(me.currentHouseholdId, 'h1');
@@ -39,7 +49,11 @@ void main() {
 
     test('emits null when the doc does not exist', () async {
       final firestore = FakeFirebaseFirestore();
-      final repo = MeRepository(firestore: firestore);
+      final repo = MeRepository(
+        firestore: firestore,
+        api: NoopFlingApi(),
+        mutations: NoopMutationQueue(),
+      );
       final me = await repo.watch('ghost').first;
       expect(me, isNull);
     });

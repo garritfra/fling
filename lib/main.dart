@@ -5,7 +5,8 @@ import 'package:fling/pages/household_add.dart';
 import 'package:fling/pages/login.dart';
 import 'package:fling/pages/template.dart';
 import 'package:fling/pages/templates.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:fling/core/firebase/emulators.dart';
 import 'package:fling/data/user.dart';
 import 'package:fling/pages/list.dart';
 import 'package:fling/pages/lists.dart';
@@ -23,7 +24,12 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  if (kDebugMode) {
+  // Re-route Firebase Auth, Firestore, and Cloud Functions to the local
+  // emulator suite when started with `--dart-define=FLING_USE_EMULATORS=true`.
+  // No-op in release builds and when the flag is absent.
+  await wireEmulatorsIfEnabled();
+
+  if (kDebugMode && !kIsWeb) {
     // Force disable Crashlytics collection while doing every day development.
     // Temporarily toggle this to true if you want to test crash reporting in your app.
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);

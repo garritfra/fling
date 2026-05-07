@@ -59,7 +59,7 @@ class _ListPageState extends State<ListPage> {
       FlingUser? user = await FlingUser.currentUser.first;
       HouseholdModel? household = await (await user?.currentHousehold)?.first;
       List<FlingTemplateModel> templates =
-          await ((await household?.templates)?.first) ?? [];
+          await household?.templates.first ?? [];
       templates.sort((a, b) => a.name.compareTo(b.name));
 
       Future<void> onAdd(FlingTemplateModel template) async {

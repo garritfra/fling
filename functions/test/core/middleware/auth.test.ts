@@ -12,7 +12,14 @@ let testToken: string;
 beforeAll(async () => {
   if (getApps().length === 0) initializeApp({projectId: "fling-rules-test"});
   const auth = getAuth();
-  const user = await auth.createUser({email: "alice@example.com"});
+  // Reuse the user if alice already exists (e.g. created by an earlier
+  // suite that shares the auth emulator under singleFork mode).
+  let user;
+  try {
+    user = await auth.getUserByEmail("alice@example.com");
+  } catch {
+    user = await auth.createUser({email: "alice@example.com"});
+  }
   // Build a custom token, then exchange it for an ID token via the emulator.
   const customToken = await auth.createCustomToken(user.uid);
   const r = await fetch(
