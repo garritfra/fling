@@ -156,43 +156,54 @@ class _TemplatesPageState extends ConsumerState<TemplatesPage> {
     }
 
     Future<void> showHouseholdSwitcher() async {
-      FlingUser? user = await FlingUser.currentUser.first;
-      var mapFutures =
-          user?.householdIds.map((id) => HouseholdModel.fromId(id)).toList();
-      List<HouseholdModel> households = await Future.wait(mapFutures ?? []);
-      final activeId = ref.read(currentHouseholdIdProvider);
-
-      Future<void> onUpdate(String id) async {
-        await ref.read(meControllerProvider).setCurrentHousehold(id);
-        if (!context.mounted) return;
-        Navigator.pop(context);
-      }
-
-      if (!context.mounted) return;
       showDialog(
-          context: context,
-          builder: ((context) => AlertDialog(
-              title: Text(l10n.households),
-              content: SizedBox(
-                  width: double.maxFinite,
-                  child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      ...households.map((h) => ListTile(
-                            onTap: () => onUpdate(h.id!),
-                            title: Text(h.name),
-                            trailing: h.id == activeId
-                                ? const Icon(Icons.check)
-                                : null,
-                            leading: const Icon(Icons.house),
-                          )),
-                      ListTile(
-                        onTap: () => onAddhousehold(),
-                        title: Text(l10n.household_add),
-                        leading: const Icon(Icons.add),
-                      )
-                    ],
-                  )))));
+        context: context,
+        builder: (dialogContext) => Consumer(
+          builder: (ctx, ref, _) {
+            final ids = ref.watch(householdIdsProvider);
+            final activeId = ref.watch(currentHouseholdIdProvider);
+            return FutureBuilder<List<HouseholdModel>>(
+              future: Future.wait(ids.map(HouseholdModel.fromId)),
+              builder: (ctx, snap) {
+                final households = snap.data ?? const <HouseholdModel>[];
+                return AlertDialog(
+                  title: Text(l10n.households),
+                  content: SizedBox(
+                    width: double.maxFinite,
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        ...households.map((h) => ListTile(
+                              onTap: () async {
+                                await ref
+                                    .read(meControllerProvider)
+                                    .setCurrentHousehold(h.id!);
+                                if (!ctx.mounted) return;
+                                Navigator.pop(ctx);
+                              },
+                              title: Text(h.name),
+                              trailing: h.id == activeId
+                                  ? const Icon(Icons.check)
+                                  : null,
+                              leading: const Icon(Icons.house),
+                            )),
+                        ListTile(
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            onAddhousehold();
+                          },
+                          title: Text(l10n.household_add),
+                          leading: const Icon(Icons.add),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      );
     }
 
     onAddTemplatePressed() {
