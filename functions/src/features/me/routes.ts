@@ -34,6 +34,14 @@ const patchMeRoute = createRoute({
     200: {description: "Updated", content: {"application/json": {schema: MeSchema}}},
     400: {description: "Validation error", content: {"application/json": {schema: ErrorSchema}}},
     401: {description: "Unauthorized", content: {"application/json": {schema: ErrorSchema}}},
+    404: {
+      description: "User document not provisioned yet",
+      content: {"application/json": {schema: ErrorSchema}},
+    },
+    409: {
+      description: "Idempotency-Key reused with a different request body",
+      content: {"application/json": {schema: ErrorSchema}},
+    },
   },
 });
 
