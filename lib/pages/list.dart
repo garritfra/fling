@@ -2,12 +2,12 @@ import 'package:fling/data/household.dart';
 import 'package:fling/data/list.dart';
 import 'package:fling/data/list_item.dart';
 import 'package:fling/data/template.dart';
-import 'package:fling/data/user.dart';
+import 'package:fling/features/me/application/me_providers.dart';
 import 'package:fling/l10n/app_localizations.dart';
 import 'package:fling/layout/confirm_dialog.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ListPageArguments {
   final FlingListModel list;
@@ -15,14 +15,14 @@ class ListPageArguments {
   ListPageArguments(this.list);
 }
 
-class ListPage extends StatefulWidget {
+class ListPage extends ConsumerStatefulWidget {
   const ListPage({super.key});
 
   @override
-  State<ListPage> createState() => _ListPageState();
+  ConsumerState<ListPage> createState() => _ListPageState();
 }
 
-class _ListPageState extends State<ListPage> {
+class _ListPageState extends ConsumerState<ListPage> {
   final newItemController = TextEditingController();
   final newItemFocusNode = FocusNode();
 
@@ -56,8 +56,9 @@ class _ListPageState extends State<ListPage> {
     }
 
     Future<void> showListTemplatesDialog() async {
-      FlingUser? user = await FlingUser.currentUser.first;
-      HouseholdModel? household = await (await user?.currentHousehold)?.first;
+      final householdId = ref.read(currentHouseholdIdProvider);
+      final household =
+          householdId == null ? null : await HouseholdModel.fromId(householdId);
       List<FlingTemplateModel> templates =
           await household?.templates.first ?? [];
       templates.sort((a, b) => a.name.compareTo(b.name));
@@ -279,41 +280,30 @@ class _ListPageState extends State<ListPage> {
           });
     }
 
-    return Consumer<FlingUser?>(
-      builder: (BuildContext context, user, Widget? child) {
-        return FutureBuilder(
-            future: user?.currentHousehold,
-            builder: (context, household) {
-              return StreamBuilder(
-                  stream: household.data,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<HouseholdModel> household) {
-                    return Scaffold(
-                      appBar: AppBar(
-                        actions: [
-                          buildAddFromTemplateButton(),
-                          buildDeleteButton(),
-                        ],
-                        title: Text(args.list.name),
-                      ),
-                      drawer: const FlingDrawer(),
-                      body: SafeArea(
-                        child: Center(
-                          child: SizedBox(
-                            width: 600.0,
-                            child: Column(
-                              children: [
-                                buildItemList(),
-                                buildItemTextField(),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  });
-            });
-      },
+    // currentHouseholdProvider is observed implicitly via showListTemplatesDialog,
+    // so the page itself only needs the static list args.
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          buildAddFromTemplateButton(),
+          buildDeleteButton(),
+        ],
+        title: Text(args.list.name),
+      ),
+      drawer: const FlingDrawer(),
+      body: SafeArea(
+        child: Center(
+          child: SizedBox(
+            width: 600.0,
+            child: Column(
+              children: [
+                buildItemList(),
+                buildItemTextField(),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

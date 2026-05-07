@@ -15,8 +15,12 @@ export const api = onRequest(
     (req, res) => handle(app, req, res),
 );
 
-// ----- v1: legacy callables & triggers (untouched until Phase 1+) --------
+// ----- v1: legacy callables & triggers (being replaced phase-by-phase) ---
 
+// PHASE-2-DELETE-START: legacy member-cache triggers (replaced by features/members/)
+// Dual-write `households` (legacy) + `household_ids` (new) so the new
+// features/me/ read path stays correct until Phase 2 ships first-class
+// member triggers.
 exports.cacheJoinHousehold = functions.firestore
     .document("households/{householdId}/members/{memberId}")
     .onCreate((change, context) => {
@@ -33,6 +37,7 @@ exports.cacheJoinHousehold = functions.firestore
           .doc(memberId)
           .update({
             households: FieldValue.arrayUnion(householdId),
+            household_ids: FieldValue.arrayUnion(householdId),
           });
     });
 
@@ -52,8 +57,10 @@ exports.cacheLeaveHousehold = functions.firestore
           .doc(memberId)
           .update({
             households: FieldValue.arrayRemove(householdId),
+            household_ids: FieldValue.arrayRemove(householdId),
           });
     });
+// PHASE-2-DELETE-END
 
 exports.inviteToHouseholdByEmail = functions.https.onCall(
     async (data, context) => {
@@ -99,18 +106,5 @@ exports.inviteToHouseholdByEmail = functions.https.onCall(
     },
 );
 
-exports.setupUser = functions.auth.user().onCreate((user) => {
-  return db
-      .collection("users")
-      .doc(user.uid)
-      .set({
-        households: [],
-      });
-});
-
-exports.deleteUser = functions.auth.user().onDelete((user) => {
-  return db
-      .collection("users")
-      .doc(user.uid)
-      .delete();
-});
+// v2-organised auth lifecycle triggers (impl: features/me/triggers.ts).
+export {onUserCreated, onUserDeleted} from "./features/me/triggers";

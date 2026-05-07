@@ -1,19 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fling/data/household.dart';
-import 'package:fling/data/user.dart';
+import 'package:fling/features/me/application/me_providers.dart';
 import 'package:fling/l10n/app_localizations.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     FirebaseAuth.instance.authStateChanges().listen((user) {
@@ -67,34 +67,20 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    return Consumer<FlingUser?>(
-      builder: (BuildContext context, user, Widget? child) {
-        return FutureBuilder(
-          future: user?.currentHousehold,
-          builder: (context, household) => StreamBuilder(
-              stream: household.data,
-              builder: (BuildContext context,
-                  AsyncSnapshot<HouseholdModel> household) {
-                return Scaffold(
-                  appBar: AppBar(
-                    // Here we take the value from the HomePage object that was created by
-                    // the App.build method, and use it to set our appbar title.
-                    title: Text(household.data?.name ??
-                        AppLocalizations.of(context)!.home),
-                  ),
-                  drawer: const FlingDrawer(),
-                  body: Row(
-                    children: [
-                      if (household.data == null)
-                        buildCreateHouseholdButton()
-                      else
-                        buildListsButton(),
-                    ],
-                  ),
-                );
-              }),
-        );
-      },
+    final HouseholdModel? household = ref.watch(currentHouseholdProvider).valueOrNull;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(household?.name ?? AppLocalizations.of(context)!.home),
+      ),
+      drawer: const FlingDrawer(),
+      body: Row(
+        children: [
+          if (household == null)
+            buildCreateHouseholdButton()
+          else
+            buildListsButton(),
+        ],
+      ),
     );
   }
 }

@@ -1,11 +1,8 @@
-import 'package:fling/data/household.dart';
 import 'package:fling/data/template.dart';
 import 'package:fling/data/template_item.dart';
-import 'package:fling/data/user.dart';
 import 'package:fling/l10n/app_localizations.dart';
 import 'package:fling/layout/drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class TemplatePageArguments {
   final FlingTemplateModel template;
@@ -233,37 +230,24 @@ class _TemplatePageState extends State<TemplatePage> {
           });
     }
 
-    return Consumer<FlingUser?>(
-      builder: (BuildContext context, user, Widget? child) {
-        return FutureBuilder(
-            future: user?.currentHousehold,
-            builder: (context, household) {
-              return StreamBuilder(
-                  stream: household.data,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<HouseholdModel> household) {
-                    return Scaffold(
-                      appBar: AppBar(
-                        title: Text(args.template.name),
-                      ),
-                      drawer: const FlingDrawer(),
-                      body: SafeArea(
-                        child: Center(
-                          child: SizedBox(
-                            width: 600.0,
-                            child: Column(
-                              children: [
-                                buildItemTemplate(),
-                                buildItemTextField(),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  });
-            });
-      },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(args.template.name),
+      ),
+      drawer: const FlingDrawer(),
+      body: SafeArea(
+        child: Center(
+          child: SizedBox(
+            width: 600.0,
+            child: Column(
+              children: [
+                buildItemTemplate(),
+                buildItemTextField(),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

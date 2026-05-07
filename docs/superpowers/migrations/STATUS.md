@@ -5,7 +5,7 @@
 > Source of truth for "where are we right now?" in the rewrite.
 
 - **Spec:** [`docs/superpowers/specs/2026-04-24-fling-rewrite-design.md`](../specs/2026-04-24-fling-rewrite-design.md)
-- **Last updated:** 2026-05-07 (Phase 1 Slice 2 implementation complete on branch; PR #561 open)
+- **Last updated:** 2026-05-07 (Phase 1 Slice 3 backend + Flutter complete on branch; rule-tighten deferred behind app rollout)
 
 ## Status legend
 
@@ -54,7 +54,7 @@ just before each phase begins) link back to these.
 - [ ] Flutter `features/me/` migrated to vertical slice; old `FlingUser` deleted
 - [ ] `setupUser` / `deleteUser` v1 functions replaced by v2 triggers in `features/me/triggers.ts` (deletion behaviour matches today: delete user doc only; cascade lands in Phase 5)
 - [ ] Migration #1 deployed: user docs gain `email`, `display_name`, `household_ids`, `current_household_id`, audit fields, `schema_version: 1`
-- [ ] Rule tightened: `/users/{uid}` is owner-only read
+- [ ] Rule tightened: `/users/{uid}` is owner-only read _(deferred — needs a released app version with the new write path widely deployed first; the deployed v0.11.1 still writes `users/{uid}.current_household` directly via `FlingUser.setCurrentHouseholdId`. Lands in a follow-up PR after the rollout is complete.)_
 
 ### Phase 2 — Households + members + invites
 
@@ -119,3 +119,4 @@ moves a phase.
 | 2026-04-30 | 1 | Started | — | Phase 1 plan published (`phase-1-me-slice.md`) |
 | 2026-05-04 | 1 | Slice 1 merged | [#543](https://github.com/garritfra/fling/pull/543) | `GET /v1/me` end-to-end. Tasks 0–7: core middleware (auth, request_id, errors, logger), `features/me/` schemas/repo/service/route, Flutter `Me` model + repo + Riverpod providers + `ProviderScope` bootstrap. Storage shape unchanged. |
 | 2026-05-07 | 1 | Slice 2 implementation complete | [#561](https://github.com/garritfra/fling/pull/561) | `PATCH /v1/me` + idempotency middleware + Flutter mutation queue + me writes wired through API. Tasks 8–13. Pending: merge, enable Firestore TTL on `idempotency_keys.expires_at`, prod smoke. |
+| 2026-05-07 | 1 | Slice 3 backend + Flutter complete | [#562](https://github.com/garritfra/fling/pull/562) | v2-organised auth triggers (`features/me/triggers.ts`), additive Migration #1 (`001-user-shape`), legacy member triggers dual-write `household_ids`, FlingUser deleted from Flutter. Tasks 15–18. Task 19 (rule tighten) **deferred**: it would break the deployed v0.11.1 client whose `FlingUser.setCurrentHouseholdId` writes `users/{uid}.current_household` directly. Lands in a follow-up PR once v0.12.0 (which uses PATCH /v1/me writes) is widely deployed. Migration #1 itself is fully back-compat — it preserves legacy `households` / `current_household` fields. |

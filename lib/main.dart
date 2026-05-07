@@ -7,7 +7,6 @@ import 'package:fling/pages/template.dart';
 import 'package:fling/pages/templates.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:fling/core/firebase/emulators.dart';
-import 'package:fling/data/user.dart';
 import 'package:fling/pages/list.dart';
 import 'package:fling/pages/lists.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fba;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderScope;
-import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -35,21 +33,7 @@ Future<void> main() async {
     await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(false);
   }
 
-  Stream<FlingUser?> user = FlingUser.currentUser;
-
-  runApp(
-    ProviderScope(
-      child: MultiProvider(
-        providers: [
-          StreamProvider<FlingUser?>(
-            create: (context) => user,
-            initialData: null,
-          ),
-        ],
-        child: const FlingApp(),
-      ),
-    ),
-  );
+  runApp(const ProviderScope(child: FlingApp()));
 }
 
 class FlingApp extends StatelessWidget {

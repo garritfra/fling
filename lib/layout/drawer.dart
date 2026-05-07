@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fling/data/user.dart';
 import 'package:fling/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -90,14 +89,12 @@ class FlingDrawer extends StatelessWidget {
                                     Text(l10n.action_account_delete_confirm),
                                 yesText: l10n.action_delete,
                                 yesAction: () async {
-                                  FlingUser? user =
-                                      await FlingUser.currentUser.first;
-
-                                  if (user != null) {
-                                    await user.deleteAccount();
-                                    // TODO: the app should listen for logout changes
-                                    navigator.popAndPushNamed('/login');
-                                  }
+                                  // The v2 onUserDeleted trigger handles
+                                  // the Firestore-side cleanup.
+                                  await FirebaseAuth.instance.currentUser
+                                      ?.delete();
+                                  // TODO: the app should listen for logout changes
+                                  navigator.popAndPushNamed('/login');
                                 }),
                           )
                         ],
