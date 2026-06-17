@@ -15,10 +15,13 @@ class NoopFlingApi implements FlingApi {
 /// mutations" — useful when a repo test cares about read paths only.
 class NoopMutationQueue implements MutationQueue {
   @override
-  Future<T> enqueue<T>(MutationSpec<T> spec) => spec.call('test');
+  Future<void> enqueue(MutationSpec spec) => spec.call('test');
 
   @override
   Stream<List<PendingMutation>> get pending => const Stream.empty();
+
+  @override
+  Stream<MutationFailure> get failures => const Stream.empty();
 
   @override
   T overlay<T>(
