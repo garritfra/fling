@@ -58,7 +58,7 @@ class MeRepository {
       if (currentHouseholdId != null) 'currentHouseholdId': currentHouseholdId,
       if (displayName != null) 'displayName': displayName,
     };
-    await mutations.enqueue(MutationSpec<void>(
+    await mutations.enqueue(MutationSpec(
       type: MeMutations.patchType,
       resourceKey: MeMutations.resourceKey(uid),
       body: body,

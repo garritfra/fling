@@ -466,6 +466,17 @@ pending mutations. Each action:
 This is encapsulated in `core/api/mutation_queue.dart` and reused by every
 feature.
 
+**`MutationQueue.enqueue` is fire-and-forget.** It returns once the
+mutation is durably persisted to the local queue, *not* when the server
+has confirmed (steps 3 + 4 happen in the background). Call sites must not
+`await` it as if it were a synchronous network call — doing so re-introduces
+round-trip latency on whatever modal/page is awaiting and defeats the
+overlay (the screen behind updates, but the user is staring at the
+modal). Pop dialogs / pages / dismiss spinners synchronously after
+`enqueue` resolves; failures arrive on `MutationQueue.failures` and are
+surfaced by a top-level listener (step 5). See
+[#563](https://github.com/garritfra/fling/issues/563).
+
 ### 7.6 Offline writes
 
 The mutation queue persists to disk. On app start and on `connectivity_plus`

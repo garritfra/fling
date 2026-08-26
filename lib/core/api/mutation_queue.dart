@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 export 'package:fling/core/api/failures.dart' show ApiFailure, NetworkFailure;
 
-class MutationSpec<T> {
+class MutationSpec {
   MutationSpec({
     required this.type,
     required this.resourceKey,
@@ -21,7 +21,7 @@ class MutationSpec<T> {
   final String resourceKey;
   final Map<String, Object?> body;
   final String? idempotencyKey;
-  final Future<T> Function(String idempotencyKey) call;
+  final Future<void> Function(String idempotencyKey) call;
 }
 
 class PendingMutation {
@@ -59,9 +59,31 @@ class PendingMutation {
       );
 }
 
+/// A mutation that the server rejected terminally (4xx non-409). Surfaced
+/// on [MutationQueue.failures] so a top-level listener can show a
+/// `FlingErrorSnackBar`. Matches the design spec §7.5 step 5.
+class MutationFailure {
+  const MutationFailure({required this.mutation, required this.error});
+  final PendingMutation mutation;
+  final ApiFailure error;
+}
+
 abstract class MutationQueue {
-  Future<T> enqueue<T>(MutationSpec<T> spec);
+  /// Enqueue a mutation. Resolves once the mutation is **durably persisted
+  /// to the local queue** — *not* when the server has confirmed. The HTTP
+  /// call runs in the background; terminal failures arrive on [failures].
+  ///
+  /// Call sites must not `await` for the round-trip via this future. The
+  /// optimistic overlay (see [overlay]) is what makes the new state visible
+  /// to the UI immediately; pop dialogs / pages synchronously after this
+  /// resolves.
+  Future<void> enqueue(MutationSpec spec);
+
   Stream<List<PendingMutation>> get pending;
+
+  /// Terminal failures (4xx non-409). Subscribers translate to UI
+  /// (top-level `FlingErrorSnackBar`).
+  Stream<MutationFailure> get failures;
 
   /// Apply pending mutations on top of an upstream snapshot. Resource-keyed.
   T overlay<T>(
@@ -85,10 +107,11 @@ class MutationQueueImpl implements MutationQueue {
   final SharedPreferences prefs;
   final Stream<bool> _online;
   late final StreamSubscription<bool> _onlineSub;
-  final _controller = StreamController<List<PendingMutation>>.broadcast();
+  final _pendingController =
+      StreamController<List<PendingMutation>>.broadcast();
+  final _failureController = StreamController<MutationFailure>.broadcast();
   final List<PendingMutation> _queue = [];
-  final Map<String, Completer<dynamic>> _completers = {};
-  final Map<String, Future<dynamic> Function(String)> _calls = {};
+  final Map<String, Future<void> Function(String)> _calls = {};
 
   void _load() {
     final raw = prefs.getString(_prefsKey);
@@ -106,17 +129,20 @@ class MutationQueueImpl implements MutationQueue {
   }
 
   void _emit() {
-    _controller.add(List.unmodifiable(_queue));
+    _pendingController.add(List.unmodifiable(_queue));
   }
 
   @override
   Stream<List<PendingMutation>> get pending {
     Future<void>.microtask(_emit);
-    return _controller.stream;
+    return _pendingController.stream;
   }
 
   @override
-  Future<T> enqueue<T>(MutationSpec<T> spec) async {
+  Stream<MutationFailure> get failures => _failureController.stream;
+
+  @override
+  Future<void> enqueue(MutationSpec spec) async {
     final key = spec.idempotencyKey ?? newIdempotencyKey();
     final p = PendingMutation(
       idempotencyKey: key,
@@ -126,37 +152,33 @@ class MutationQueueImpl implements MutationQueue {
       createdAt: DateTime.now().toUtc(),
     );
     _queue.add(p);
-    final completer = Completer<T>();
-    _completers[key] = completer;
     _calls[key] = spec.call;
     await _persist();
     _emit();
+    // Run the network call in the background. The caller is unblocked the
+    // moment the mutation is in the queue + persisted; the overlay makes
+    // the new state visible immediately.
     unawaited(_runOne(p));
-    return completer.future;
   }
 
   Future<void> _runOne(PendingMutation p) async {
     final call = _calls[p.idempotencyKey];
-    final completer = _completers[p.idempotencyKey];
-    if (call == null || completer == null) return;
+    if (call == null) return;
     p.attempts++;
     try {
-      final result = await call(p.idempotencyKey);
+      await call(p.idempotencyKey);
       _queue.removeWhere((q) => q.idempotencyKey == p.idempotencyKey);
-      _completers.remove(p.idempotencyKey);
       _calls.remove(p.idempotencyKey);
-      completer.complete(result);
     } on NetworkFailure {
       // Stay pending; retried on next drain / connectivity event.
     } on ApiFailure catch (e) {
-      // 409 is a server-side conflict — keep it pending so the caller can
-      // resolve it (e.g. fresh idempotency key). All other 4xx are caller
-      // errors; drop and rethrow so the caller sees them.
+      // 409 is a server-side conflict — keep it pending so a future drain
+      // (e.g. fresh idempotency key) can resolve it. All other 4xx are
+      // terminal: drop the mutation and surface on `failures`.
       if (e.status >= 400 && e.status < 500 && e.status != 409) {
         _queue.removeWhere((q) => q.idempotencyKey == p.idempotencyKey);
-        _completers.remove(p.idempotencyKey);
         _calls.remove(p.idempotencyKey);
-        completer.completeError(e);
+        _failureController.add(MutationFailure(mutation: p, error: e));
       }
     } catch (_) {
       // Unknown error — treat as transient.
@@ -189,7 +211,8 @@ class MutationQueueImpl implements MutationQueue {
 
   Future<void> dispose() async {
     await _onlineSub.cancel();
-    await _controller.close();
+    await _pendingController.close();
+    await _failureController.close();
   }
 }
 
@@ -212,4 +235,12 @@ final mutationQueueProvider = FutureProvider<MutationQueue>((ref) async {
   final queue = MutationQueueImpl(prefs: prefs, online: online);
   ref.onDispose(queue.dispose);
   return queue;
+});
+
+/// Surface for terminal mutation failures. Exposed as a StreamProvider so
+/// listeners (e.g. the top-level snackbar) can use `ref.listen` rather
+/// than tracking a `StreamSubscription` themselves.
+final mutationFailuresProvider = StreamProvider<MutationFailure>((ref) async* {
+  final queue = await ref.watch(mutationQueueProvider.future);
+  yield* queue.failures;
 });

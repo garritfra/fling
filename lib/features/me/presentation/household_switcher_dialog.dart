@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fling/data/household.dart';
 import 'package:fling/features/me/application/me_providers.dart';
 import 'package:fling/l10n/app_localizations.dart';
@@ -31,11 +33,14 @@ Future<void> showHouseholdSwitcherDialog(
                   shrinkWrap: true,
                   children: [
                     ...households.map((h) => ListTile(
-                          onTap: () async {
-                            await ref
+                          onTap: () {
+                            // Fire-and-forget: the mutation queue persists +
+                            // applies the optimistic overlay synchronously
+                            // (#563); awaiting here would re-introduce
+                            // round-trip latency on the dialog.
+                            unawaited(ref
                                 .read(meControllerProvider)
-                                .setCurrentHousehold(h.id!);
-                            if (!ctx.mounted) return;
+                                .setCurrentHousehold(h.id!));
                             Navigator.pop(ctx);
                           },
                           title: Text(h.name),

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fling/data/household.dart';
 import 'package:fling/features/me/application/me_providers.dart';
 import 'package:fling/l10n/app_localizations.dart';
@@ -18,12 +20,15 @@ class _AddHouseholdState extends ConsumerState<AddHousehold> {
     final nameController = TextEditingController();
 
     Future<void> onCreateHousehold() async {
+      // The household-doc create is still synchronous because we need the
+      // server-assigned id back. Switching the active household goes
+      // through the mutation queue, which persists + overlays optimistically
+      // (#563); fire-and-forget so the page dismisses without waiting on
+      // PATCH /v1/me.
       final household = await HouseholdModel(name: nameController.text).save();
-      // Switch the current household via the new API + mutation queue
-      // (PATCH /v1/me).
-      await ref
+      unawaited(ref
           .read(meControllerProvider)
-          .setCurrentHousehold(household.id!);
+          .setCurrentHousehold(household.id!));
 
       if (!context.mounted) return;
       Navigator.pop(context);

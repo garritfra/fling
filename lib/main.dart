@@ -6,6 +6,7 @@ import 'package:fling/pages/login.dart';
 import 'package:fling/pages/template.dart';
 import 'package:fling/pages/templates.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:fling/core/api/mutation_failure_listener.dart';
 import 'package:fling/core/firebase/emulators.dart';
 import 'package:fling/pages/list.dart';
 import 'package:fling/pages/lists.dart';
@@ -60,6 +61,9 @@ class FlingApp extends StatelessWidget {
         darkTheme: ThemeData(
             useMaterial3: true,
             colorScheme: darkDynamic ?? ThemeData.dark().colorScheme),
+        // Top-level surface for terminal mutation failures (spec §7.5 step 5).
+        builder: (context, child) =>
+            MutationFailureListener(child: child ?? const SizedBox.shrink()),
         initialRoute:
             fba.FirebaseAuth.instance.currentUser == null ? '/login' : '/',
         routes: <String, WidgetBuilder>{
