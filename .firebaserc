@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "fling-list"
+    "default": "demo-fling",
+    "prod": "fling-list"
   }
 }
