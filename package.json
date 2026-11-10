@@ -1,0 +1,47 @@
+{
+  "name": "fling",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "typecheck": "tsc --noEmit",
+    "lint": "expo lint",
+    "test": "vitest run test/unit",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-fling \"vitest run test/rules\"",
+    "emulators": "firebase emulators:start"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^15.0.2",
+    "@react-native-firebase/app": "~26.4.1",
+    "@react-native-firebase/auth": "~26.4.1",
+    "@react-native-firebase/firestore": "~26.4.1",
+    "@react-native-google-signin/google-signin": "^17.0.0",
+    "expo": "~58.0.23",
+    "expo-constants": "~58.0.15",
+    "expo-dev-client": "~58.0.18",
+    "expo-linking": "~58.0.16",
+    "expo-router": "~58.0.30",
+    "expo-splash-screen": "~58.0.13",
+    "expo-status-bar": "~58.0.4",
+    "expo-updates": "~58.0.21",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-screens": "~4.30.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "@types/node": "^22.20.5",
+    "@types/react": "~19.3.0",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~58.0.4",
+    "firebase": "13.1.0",
+    "firebase-tools": "^15.35.0",
+    "typescript": "~6.0.3",
+    "vitest": "^5.1.0"
+  }
+}

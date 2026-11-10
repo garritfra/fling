@@ -1,41 +1,91 @@
 rules_version = '2';
-service cloud.firestore {
-  match /databases/{db}/documents {
 
-    function signedIn() { return request.auth != null; }
+// Grundregel: Alles liegt unter households/{householdId}/. Zugriff hat, wer in memberUids steht.
+// Einzige haushaltsübergreifende Daten: invites/{code}.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function householdPath(hid) {
+      return /databases/$(database)/documents/households/$(hid);
+    }
 
     function isMember(hid) {
       return signedIn()
-        && exists(/databases/$(db)/documents/households/$(hid)/members/$(request.auth.uid));
+        && exists(householdPath(hid))
+        && request.auth.uid in get(householdPath(hid)).data.memberUids;
     }
 
-    // Users can read & write their own user doc (current Flutter behaviour).
-    match /users/{uid} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
+    function onlyChanges(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
     }
 
-    // Households + nested data: any household member can read & write.
-    // NOTE(phase-0): the create carve-outs below are deliberately loose to
-    // mirror today's client behaviour. The /members/{uid} rule lets ANY
-    // signed-in user add themselves to ANY household, not just brand-new
-    // ones. This is a known issue; Phase 2 replaces the carve-out with the
-    // first-class invite flow. See docs/superpowers/specs/2026-04-24-fling-rewrite-design.md §6.4.
+    // Beitritt: Ein Nicht-Mitglied darf nur seine eigene uid hinzufügen und muss dabei einen
+    // gültigen, noch unbenutzten Einladungscode für genau diesen Haushalt mitschreiben.
+    function isJoining(hid) {
+      let code = request.resource.data.inviteCode;
+      let invitePath = /databases/$(database)/documents/invites/$(code);
+      let invite = get(invitePath).data;
+      return signedIn()
+        && !(request.auth.uid in resource.data.memberUids)
+        && onlyChanges(['memberUids', 'inviteCode'])
+        && request.resource.data.memberUids.toSet() == resource.data.memberUids.toSet().union([request.auth.uid].toSet())
+        && request.resource.data.memberUids.size() == resource.data.memberUids.size() + 1
+        && code is string
+        && exists(invitePath)
+        && invite.householdId == hid
+        && invite.expiresAt > request.time
+        && !('usedAt' in invite);
+    }
+
+    // Mitglieder dürfen den Haushalt bearbeiten. memberUids darf sich dabei nur ändern,
+    // indem man sich selbst entfernt (Verlassen). Fremde hinzufügen geht nur per Einladung.
+    function isMemberUpdate() {
+      let before = resource.data.memberUids;
+      let after = request.resource.data.memberUids;
+      return signedIn()
+        && request.auth.uid in before
+        && (after == before
+            || (after.toSet() == before.toSet().difference([request.auth.uid].toSet())
+                && after.size() == before.size() - 1));
+    }
+
     match /households/{hid} {
-      allow read, write: if isMember(hid)
-                         || (signedIn() && request.method == 'create');
+      // Lesen über resource.data, damit die Abfrage "memberUids array-contains uid" erlaubt ist.
+      allow read: if signedIn() && request.auth.uid in resource.data.memberUids;
+      allow create: if signedIn()
+        && request.resource.data.memberUids == [request.auth.uid]
+        && request.resource.data.name is string
+        && request.resource.data.activeModules is list;
+      allow update: if isMemberUpdate() || isJoining(hid);
+      allow delete: if false;
 
-      match /members/{uid} {
-        allow read, write: if isMember(hid)
-                           || (signedIn() && request.auth.uid == uid && request.method == 'create');
-      }
-
-      match /lists/{lid}/{document=**} {
+      // Nur Unterkollektionen: {document=**} allein würde in Rules v2 auch den Haushalt selbst treffen.
+      match /{collection}/{document=**} {
         allow read, write: if isMember(hid);
       }
+    }
 
-      match /templates/{tid}/{document=**} {
-        allow read, write: if isMember(hid);
-      }
+    match /invites/{code} {
+      // Einzelabruf per Code ist erlaubt (zum Beitreten), Auflisten nicht.
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && isMember(request.resource.data.householdId)
+        && request.resource.data.expiresAt is timestamp
+        && request.resource.data.expiresAt > request.time
+        && request.resource.data.expiresAt < request.time + duration.value(24, 'h')
+        && !('usedAt' in request.resource.data);
+      // Beim Beitritt wird der Code im selben Batch als benutzt markiert.
+      allow update: if signedIn()
+        && onlyChanges(['usedAt'])
+        && !('usedAt' in resource.data)
+        && request.auth.uid in getAfter(householdPath(resource.data.householdId)).data.memberUids;
+      allow delete: if signedIn() && resource.data.createdBy == request.auth.uid;
     }
   }
 }
