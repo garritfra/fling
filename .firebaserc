@@ -1,6 +1,7 @@
 {
   "projects": {
     "default": "demo-fling",
+    "dev": "sunny-emblem-184106",
     "prod": "fling-list"
   }
 }

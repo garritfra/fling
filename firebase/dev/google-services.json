@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "153600597387",
+    "firebase_url": "https://sunny-emblem-184106.firebaseio.com",
+    "project_id": "sunny-emblem-184106",
+    "storage_bucket": "sunny-emblem-184106.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:153600597387:android:7e9dc13c375b9e6835238e",
+        "android_client_info": {
+          "package_name": "de.garritfra.fling.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "153600597387-ktu9gnoejkis14p9mom4bna37sllfarq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.garritfra.fling.dev",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "153600597387-6me7d6otsra5g0laqi15ae3hsfugqihe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmie7wGl5sjwNRLwl-2Ez-X7AHecDle9Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "153600597387-4sn2uqmj4j3mocirg5m0tm014s85succ.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
